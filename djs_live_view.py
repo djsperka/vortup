@@ -8,13 +8,13 @@ from PyQt5.QtWidgets import QApplication
 from vortex import Range, get_console_logger as get_logger
 from vortex.marker import Flags
 from vortex.scan import RasterScanConfig, RasterScan, RadialScanConfig, RadialScan, SpiralScanConfig, SpiralScan, limits
-from vortex.engine import EngineConfig, Engine, StackDeviceTensorEndpointInt8 as StackDeviceTensorEndpoint, RadialDeviceTensorEndpointInt8 as RadialDeviceTensorEndpoint, AscanSpiralDeviceTensorEndpointInt8 as AscanSpiralDeviceTensorEndpoint
-
+from vortex.engine import EngineConfig, Engine, source, StackDeviceTensorEndpointInt8 as StackDeviceTensorEndpoint, RadialDeviceTensorEndpointInt8 as RadialDeviceTensorEndpoint, AscanSpiralDeviceTensorEndpointInt8 as AscanSpiralDeviceTensorEndpoint
+from vortex.acquire import alazar
 from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, RadialFormatExecutorConfig, RadialFormatExecutor, SpiralFormatExecutorConfig, SpiralFormatExecutor, SimpleSlice
 
 from vortex_tools.ui.display import RasterEnFaceWidget, RadialEnFaceWidget, SpiralEnFaceWidget, CrossSectionImageWidget
 
-from myengine import setup_logging, StandardEngineParams, DEFAULT_ENGINE_PARAMS, BaseEngine
+from myengine import setup_logging, StandardEngineParams, BaseEngine
 
 class OCTEngine(BaseEngine):
     def __init__(self, cfg: StandardEngineParams, doIO = False, doStrobe = False):
@@ -268,8 +268,64 @@ class OCTEngine(BaseEngine):
 if __name__ == '__main__':
     setup_logging()
 
-    myEngineParameters = DEFAULT_ENGINE_PARAMS
-    myEngineParameters.log_level = 1
+    myEngineParams = StandardEngineParams(
+        scan_dimension=5,
+        bidirectional=False,
+        ascans_per_bscan=500,
+        bscans_per_volume=500,
+        galvo_delay=95e-6,
+        clock_samples_per_second=int(500e6),    # ATS 9350 max 500e6
+        blocks_to_acquire=0,                    # zero blocks to acquire means infinite acquisition
+        ascans_per_block=500,
+        samples_per_ascan=1376,                 # Axsun generates this many triggers each sweep
+        trigger_delay_seconds=0,
+        blocks_to_allocate=128,
+        preload_count=32,
+        swept_source=source.Axsun100k,
+        internal_clock=False,                   #I think this is ignored if using external clock
+        clock_channel=alazar.Channel.B,         #ignored if using external clock
+        input_channel=alazar.Channel.A,
+        process_slots=2,
+        dispersion=(2.8e-5, 0),
+        log_level=1,
+    )
 
     engine = OCTEngine(myEngineParameters, False, False)
     engine.run()
+
+
+
+""" DEFAULT_ENGINE_PARAMS = StandardEngineParams(
+    scan_dimension=5,
+    bidirectional=False,
+    ascans_per_bscan=500,
+    bscans_per_volume=500,
+    galvo_delay=95e-6,
+
+    # RuntimeError: failed to configure internal clock at 800000000 samples/s and decimation 0: (513) ApiFailed
+    # clock_samples_per_second=int(800e6),
+    clock_samples_per_second=int(500e6),    
+    # zero blocks to acquire means infinite acquisition
+    blocks_to_acquire=0,
+    ascans_per_block=500,
+#    samples_per_ascan=2752,
+    samples_per_ascan=1376
+    ,
+    trigger_delay_seconds=0,
+
+    blocks_to_allocate=128,
+    preload_count=32,
+
+    swept_source=source.Axsun100k,
+    internal_clock=False,
+    #I think this is ignored if using external clock
+    clock_channel=alazar.Channel.B,
+
+    input_channel=alazar.Channel.A,
+
+    process_slots=2,
+    dispersion=(2.8e-5, 0),
+
+    log_level=1,
+)
+ """
