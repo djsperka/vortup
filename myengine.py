@@ -35,8 +35,14 @@ class StandardEngineParams:
     # hardware configuration
     swept_source: Source
     internal_clock: bool
+    external_clock_level_pct: int
     clock_channel: alazar.Channel
     input_channel: alazar.Channel
+    input_channel_range_millivolts: int
+    doIO: bool
+    doStrobe: bool
+    trigger_range_millivolts: int
+    trigger_level_fraction: float
 
     # engine memory parameters
     blocks_to_allocate: int
@@ -78,43 +84,48 @@ class StandardEngineParams:
 # )
 
 DEFAULT_ENGINE_PARAMS = StandardEngineParams(
+    # scan parameters
     scan_dimension=5,
     bidirectional=False,
     ascans_per_bscan=500,
     bscans_per_volume=500,
     galvo_delay=95e-6,
 
-    # RuntimeError: failed to configure internal clock at 800000000 samples/s and decimation 0: (513) ApiFailed
-    # clock_samples_per_second=int(800e6),
-    clock_samples_per_second=int(500e6),    
-    # zero blocks to acquire means infinite acquisition
+    # acquisition parameters
+    clock_samples_per_second=int(500e6),    # ATS 9350
     blocks_to_acquire=0,
     ascans_per_block=500,
-#    samples_per_ascan=2752,
-    samples_per_ascan=1376
-    ,
+    samples_per_ascan=1376,     # Axsun 100k
     trigger_delay_seconds=0,
 
+    # These are probably rig-specific? Hasn't been an issue to use these. 
     blocks_to_allocate=128,
     preload_count=32,
 
+    # hardware configuration
     swept_source=source.Axsun100k,
     internal_clock=False,
-    #I think this is ignored if using external clock
-    clock_channel=alazar.Channel.B,
-
+    external_clock_level_pct=50,        # only relevant if internal_clock is False
+    clock_channel=alazar.Channel.B,     # only relevant if internal_clock is True
     input_channel=alazar.Channel.A,
+    input_channel_range_millivolts=1000,
+    doIO=False,
+    doStrobe=False,
+    trigger_range_millivolts=5000,
+    trigger_level_fraction=0.10,
 
-    process_slots=2,
-    dispersion=(2.8e-5, 0),
+    # engine memory parameters
+    process_slots=2,                    # I think this is for in-stream processing?
+    dispersion=(2.8e-5, 0),             # no idea
 
-    log_level=1,
+    # logging
+    log_level=1,                        # 1 is normal, 0 is debug-level
 )
 
 
 
 class BaseEngine:
-    def __init__(self, cfg: StandardEngineParams, doIO = False, doStrobe = False):
+    def __init__(self, cfg: StandardEngineParams):
 
         #
         # acquisition
@@ -123,18 +134,21 @@ class BaseEngine:
         # configure external clocking from an Alazar card
         # internal clock works for testing with 9350 (doesn't take 800*10**6)
         ac = AlazarConfig()
-        ac.clock = alazar.ExternalClock(level_ratio = 50, coupling=alazar.Coupling.AC, edge=alazar.ClockEdge.Rising, dual=False)
+
+        if cfg.internal_clock:
+            ac.clock = alazar.InternalClock(cfg.clock_samples_per_second)
+        else:
+            ac.clock = alazar.ExternalClock(level_ratio=cfg.external_clock_level_pct, coupling=alazar.Coupling.AC, edge=alazar.ClockEdge.Rising, dual=False)
+
         resampling = []
         board = alazar.Board(ac.device.system_index, ac.device.board_index)
         ac.samples_per_record = board.info.smallest_aligned_samples_per_record(cfg.swept_source.clock_rising_edges_per_trigger)
 
-        # ac.clock = alazar.InternalClock(500000000)
-
         # trigger with range - must be 5000 (2500 will err). TTL will work in config also. Discrepancy with docs
-        ac.trigger = alazar.SingleExternalTrigger(range_millivolts=5000, level_ratio = 0.10, delay_samples=0, slope=alazar.TriggerSlope.Negative)
+        ac.trigger = alazar.SingleExternalTrigger(range_millivolts=cfg.trigger_range_millivolts, level_ratio=cfg.trigger_level_fraction, delay_samples=0, slope=alazar.TriggerSlope.Negative)
 
         # only input channel A
-        input = alazar.Input(alazar.Channel.A, range_millivolts = 1000)
+        input = alazar.Input(alazar.Channel.A, cfg.input_channel_range_millivolts)
         ac.inputs.append(input)
 
         # pull in engine params
@@ -176,7 +190,7 @@ class BaseEngine:
         # galvo control
         #
 
-        if doIO:
+        if cfg.doIO:
             # output
             ioc_out = DAQmxConfig()
             ioc_out.samples_per_block = ac.records_per_block
@@ -195,12 +209,13 @@ class BaseEngine:
             ioc_out.channels.append(daqmx.AnalogVoltageOutput('Dev1/ao1', 15 / 10, stream, 1))
 
 
+
             io_out = DAQmxIO(get_logger(ioc_out.name, cfg.log_level))
             io_out.initialize(ioc_out)
             self._io_out = io_out
 
 
-        if doStrobe:
+        if cfg.doStrobe:
             sc.name = 'strobe'
             sc.channels.append(daqmx.DigitalOutput('Dev1/port0', Block.StreamIndex.Strobes))
             strobe = DAQmxIO(get_logger(sc.name, cfg.log_level))

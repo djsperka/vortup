@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QApplication
 
 from vortex import Range, get_console_logger as get_logger
 from vortex.marker import Flags
-from vortex.scan import RasterScanConfig, RasterScan, RadialScanConfig, RadialScan, SpiralScanConfig, SpiralScan, limits
+from vortex.scan import RasterScanConfig, RasterScan, RadialScanConfig, RadialScan, SpiralScanConfig, SpiralScan
 from vortex.engine import EngineConfig, Engine, source, StackDeviceTensorEndpointInt8 as StackDeviceTensorEndpoint, RadialDeviceTensorEndpointInt8 as RadialDeviceTensorEndpoint, AscanSpiralDeviceTensorEndpointInt8 as AscanSpiralDeviceTensorEndpoint
 from vortex.acquire import alazar
 from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, RadialFormatExecutorConfig, RadialFormatExecutor, SpiralFormatExecutorConfig, SpiralFormatExecutor, SimpleSlice
@@ -15,6 +15,18 @@ from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecuto
 from vortex_tools.ui.display import RasterEnFaceWidget, RadialEnFaceWidget, SpiralEnFaceWidget, CrossSectionImageWidget
 
 from myengine import setup_logging, StandardEngineParams, BaseEngine
+
+class OCTUI(QtGui.QMainWindow):
+    def __init__(self, engine):
+        super().__init__();
+        self.ui = Ui_Form()
+        self.ui.setupUi(self)
+
+# if __name__=='__main__':
+#     Program =  QtWidgets.QApplication(sys.argv)
+#     MyProg = Prog()
+#     MyProg.show()
+#     sys.exit(Program.exec_())
 
 class OCTEngine(BaseEngine):
     def __init__(self, cfg: StandardEngineParams):
@@ -155,7 +167,6 @@ class OCTEngine(BaseEngine):
         ec.preload_count = cfg.preload_count
         ec.records_per_block = cfg.ascans_per_block
         ec.blocks_to_allocate = cfg.blocks_to_allocate
-
         ec.blocks_to_acquire = cfg.blocks_to_acquire
 
     
@@ -166,40 +177,7 @@ class OCTEngine(BaseEngine):
         engine.prepare()
 
     def _handle_keypress(self, e):
-        if e.key() == Qt.Key.Key_1:
-            print('switch to raster scan')
-
-            # clear volume
-            with self._stack_tensor_endpoint.tensor as volume:
-                volume[:] = 0
-            # invalidate all B-scans
-            self._stack_widget.notify_segments(range(self._raster_scan.config.bscans_per_volume))
-
-            self._engine.scan_queue.interrupt(self._raster_scan)
-
-        elif e.key() == Qt.Key.Key_2:
-            print('switch to radial scan')
-
-            # clear volume
-            with self._radial_tensor_endpoint.tensor as volume:
-                volume[:] = 0
-            # invalidate all B-scans
-            self._radial_widget.notify_segments([0])
-
-            self._engine.scan_queue.interrupt(self._radial_scan)
-
-        elif e.key() == Qt.Key.Key_3:
-            print('switch to spiral scan')
-
-            # clear volume
-            with self._spiral_tensor_endpoint.tensor as volume:
-                volume[:] = 0
-            # invalidate all B-scans
-            self._spiral_widget.notify_segments([0])
-
-            self._engine.scan_queue.interrupt(self._spiral_scan)
-
-        elif e.key() == Qt.Key.Key_Q:
+        if e.key() == Qt.Key.Key_Q:
             self._engine.stop()
 
     def run(self):
@@ -214,33 +192,19 @@ class OCTEngine(BaseEngine):
         self._engine.scan_queue.append(self._raster_scan)
 
         self._stack_widget = RasterEnFaceWidget(self._stack_tensor_endpoint)
-        self._radial_widget = RadialEnFaceWidget(self._radial_tensor_endpoint)
-        self._spiral_widget = SpiralEnFaceWidget(self._spiral_tensor_endpoint)
         self._cross_widget = CrossSectionImageWidget(self._stack_tensor_endpoint)
 
         self._stack_tensor_endpoint.aggregate_segment_callback = self._stack_widget.notify_segments
-        self._radial_tensor_endpoint.aggregate_segment_callback = self._radial_widget.notify_segments
-        self._spiral_tensor_endpoint.update_callback = lambda: self._spiral_widget.notify_segments([0])
 
         def cb(v):
             self._stack_widget.notify_segments(v)
             self._cross_widget.notify_segments(v)
         self._stack_tensor_endpoint.aggregate_segment_callback = cb
-        def cb(v):
-            self._radial_widget.notify_segments(v)
-        self._radial_tensor_endpoint.aggregate_segment_callback = cb
-        def cb(v):
-            self._spiral_widget.notify_segments(v)
-        self._spiral_tensor_endpoint.aggregate_segment_callback = cb
 
         self._stack_widget.keyPressEvent = self._handle_keypress
-        self._radial_widget.keyPressEvent = self._handle_keypress
-        self._spiral_widget.keyPressEvent = self._handle_keypress
         self._cross_widget.keyPressEvent = self._handle_keypress
 
         self._stack_widget.show()
-        self._radial_widget.show()
-        self._spiral_widget.show()
         self._cross_widget.show()
 
         self._stack_widget.setWindowTitle('Raster Scan (Press 1)')
