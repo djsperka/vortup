@@ -3,7 +3,7 @@ import os
 from math import pi
 
 from PyQt5.QtCore import Qt, QEventLoop
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QDialog
 
 from vortex import Range, get_console_logger as get_logger
 from vortex.marker import Flags
@@ -14,19 +14,9 @@ from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecuto
 
 from vortex_tools.ui.display import RasterEnFaceWidget, RadialEnFaceWidget, SpiralEnFaceWidget, CrossSectionImageWidget
 
-from myengine import setup_logging, StandardEngineParams, BaseEngine
+from myengine import setup_logging, StandardEngineParams, BaseEngine, DEFAULT_ENGINE_PARAMS
 
-class OCTUI(QtGui.QMainWindow):
-    def __init__(self, engine):
-        super().__init__();
-        self.ui = Ui_Form()
-        self.ui.setupUi(self)
-
-# if __name__=='__main__':
-#     Program =  QtWidgets.QApplication(sys.argv)
-#     MyProg = Prog()
-#     MyProg.show()
-#     sys.exit(Program.exec_())
+from OCTDialog import Ui_OCTDialog
 
 class OCTEngine(BaseEngine):
     def __init__(self, cfg: StandardEngineParams):
@@ -233,45 +223,14 @@ class OCTEngine(BaseEngine):
 if __name__ == '__main__':
     setup_logging()
 
-    myEngineParams = StandardEngineParams(
-        # scan parameters
-        scan_dimension=5,
-        bidirectional=False,
-        ascans_per_bscan=500,
-        bscans_per_volume=500,
-        galvo_delay=95e-6,
-
-        # acquisition parameters
-        clock_samples_per_second=int(500e6),    # ATS 9350
-        blocks_to_acquire=0,
-        ascans_per_block=500,
-        samples_per_ascan=1376,     # Axsun 100k
-        trigger_delay_seconds=0,
-
-        # These are probably rig-specific? Hasn't been an issue to use these. 
-        blocks_to_allocate=128,
-        preload_count=32,
-
-        # hardware configuration
-        swept_source=source.Axsun100k,
-        internal_clock=False,
-        external_clock_level_pct=50,        # only relevant if internal_clock is False
-        clock_channel=alazar.Channel.B,     # only relevant if internal_clock is True
-        input_channel=alazar.Channel.A,
-        input_channel_range_millivolts=1000,
-        doIO=False,
-        doStrobe=False,
-        trigger_range_millivolts=5000,
-        trigger_level_fraction=0.10,
-
-        # engine memory parameters
-        process_slots=2,                    # I think this is for in-stream processing?
-        dispersion=(2.8e-5, 0),             # no idea
-
-        # logging
-        log_level=1,                        # 1 is normal, 0 is debug-level
-    )
-
+    # engine
+    myEngineParams = DEFAULT_ENGINE_PARAMS
     engine = OCTEngine(myEngineParams)
-    engine.run()
 
+    # gui
+    app = QApplication(sys.argv)
+    dlg = QDialog()
+    ui = Ui_OCTDialog()
+    ui.setupUi(dlg)
+    dlg.show()
+    sys.exit(app.exec_())
