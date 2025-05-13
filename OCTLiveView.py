@@ -4,6 +4,7 @@ from math import pi
 
 from PyQt5.QtCore import Qt, QEventLoop
 from PyQt5.QtWidgets import QApplication, QDialog
+from PyQt5 import uic
 
 from vortex import Range, get_console_logger as get_logger
 from vortex.marker import Flags
@@ -16,7 +17,6 @@ from vortex_tools.ui.display import RasterEnFaceWidget, RadialEnFaceWidget, Spir
 
 from myengine import setup_logging, StandardEngineParams, BaseEngine, DEFAULT_ENGINE_PARAMS
 
-from OCTDialog import Ui_OCTDialog
 
 class OCTEngine(BaseEngine):
     def __init__(self, cfg: StandardEngineParams):
@@ -41,39 +41,6 @@ class OCTEngine(BaseEngine):
         raster_scan.initialize(raster_sc)
         self._raster_scan = raster_scan
 
-        radial_sc = RadialScanConfig()
-        radial_sc.bscans_per_volume = cfg.bscans_per_volume
-        radial_sc.ascans_per_bscan = cfg.ascans_per_bscan
-        radial_sc.bscan_extent = Range(-cfg.scan_dimension, cfg.scan_dimension)
-        # set half_evenly_spaced sets the volume extent to [0, pi)
-        radial_sc.set_half_evenly_spaced(radial_sc.bscans_per_volume)
-        # adjust angle to that radial scan is same orientation as raster scan
-        radial_sc.angle = pi / 2
-        radial_sc.bidirectional_segments = cfg.bidirectional
-        radial_sc.bidirectional_volumes = cfg.bidirectional
-        radial_sc.samples_per_second = cfg.swept_source.triggers_per_second
-        radial_sc.loop = True
-        radial_sc.flags = Flags(0x2)
-
-        radial_scan = RadialScan()
-        radial_scan.initialize(radial_sc)
-        self._radial_scan = radial_scan
-
-        spiral_sc = SpiralScanConfig()
-        spiral_sc.volume_extent = Range(0, cfg.scan_dimension)
-        spiral_sc.rings_per_spiral = cfg.bscans_per_volume
-        spiral_sc.ascans_per_bscan = cfg.bscans_per_volume * cfg.ascans_per_bscan * 2
-        spiral_sc.linear_velocity = 0
-        spiral_sc.angular_velocity = 10
-        spiral_sc.angle = pi / 2
-        spiral_sc.samples_per_second = cfg.swept_source.triggers_per_second
-        spiral_sc.loop = True
-        spiral_sc.flags = Flags(0x4)
-
-        spiral_scan = SpiralScan()
-        spiral_scan.initialize(spiral_sc)
-        self._spiral_scan = spiral_scan
-
         #
         # output setup
         #
@@ -89,18 +56,6 @@ class OCTEngine(BaseEngine):
         stack_format.initialize(fc)
         self._stack_format = stack_format
 
-        fc.mask = radial_sc.flags
-        radial_format = FormatPlanner(get_logger('radial format', cfg.log_level))
-        radial_format.initialize(fc)
-        self._radial_format = radial_format
-
-        fc.mask = spiral_sc.flags
-        fc.segments_per_volume = 1
-        fc.records_per_segment = spiral_sc.samples_per_segment
-        spiral_format = FormatPlanner(get_logger('spiral format', cfg.log_level))
-        spiral_format.initialize(fc)
-        self._spiral_format = spiral_format
-
         # format executors
         cfec = StackFormatExecutorConfig()
         # only keep half of the spectrum
@@ -113,30 +68,6 @@ class OCTEngine(BaseEngine):
         stack_tensor_endpoint = StackDeviceTensorEndpoint(cfe, (raster_sc.bscans_per_volume, raster_sc.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
         self._stack_tensor_endpoint = stack_tensor_endpoint
 
-        rfec = RadialFormatExecutorConfig()
-        rfec.sample_slice = cfec.sample_slice
-        rfec.volume_xy_extent = [Range(cfg.scan_dimension, -cfg.scan_dimension), Range(-cfg.scan_dimension, cfg.scan_dimension)]
-        rfec.segment_rt_extent = (radial_sc.bscan_extent, radial_sc.volume_extent)
-        rfec.radial_segments_per_volume = radial_sc.bscans_per_volume
-        rfec.radial_records_per_segment = radial_sc.ascans_per_bscan
-
-        rfe = RadialFormatExecutor()
-        rfe.initialize(rfec)
-        radial_tensor_endpoint = RadialDeviceTensorEndpoint(rfe, (raster_sc.bscans_per_volume, raster_sc.ascans_per_bscan, samples_to_save), get_logger('radial', cfg.log_level))
-        self._radial_tensor_endpoint = radial_tensor_endpoint
-
-        sfec = SpiralFormatExecutorConfig()
-        sfec.sample_slice = cfec.sample_slice
-        sfec.volume_xy_extent = [Range(cfg.scan_dimension, -cfg.scan_dimension), Range(-cfg.scan_dimension, cfg.scan_dimension)]
-        sfec.radial_extent = spiral_sc.volume_extent
-        sfec.rings_per_spiral = spiral_sc.rings_per_spiral
-        sfec.samples_per_spiral = spiral_sc.samples_per_segment
-        sfec.spiral_velocity = spiral_sc.angular_velocity
-
-        sfe = SpiralFormatExecutor()
-        sfe.initialize(sfec)
-        spiral_tensor_endpoint = AscanSpiralDeviceTensorEndpoint(sfe, (raster_sc.bscans_per_volume, raster_sc.ascans_per_bscan, samples_to_save), get_logger('spiral', cfg.log_level))
-        self._spiral_tensor_endpoint = spiral_tensor_endpoint
 
         #
         # engine setup
@@ -144,10 +75,8 @@ class OCTEngine(BaseEngine):
 
         ec = EngineConfig()
         ec.add_acquisition(self._acquire, [self._process])
-        ec.add_processor(self._process, [stack_format, radial_format, spiral_format])
+        ec.add_processor(self._process, [stack_format])
         ec.add_formatter(stack_format, [stack_tensor_endpoint])
-        ec.add_formatter(radial_format, [radial_tensor_endpoint])
-        ec.add_formatter(spiral_format, [spiral_tensor_endpoint])
         if cfg.doIO:
             ec.add_io(self._io_out, lead_samples=round(cfg.galvo_delay * self._io_out.config.samples_per_second))
             ec.galvo_output_channels = len(self._io_out.config.channels)
@@ -170,55 +99,65 @@ class OCTEngine(BaseEngine):
         if e.key() == Qt.Key.Key_Q:
             self._engine.stop()
 
+    def stop(self):
+        self._engine.stop()
+
     def run(self):
-        app = QApplication(sys.argv)
+        cpcfg = self._process.config
+        print("CUDA config:\naverage_window: {0}\nresampling_samples: {1}\nenable_ifft: {2}\n".format(cpcfg.average_window, cpcfg.resampling_samples, cpcfg.enable_ifft))
 
-        import traceback
-        def handler(cls, ex, trace):
-            traceback.print_exception(cls, ex, trace)
-            app.closeAllWindows()
-        sys.excepthook = handler
-
+        # add scan pattern
         self._engine.scan_queue.append(self._raster_scan)
-
-        self._stack_widget = RasterEnFaceWidget(self._stack_tensor_endpoint)
-        self._cross_widget = CrossSectionImageWidget(self._stack_tensor_endpoint)
-
-        self._stack_tensor_endpoint.aggregate_segment_callback = self._stack_widget.notify_segments
-
-        def cb(v):
-            self._stack_widget.notify_segments(v)
-            self._cross_widget.notify_segments(v)
-        self._stack_tensor_endpoint.aggregate_segment_callback = cb
-
-        self._stack_widget.keyPressEvent = self._handle_keypress
-        self._cross_widget.keyPressEvent = self._handle_keypress
-
-        self._stack_widget.show()
-        self._cross_widget.show()
-
-        self._stack_widget.setWindowTitle('Raster Scan (Press 1)')
-        self._radial_widget.setWindowTitle('Radial Scan (Press 2)')
-        self._spiral_widget.setWindowTitle('Spiral Scan (Press 3)')
-
         self._engine.start()
 
-        try:
-            while (self._stack_widget.isVisible() or self._radial_widget.isVisible() or self._spiral_widget.isVisible()) and self._cross_widget.isVisible():
-                if self._engine.wait_for(0.01):
-                    break
+        # app = QApplication(sys.argv)
 
-                self._stack_widget.update()
-                self._radial_widget.update()
-                self._spiral_widget.update()
-                self._cross_widget.update()
+        # import traceback
+        # def handler(cls, ex, trace):
+        #     traceback.print_exception(cls, ex, trace)
+        #     app.closeAllWindows()
+        # sys.excepthook = handler
 
-                app.processEvents(QEventLoop.AllEvents, 10)
+        # self._engine.scan_queue.append(self._raster_scan)
 
-        except KeyboardInterrupt:
-            pass
-        finally:
-            self._engine.stop()
+        # self._stack_widget = RasterEnFaceWidget(self._stack_tensor_endpoint)
+        # self._cross_widget = CrossSectionImageWidget(self._stack_tensor_endpoint)
+
+        # self._stack_tensor_endpoint.aggregate_segment_callback = self._stack_widget.notify_segments
+
+        # def cb(v):
+        #     self._stack_widget.notify_segments(v)
+        #     self._cross_widget.notify_segments(v)
+        # self._stack_tensor_endpoint.aggregate_segment_callback = cb
+
+        # self._stack_widget.keyPressEvent = self._handle_keypress
+        # self._cross_widget.keyPressEvent = self._handle_keypress
+
+        # self._stack_widget.show()
+        # self._cross_widget.show()
+
+        # self._stack_widget.setWindowTitle('Raster Scan (Press 1)')
+        # self._radial_widget.setWindowTitle('Radial Scan (Press 2)')
+        # self._spiral_widget.setWindowTitle('Spiral Scan (Press 3)')
+
+        # self._engine.start()
+
+        # try:
+        #     while (self._stack_widget.isVisible() or self._radial_widget.isVisible() or self._spiral_widget.isVisible()) and self._cross_widget.isVisible():
+        #         if self._engine.wait_for(0.01):
+        #             break
+
+        #         self._stack_widget.update()
+        #         self._radial_widget.update()
+        #         self._spiral_widget.update()
+        #         self._cross_widget.update()
+
+        #         app.processEvents(QEventLoop.AllEvents, 10)
+
+        # except KeyboardInterrupt:
+        #     pass
+        # finally:
+        #     self._engine.stop()
 
 if __name__ == '__main__':
     setup_logging()
@@ -227,10 +166,53 @@ if __name__ == '__main__':
     myEngineParams = DEFAULT_ENGINE_PARAMS
     engine = OCTEngine(myEngineParams)
 
-    # gui
+    # gui and exception handler
     app = QApplication(sys.argv)
-    dlg = QDialog()
-    ui = Ui_OCTDialog()
-    ui.setupUi(dlg)
-    dlg.show()
+
+    import traceback
+    def handler(cls, ex, trace):
+        traceback.print_exception(cls, ex, trace)
+        app.closeAllWindows()
+    sys.excepthook = handler
+
+
+
+    class Ui(QDialog):
+        def __init__(self):
+            super(Ui, self).__init__() # Call the inherited classes __init__ method
+            uic.loadUi('OCTDialog.ui', self) # Load the .ui file
+
+    # Now create dialog and configure it with engine
+    ui = Ui()
+    
+
+    # set up plots
+    stack_widget = RasterEnFaceWidget(engine._stack_tensor_endpoint)
+    ui.tabWidgetPlots.addTab(stack_widget, "Raster")
+    cross_widget = CrossSectionImageWidget(engine._stack_tensor_endpoint)
+    ui.tabWidgetPlots.addTab(cross_widget, "cross")
+
+    # argument (v) here is a number - index pointing to a segment in allocated segments.
+    def cb(v):
+        stack_widget.notify_segments(v)
+        cross_widget.notify_segments(v)
+    engine._stack_tensor_endpoint.aggregate_segment_callback = cb
+
+    # set start button callback to start engine
+    # set stop button callback to stop it
+    def startClicked():
+        engine.run()
+    
+    def stopClicked():
+        engine.stop()
+
+    def statusClicked():
+        s = engine._engine.status()
+        print(s)
+
+    ui.pbStart.clicked.connect(startClicked)
+    ui.pbStop.clicked.connect(stopClicked)
+    ui.pbStatus.clicked.connect(statusClicked)
+
+    ui.show()
     sys.exit(app.exec_())

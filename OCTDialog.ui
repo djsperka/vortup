@@ -30,6 +30,13 @@
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="pbStatus">
+       <property name="text">
+        <string>Engine Status</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pbStart">
        <property name="text">
         <string>Start</string>
@@ -46,12 +53,9 @@
     </layout>
    </item>
    <item>
-    <widget class="QFrame" name="framePlotMain">
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
+    <widget class="QTabWidget" name="tabWidgetPlots">
+     <property name="currentIndex">
+      <number>-1</number>
      </property>
     </widget>
    </item>
