@@ -2,7 +2,7 @@ import sys
 import os
 from math import pi
 
-from PyQt5.QtCore import Qt, QEventLoop
+from PyQt5.QtCore import Qt, QEventLoop, QTimer
 from PyQt5.QtWidgets import QApplication, QDialog
 from PyQt5 import uic
 
@@ -206,13 +206,19 @@ if __name__ == '__main__':
     def stopClicked():
         engine.stop()
 
-    def statusClicked():
+    def statusTimerCallback():
         s = engine._engine.status()
-        print(s)
+        if s.active:
+            str = "Status: active, dispatched/in-flight {0:5d}/{1:5d}/{2:.2f}/{3:.2f}".format(s.dispatched_blocks, s.inflight_blocks, s.dispatch_completion, s.block_utilization)
+        else:
+            str = "Status: idle"
+        ui.labelStatus.setText(str)
 
+    timer = QTimer(ui)
+    timer.timeout.connect(statusTimerCallback)
     ui.pbStart.clicked.connect(startClicked)
     ui.pbStop.clicked.connect(stopClicked)
-    ui.pbStatus.clicked.connect(statusClicked)
 
     ui.show()
+    timer.start(1000)
     sys.exit(app.exec_())
