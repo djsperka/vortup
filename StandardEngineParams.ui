@@ -1,36 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>StandardEngineParamsDialog</class>
+ <widget class="QDialog" name="StandardEngineParamsDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>790</height>
+    <width>625</width>
+    <height>705</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
           <string>Scan Parameters</string>
          </property>
          <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBoxScanDimension">
-            <property name="decimals">
-             <number>0</number>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_3">
             <property name="text">
@@ -44,12 +37,6 @@
              <string/>
             </property>
            </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QSpinBox" name="spinBoxBscansPerVolume"/>
-          </item>
-          <item row="2" column="1">
-           <widget class="QSpinBox" name="spinBoxAscansPerBscan"/>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="label_4">
@@ -72,15 +59,24 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBoxGalvoDelay"/>
-          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label">
             <property name="text">
              <string>scan dimension</string>
             </property>
            </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="lineEditGalvoDelay"/>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="lineEditAscansPerBscan"/>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEditScanDimension"/>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="lineEditBscansPerVolume"/>
           </item>
          </layout>
         </widget>
@@ -99,7 +95,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QSpinBox" name="spinBoxBlocksToAcquire"/>
+           <widget class="QLineEdit" name="lineEditBlocksToAcquire"/>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_7">
@@ -109,7 +105,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QSpinBox" name="spinBoxAscansPerBlock"/>
+           <widget class="QLineEdit" name="lineEditAscansPerBlock"/>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_8">
@@ -119,7 +115,7 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QSpinBox" name="spinBoxSamplesPerAscan"/>
+           <widget class="QLineEdit" name="lineEditSamplesPerAscan"/>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="label_9">
@@ -129,7 +125,76 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBoxTriggerDelay"/>
+           <widget class="QLineEdit" name="lineEditTriggerDelay"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_5">
+         <property name="title">
+          <string>Memory/processing</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout_5">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_23">
+            <property name="text">
+             <string>blocks to allocate</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEditBlocksToAllocate"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_24">
+            <property name="text">
+             <string>preload count</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="lineEditPreloadCount"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_25">
+            <property name="text">
+             <string>process slots</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="lineEditProcessSlots"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_26">
+            <property name="text">
+             <string>dispersion[0]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="lineEditDispersion0"/>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="lineEditDispersion1"/>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_27">
+            <property name="text">
+             <string>dispersion[1]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_28">
+            <property name="text">
+             <string>log level</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLineEdit" name="lineEditLogLevel"/>
           </item>
          </layout>
         </widget>
@@ -157,6 +222,9 @@
                  <property name="text">
                   <string>Axsun 100k</string>
                  </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">buttonGroupSource</string>
+                 </attribute>
                 </widget>
                </item>
                <item row="1" column="1">
@@ -164,6 +232,9 @@
                  <property name="text">
                   <string>Custom</string>
                  </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">buttonGroupSource</string>
+                 </attribute>
                 </widget>
                </item>
                <item row="0" column="1">
@@ -171,6 +242,9 @@
                  <property name="text">
                   <string>Thorlabs VCSEL 400k</string>
                  </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">buttonGroupSource</string>
+                 </attribute>
                 </widget>
                </item>
                <item row="1" column="0">
@@ -178,6 +252,9 @@
                  <property name="text">
                   <string>Axsun 200k</string>
                  </property>
+                 <attribute name="buttonGroup">
+                  <string notr="true">buttonGroupSource</string>
+                 </attribute>
                 </widget>
                </item>
               </layout>
@@ -191,18 +268,12 @@
                  </property>
                 </widget>
                </item>
-               <item row="0" column="1">
-                <widget class="QSpinBox" name="spinBoxTriggersPerSecond"/>
-               </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="label_11">
                  <property name="text">
                   <string>clock rising edge/trigger</string>
                  </property>
                 </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QSpinBox" name="spinBoxClockRisingEdgesPerTrigger"/>
                </item>
                <item row="2" column="0">
                 <widget class="QLabel" name="label_12">
@@ -211,9 +282,6 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="1">
-                <widget class="QDoubleSpinBox" name="doubleSpinBoxDutyCycle"/>
-               </item>
                <item row="3" column="0">
                 <widget class="QLabel" name="label_13">
                  <property name="text">
@@ -221,8 +289,17 @@
                  </property>
                 </widget>
                </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="lineEditTriggersPerSecond"/>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="lineEditClockRisingEdgesPerTrigger"/>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLineEdit" name="lineEditDutyCycle"/>
+               </item>
                <item row="3" column="1">
-                <widget class="QDoubleSpinBox" name="doubleSpinBoxImagingDepth"/>
+                <widget class="QLineEdit" name="lineEditImagingDepth"/>
                </item>
               </layout>
              </item>
@@ -252,18 +329,12 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="1">
-             <widget class="QSpinBox" name="spinBoxInternalClockRate"/>
-            </item>
             <item row="2" column="0">
              <widget class="QLabel" name="label_16">
               <property name="text">
                <string>ext clock level %</string>
               </property>
              </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QDoubleSpinBox" name="doubleSpinBoxExternalClockLevelPct"/>
             </item>
             <item row="3" column="0">
              <widget class="QLabel" name="label_17">
@@ -320,9 +391,6 @@
               </property>
              </widget>
             </item>
-            <item row="7" column="1">
-             <widget class="QSpinBox" name="spinBoxTriggerRange"/>
-            </item>
             <item row="8" column="0">
              <widget class="QLabel" name="label_22">
               <property name="text">
@@ -330,8 +398,17 @@
               </property>
              </widget>
             </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="lineEditInternalClockRate"/>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLineEdit" name="lineEditExternalClockLevelPct"/>
+            </item>
+            <item row="7" column="1">
+             <widget class="QLineEdit" name="lineEditTriggerRange"/>
+            </item>
             <item row="8" column="1">
-             <widget class="QDoubleSpinBox" name="doubleSpinBoxTriggerLevelFraction"/>
+             <widget class="QLineEdit" name="lineEditTriggerLevelFraction"/>
             </item>
            </layout>
           </item>
@@ -343,59 +420,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_5">
-     <property name="title">
-      <string>Memory/processing</string>
-     </property>
-     <layout class="QFormLayout" name="formLayout_5">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_23">
-        <property name="text">
-         <string>blocks to allocate</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QSpinBox" name="spinBoxBlocksToAllocate"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_24">
-        <property name="text">
-         <string>preload count</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QSpinBox" name="spinBoxPreloadCount"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_25">
-        <property name="text">
-         <string>process slots</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QSpinBox" name="spinBoxProcessSlots"/>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_26">
-        <property name="text">
-         <string>dispersion</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QDoubleSpinBox" name="doubleSpinBoxDispersion0"/>
-      </item>
-      <item row="4" column="1">
-       <widget class="QDoubleSpinBox" name="doubleSpinBoxDispersion1"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
+    <widget class="QDialogButtonBox" name="buttonBoxMain">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -407,38 +432,8 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>Dialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>Dialog</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroupSource"/>
+ </buttongroups>
 </ui>
