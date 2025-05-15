@@ -92,7 +92,6 @@ DEFAULT_ENGINE_PARAMS = StandardEngineParams(
     galvo_delay=95e-6,
 
     # acquisition parameters
-    clock_samples_per_second=int(500e6),    # ATS 9350
     blocks_to_acquire=0,
     ascans_per_block=500,
     samples_per_ascan=1376,     # Axsun 100k
@@ -105,6 +104,7 @@ DEFAULT_ENGINE_PARAMS = StandardEngineParams(
     # hardware configuration
     swept_source=source.Axsun100k,
     internal_clock=False,
+    clock_samples_per_second=int(500e6),    # ATS 9350 - applies to internal clock only
     external_clock_level_pct=50,        # only relevant if internal_clock is False
     clock_channel=alazar.Channel.B,     # only relevant if internal_clock is True
     input_channel=alazar.Channel.A,
