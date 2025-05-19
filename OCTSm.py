@@ -6,19 +6,23 @@ from StandardEngineParamsDialog import StandardEngineParamsDialog
 
 import sys
 
+f_cfg = DEFAULT_ENGINE_PARAMS
+
 def enteredConfig():
     print("entered config")
     dlg = StandardEngineParamsDialog(f_cfg)
     value = dlg.exec()
     if value==1:
         # user hit OK
+        f_cfg = dlg.getEngineParameters()
+        print("got cfg from dlg")
     else:
         # user hit CANCEL
+        print("UJser hit cancel")
     print("entered config - done " + str(value))
 
 
 
-f_cfg = DEFAULT_ENGINE_PARAMS
 
 app = QApplication(sys.argv)
 
