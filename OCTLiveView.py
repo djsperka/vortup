@@ -14,6 +14,7 @@ from vortex_tools.ui.display import RasterEnFaceWidget, RadialEnFaceWidget, Spir
 
 from myengine import setup_logging, StandardEngineParams, BaseEngine, DEFAULT_ENGINE_PARAMS
 from OCTUi import OCTUi
+from OCTEngine import OCTEngine
 
 import StandardEngineParamsDialog
 
