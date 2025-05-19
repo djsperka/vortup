@@ -7,7 +7,16 @@ from myengine import StandardEngineParams, DEFAULT_ENGINE_PARAMS
 from vortex.engine import source, Source
 
 class StandardEngineParamsDialog(QDialog):
-    def __init__(self, cfg: StandardEngineParams):
+    """Dialog for setting StandardEngineParameters.     
+
+    """
+    def __init__(self, cfg: StandardEngineParams=DEFAULT_ENGINE_PARAMS):
+        """Instantiate dialog for editing params in cfg.
+
+        Args:
+            cfg (StandardEngineParams, optional): Configuration to edit. Defaults to DEFAULT_ENGINE_PARAMS.
+
+        """
         super().__init__()
         self.setWindowTitle("OCT Engine Parameters")
         uic.loadUi("StandardEngineParams.ui", self)
