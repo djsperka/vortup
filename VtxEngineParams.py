@@ -2,11 +2,17 @@ from vortex.acquire import alazar
 from vortex.engine import source, Source
 from typing import Tuple
 from dataclasses import dataclass
-
+from enum import Enum
 #from vortex.engine import Source
+
+class AcquisitionType(Enum):
+    ALAZAR_ACQUISITION = 1
+    FILE_ACQUISITION= 2
 
 @dataclass
 class VtxEngineParams:
+    # acquisition type
+    acquisition_type: AcquisitionType
 
     # scan parameters
     scan_dimension: float
@@ -46,6 +52,9 @@ class VtxEngineParams:
     log_level: int
 
 DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
+
+    acquisition_type=AcquisitionType.ALAZAR_ACQUISITION,
+
     # scan parameters
     scan_dimension=5,
     bidirectional=False,

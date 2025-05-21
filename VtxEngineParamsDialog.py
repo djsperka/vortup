@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtWidgets import QDialog, QApplication
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5 import uic
-from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS
+from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, AcquisitionType
 from Ui_VtxEngineParamsDialog import Ui_VtxEngineParamsDialog
 from vortex.engine import source, Source
 
@@ -129,6 +129,11 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         
     def initializeDialog(self, cfg):
         self._cfg = cfg
+        if self._cfg.acquisition_type==AcquisitionType.ALAZAR_ACQUISITION:
+            self.radioButtonAlazarAcquisition.setChecked(True)
+        elif self._cfg.acquisition_type==AcquisitionType.FILE_ACQUISITION:
+            self.radioButtonFileAcquisition.setChecked(True)
+
         self.lineEditScanDimension.setText(str(cfg.scan_dimension))
         self.checkBoxBidirectional.setChecked(cfg.bidirectional)
         self.lineEditAscansPerBscan.setText(str(cfg.ascans_per_bscan))
@@ -162,6 +167,11 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
 
     def getEngineParameters(self) -> VtxEngineParams:
         s = DEFAULT_VTX_ENGINE_PARAMS   # TODO: would be nice to have an empty obj
+        if self.radioButtonAlazarAcquisition.isChecked():
+            s.acquisition_type = AcquisitionType.ALAZAR_ACQUISITION
+        elif self.radioButtonFileAcquisition.isChecked():
+            s.acquisition_type = AcquisitionType.FILE_ACQUISITION
+
         s.scan_dimension = float(self.lineEditScanDimension.text())
         s.bidirectional = self.checkBoxBidirectional.isChecked()
         s.ascans_per_bscan = int(self.lineEditAscansPerBscan.text())
