@@ -1,80 +1,65 @@
-from PyQt5.QtWidgets import QDialog
-from PyQt5 import uic
-from PyQt5.QtCore import QState, QFinalState, QStateMachine, QEvent, QEventTransition, QSignalTransition, pyqtSignal
-from myengine import DEFAULT_ENGINE_PARAMS, StandardEngineParams
-from StandardEngineParamsDialog import StandardEngineParamsDialog
+import sys
+from VtxEngineParams import DEFAULT_VTX_ENGINE_PARAMS, VtxEngineParams
+from VtxEngineParamsDialog import VtxEngineParamsDialog
+from VtxEngine import VtxEngine
+from OCTDialog import OCTDialog
+from PyQt5.QtWidgets import QApplication
 
-class OCTUi(QDialog):
-    """Wrapper class around designer-generated user interface. 
-    
-    The user interface file is created and updated using designer, which 
-    is found somewhere in the qt5-tools package in your python installation
-    (find site-packages inside your venv, as a starting point). The whole thing
-    is done here (instead of inside the application file itself) to suppress a
-    deprecation warning that comes up:
+import logging
+from rainbow_logging_handler import RainbowLoggingHandler
 
-    sipPyTypeDict() is deprecated, the extension module should use sipPyTypeDictRef() instead
 
-    I'm not sure what that means, but by moving the loading process (uic.loadUi) to a separate 
-    file, it goes away. 
-
-    Args:
-        QDialog (_type_): Parent dialog that the UI is placed inside of
-    """    
+class OCTUi():
     
     def __init__(self):
         super().__init__() # Call the inherited class' __init__ method
-        self._cfg = DEFAULT_ENGINE_PARAMS
-        self._cfgDialog = None
 
-        uic.loadUi('OCTDialog.ui', self) # Load the .ui file
-        self._machine = self.setupStateMachine()
-        self._machine.start()
-        self.show()
+        #self._app = QApplication(sys.argv)
+        self._cfg = DEFAULT_VTX_ENGINE_PARAMS
+        self.showParamsDialog()
 
-    def acceptedStandardEngineParams(self):
-        self._cfg = self._cfgDialog.getEngineParameters()
-        # initiate a transition to Ready
-        self._readySignal.emit()
-
-    def enteredStateReady(self):
-        print("Entered state ready")
-
-    def enteredStateConfig(self):
-        print("entered state config")
-        self._cfgDialog = StandardEngineParamsDialog(self._cfg)
-        self._cfgDialog.accepted.connect(self.acceptedStandardEngineParams)
-        self._cfgDialog.rejected.connect(self.rejectedStandardEngineParams)
+    def showParamsDialog(self):
+        self._cfgDialog = VtxEngineParamsDialog(self._cfg)
+        self._cfgDialog.finished.connect(self.cfgFinished)
         self._cfgDialog.show()
 
-    def setupStateMachine(self) -> QStateMachine: 
-        machine = QStateMachine(self)
-        self._stateConfig = QState()
-        self._stateDone = QFinalState()
-        self._stateReady = QState()
-        stateDone = QFinalState()
-        machine.addState(self._stateConfig)
-        machine.addState(self._stateReady)
-        machine.setInitialState(self._stateConfig)
-        self._stateConfig.entered.connect(self.enteredStateConfig)
-        self._stateReady.entered.connect(self.enteredStateReady)
+    def cfgFinished(self, v):
 
-        self._readySignal = pyqtSignal(name="ready")
-        self._cancelSignal = pyqtSignal(name="cancel")
-        self._stateConfig.addTransition(self._readySignal, self._stateReady)
-        self._stateConfig.addTransition()
+        self._octDialog = OCTDialog()
+        self._octDialog.show()
+        # if v == 1:
+        #     self._cfg = self._cfgDialog.getEngineParameters()
+        #     try:
+        #         # get oct engine ready
+        #         self._engine = VtxEngine(self._cfg)
+        #     except RuntimeError as e:
+        #         print("RuntimeError:")
+        #         print(e)
+        #         self.showParamsDialog()
+        #     else:    
+        #         self._octDialog = OCTDialog()
+        #         self._octDialog.show()
+        # else:
+        #     sys.exit()
 
 
-        return machine
+def setup_logging():
+    # configure the root logger to accept all records
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.NOTSET)
+    logging.getLogger("matplotlib").setLevel(logging.WARNING)
 
-    class _ReadyEvent(QEvent):
-        EventType = QEvent.User + 1  # Custom event type
-        def __init__(self, data=None):
-            super().__init__(_ReadyEvent.EventType)
-            self.data = data
+    formatter = logging.Formatter('%(asctime)s.%(msecs)03d [%(name)s] %(filename)s:%(lineno)d\t%(levelname)s:\t%(message)s')
 
-    class _CancelEvent(QEvent):
-        EventType = QEvent.User + 2  # Custom event type
-        def __init__(self, data=None):
-            super().__init__(_CancelEvent.EventType)
-            self.data = data
+    # set up colored logging to console
+    console_handler = RainbowLoggingHandler(sys.stderr)
+    console_handler.setFormatter(formatter)
+    root_logger.addHandler(console_handler)
+
+
+
+if __name__ == '__main__':
+    setup_logging()
+    app = QApplication(sys.argv)
+    octui = OCTUi()
+    app.exec_()
