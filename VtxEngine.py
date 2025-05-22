@@ -32,7 +32,7 @@ class VtxEngine():
             ac.samples_per_record = board.info.smallest_aligned_samples_per_record(cfg.swept_source.clock_rising_edges_per_trigger)
 
             # trigger with range - must be 5000 (2500 will err). TTL will work in config also. Discrepancy with docs
-            ac.trigger = alazar.SingleExternalTrigger(range_millivolts=cfg.trigger_range_millivolts, level_ratio=cfg.trigger_level_fraction, delay_samples=0, slope=alazar.TriggerSlope.Negative)
+            ac.trigger = alazar.SingleExternalTrigger(range_millivolts=cfg.trigger_range_millivolts, level_ratio=cfg.trigger_level_fraction, delay_samples=0, slope=alazar.TriggerSlope.Positive)
 
             # only input channel A
             input = alazar.Input(alazar.Channel.A, cfg.input_channel_range_millivolts)
@@ -157,8 +157,7 @@ class VtxEngine():
             ioc_out.samples_per_second = cfg.swept_source.triggers_per_second
             ioc_out.blocks_to_buffer = cfg.preload_count
             
-            # djs - use PFI12 instead of PFI0
-            ioc_out.clock.source = "pfi12"
+            ioc_out.clock.source = "pfi0"
 
             sc = ioc_out.copy()
 
@@ -194,6 +193,7 @@ class VtxEngine():
         if cfg.doIO:
             ec.add_io(self._io_out, lead_samples=round(cfg.galvo_delay * self._io_out.config.samples_per_second))
             ec.galvo_output_channels = len(self._io_out.config.channels)
+            print("there are {0:d} galvo channels".format(ec.galvo_output_channels))
         if cfg.doStrobe:
             ec.add_io(self._strobe)
 

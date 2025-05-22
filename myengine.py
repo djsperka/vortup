@@ -198,7 +198,7 @@ class BaseEngine:
             ioc_out.blocks_to_buffer = cfg.preload_count
             
             # djs - use PFI12 instead of PFI0
-            ioc_out.clock.source = "pfi12"
+            ioc_out.clock.source = "pfi0"
 
             sc = ioc_out.copy()
 

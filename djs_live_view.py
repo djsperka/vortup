@@ -295,7 +295,7 @@ if __name__ == '__main__':
         clock_channel=alazar.Channel.B,     # only relevant if internal_clock is True
         input_channel=alazar.Channel.A,
         input_channel_range_millivolts=1000,
-        doIO=False,
+        doIO=True,
         doStrobe=False,
         trigger_range_millivolts=5000,
         trigger_level_fraction=0.10,
