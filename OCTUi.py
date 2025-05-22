@@ -29,7 +29,7 @@ class OCTUi():
             self._cfg = self._cfgDialog.getEngineParameters()
             try:
                 # get oct engine ready
-                self._engine = VtxEngine(self._cfg)
+                self._vtxengine = VtxEngine(self._cfg)
 
             except RuntimeError as e:
                 print("RuntimeError:")
@@ -39,19 +39,7 @@ class OCTUi():
                 self._octDialog = OCTDialog()
                 self._octDialog.pbStart.clicked.connect(self.startClicked)
                 self._octDialog.pbStop.clicked.connect(self.stopClicked)
-                self._octDialog.pbStart.enabled = False
-                
-                # set up plots
-                stack_widget = RasterEnFaceWidget(self._engine._stack_tensor_endpoint)
-                self._octDialog.tabWidgetPlots.addTab(stack_widget, "Raster")
-                cross_widget = CrossSectionImageWidget(self._engine._stack_tensor_endpoint)
-                self._octDialog.tabWidgetPlots.addTab(cross_widget, "cross")
-
-                # argument (v) here is a number - index pointing to a segment in allocated segments.
-                def cb(v):
-                    stack_widget.notify_segments(v)
-                    cross_widget.notify_segments(v)
-                self._engine._stack_tensor_endpoint.aggregate_segment_callback = cb
+                self._octDialog.pbStart.enabled = False                
                 self._octDialog.show()
         else:
             sys.exit()
@@ -60,13 +48,33 @@ class OCTUi():
         print("startClicked")
         self._octDialog.pbStart.enabled = False
         self._octDialog.pbStop.enabled = True
-        self._engine.start()
+
+        # set up plots
+        # We need access to both the engine (the endpoints) and the gui (display widgets). 
+        # Choosing to handle this here instead of in constructor.
+        stack_widget = RasterEnFaceWidget(self._vtxengine._stack_tensor_endpoint)
+        self._octDialog.tabWidgetPlots.addTab(stack_widget, "Raster")
+        cross_widget = CrossSectionImageWidget(self._vtxengine._stack_tensor_endpoint)
+        self._octDialog.tabWidgetPlots.addTab(cross_widget, "cross")
+
+        # argument (v) here is a number - index pointing to a segment in allocated segments.
+        def cb(v):
+            stack_widget.notify_segments(v)
+            cross_widget.notify_segments(v)
+        self._vtxengine._stack_tensor_endpoint.aggregate_segment_callback = cb
+
+
+        # put something into the scan queue
+        self._vtxengine._engine.scan_queue.append(self._vtxengine._raster_scan)
+
+        # now start the actual engine
+        self._vtxengine._engine.start()
 
     def stopClicked(self):
         print("stopClicked")
         self._octDialog.pbStart.enabled = True
         self._octDialog.pbStop.enabled = False
-        self._engine.stop()
+        self._vtxengine._engine.stop()
 
 
 

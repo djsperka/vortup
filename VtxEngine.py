@@ -9,9 +9,8 @@ from vortex.scan import RasterScanConfig, RasterScan
 from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, SimpleSlice
 import numpy as np
 
-class VtxEngine(Engine):
+class VtxEngine():
     def __init__(self, cfg: VtxEngineParams):
-        super().__init__(get_logger('engine', cfg.log_level))
 
         #
         # acquisition
@@ -202,6 +201,7 @@ class VtxEngine(Engine):
         ec.records_per_block = cfg.ascans_per_block
         ec.blocks_to_allocate = cfg.blocks_to_allocate
         ec.blocks_to_acquire = cfg.blocks_to_acquire
+        print("blocks to acquire {0:d}".format(ec.blocks_to_acquire))
 
 
         engine = Engine(get_logger('engine', cfg.log_level))
