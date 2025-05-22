@@ -4,7 +4,7 @@ from VtxEngineParamsDialog import VtxEngineParamsDialog
 from VtxEngine import VtxEngine
 from OCTDialog import OCTDialog
 from PyQt5.QtWidgets import QApplication
-
+from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
 import logging
 from rainbow_logging_handler import RainbowLoggingHandler
 
@@ -25,22 +25,49 @@ class OCTUi():
 
     def cfgFinished(self, v):
 
-        self._octDialog = OCTDialog()
-        self._octDialog.show()
-        # if v == 1:
-        #     self._cfg = self._cfgDialog.getEngineParameters()
-        #     try:
-        #         # get oct engine ready
-        #         self._engine = VtxEngine(self._cfg)
-        #     except RuntimeError as e:
-        #         print("RuntimeError:")
-        #         print(e)
-        #         self.showParamsDialog()
-        #     else:    
-        #         self._octDialog = OCTDialog()
-        #         self._octDialog.show()
-        # else:
-        #     sys.exit()
+        if v == 1:
+            self._cfg = self._cfgDialog.getEngineParameters()
+            try:
+                # get oct engine ready
+                self._engine = VtxEngine(self._cfg)
+
+            except RuntimeError as e:
+                print("RuntimeError:")
+                print(e)
+                self.showParamsDialog()
+            else:    
+                self._octDialog = OCTDialog()
+                self._octDialog.pbStart.clicked.connect(self.startClicked)
+                self._octDialog.pbStop.clicked.connect(self.stopClicked)
+                self._octDialog.pbStart.enabled = False
+                
+                # set up plots
+                stack_widget = RasterEnFaceWidget(self._engine._stack_tensor_endpoint)
+                self._octDialog.tabWidgetPlots.addTab(stack_widget, "Raster")
+                cross_widget = CrossSectionImageWidget(self._engine._stack_tensor_endpoint)
+                self._octDialog.tabWidgetPlots.addTab(cross_widget, "cross")
+
+                # argument (v) here is a number - index pointing to a segment in allocated segments.
+                def cb(v):
+                    stack_widget.notify_segments(v)
+                    cross_widget.notify_segments(v)
+                self._engine._stack_tensor_endpoint.aggregate_segment_callback = cb
+                self._octDialog.show()
+        else:
+            sys.exit()
+
+    def startClicked(self):
+        print("startClicked")
+        self._octDialog.pbStart.enabled = False
+        self._octDialog.pbStop.enabled = True
+        self._engine.start()
+
+    def stopClicked(self):
+        print("stopClicked")
+        self._octDialog.pbStart.enabled = True
+        self._octDialog.pbStop.enabled = False
+        self._engine.stop()
+
 
 
 def setup_logging():

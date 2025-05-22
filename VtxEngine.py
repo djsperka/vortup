@@ -1,12 +1,13 @@
-from vortex import get_console_logger as get_logger
-from vortex.engine import Engine, Block, source, acquire_alazar_clock, find_rising_edges, compute_resampling, dispersion_phasor
-
-from vortex.acquire import AlazarConfig, AlazarAcquisition, alazar
+from vortex import Range, get_console_logger as get_logger
+from vortex.marker import Flags
+from vortex.engine import Engine, EngineConfig, Block, dispersion_phasor, StackDeviceTensorEndpointInt8 as StackDeviceTensorEndpoint
+from vortex.acquire import AlazarConfig, AlazarAcquisition, alazar, FileAcquisitionConfig, FileAcquisition
 from vortex.process import CUDAProcessor, CUDAProcessorConfig
 from vortex.io import DAQmxIO, DAQmxConfig, daqmx
-from vortex.engine import source, Source, Engine
-from VtxEngineParams import VtxEngineParams
-from numpy import hanning
+from VtxEngineParams import VtxEngineParams, AcquisitionType
+from vortex.scan import RasterScanConfig, RasterScan
+from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, SimpleSlice
+import numpy as np
 
 class VtxEngine(Engine):
     def __init__(self, cfg: VtxEngineParams):
@@ -16,33 +17,80 @@ class VtxEngine(Engine):
         # acquisition
         #
 
-        # configure external clocking from an Alazar card
-        # internal clock works for testing with 9350 (doesn't take 800*10**6)
-        ac = AlazarConfig()
+        resampling = []     # may be reassigned in this block, used below this block
+        if cfg.acquisition_type == AcquisitionType.ALAZAR_ACQUISITION:
 
-        if cfg.internal_clock:
-            ac.clock = alazar.InternalClock(cfg.clock_samples_per_second)
-        else:
-            ac.clock = alazar.ExternalClock(level_ratio=cfg.external_clock_level_pct, coupling=alazar.Coupling.AC, edge=alazar.ClockEdge.Rising, dual=False)
+            # configure external clocking from an Alazar card
+            # internal clock works for testing with 9350 (doesn't take 800*10**6)
+            ac = AlazarConfig()
 
-        resampling = []
-        board = alazar.Board(ac.device.system_index, ac.device.board_index)
-        ac.samples_per_record = board.info.smallest_aligned_samples_per_record(cfg.swept_source.clock_rising_edges_per_trigger)
+            if cfg.internal_clock:
+                ac.clock = alazar.InternalClock(cfg.clock_samples_per_second)
+            else:
+                ac.clock = alazar.ExternalClock(level_ratio=cfg.external_clock_level_pct, coupling=alazar.Coupling.AC, edge=alazar.ClockEdge.Rising, dual=False)
 
-        # trigger with range - must be 5000 (2500 will err). TTL will work in config also. Discrepancy with docs
-        ac.trigger = alazar.SingleExternalTrigger(range_millivolts=cfg.trigger_range_millivolts, level_ratio=cfg.trigger_level_fraction, delay_samples=0, slope=alazar.TriggerSlope.Negative)
+            board = alazar.Board(ac.device.system_index, ac.device.board_index)
+            ac.samples_per_record = board.info.smallest_aligned_samples_per_record(cfg.swept_source.clock_rising_edges_per_trigger)
 
-        # only input channel A
-        input = alazar.Input(alazar.Channel.A, cfg.input_channel_range_millivolts)
-        ac.inputs.append(input)
+            # trigger with range - must be 5000 (2500 will err). TTL will work in config also. Discrepancy with docs
+            ac.trigger = alazar.SingleExternalTrigger(range_millivolts=cfg.trigger_range_millivolts, level_ratio=cfg.trigger_level_fraction, delay_samples=0, slope=alazar.TriggerSlope.Negative)
 
-        # pull in engine params
-        ac.records_per_block = cfg.ascans_per_block
-        ac.samples_per_record = cfg.samples_per_ascan
+            # only input channel A
+            input = alazar.Input(alazar.Channel.A, cfg.input_channel_range_millivolts)
+            ac.inputs.append(input)
 
-        acquire = AlazarAcquisition(get_logger('acquire', cfg.log_level))
-        acquire.initialize(ac)
-        self._acquire = acquire
+            # pull in engine params
+            ac.records_per_block = cfg.ascans_per_block
+            ac.samples_per_record = cfg.samples_per_ascan
+
+            acquire = AlazarAcquisition(get_logger('acquire', cfg.log_level))
+            acquire.initialize(ac)
+            self._acquire = acquire
+
+        elif cfg.acquisition_type == AcquisitionType.FILE_ACQUISITION:
+
+            # create a temporary file with a pure sinusoid for tutorial purposes only
+            spectrum = 2**15 + 2**14 * np.sin(2*np.pi * (cfg.samples_per_ascan / 4) * np.linspace(0, 1, cfg.samples_per_ascan))
+            spectra = np.repeat(spectrum[None, ...], cfg.ascans_per_block, axis=0)
+
+            import os
+            from tempfile import mkstemp
+            (fd, test_file_path) = mkstemp()
+            # NOTE: the Python bindings are restricted to the uint16 data type
+            open(test_file_path, 'wb').write(spectra.astype(np.uint16).tobytes())
+            os.close(fd)
+
+
+            # produce blocks ready from a file
+            ac = FileAcquisitionConfig()
+            ac.path = test_file_path
+            ac.records_per_block = cfg.ascans_per_block
+            ac.samples_per_record = cfg.samples_per_ascan
+            ac.loop = True # repeat the file indefinitely
+
+            acquire = FileAcquisition(get_logger('acquire', cfg.log_level))
+            acquire.initialize(ac)
+            self._acquire = acquire
+
+
+        #
+        # scan
+        #
+
+        raster_sc = RasterScanConfig()
+        raster_sc.bscans_per_volume = cfg.bscans_per_volume
+        raster_sc.ascans_per_bscan = cfg.ascans_per_bscan
+        raster_sc.bscan_extent = Range(-cfg.scan_dimension, cfg.scan_dimension)
+        raster_sc.volume_extent = Range(-cfg.scan_dimension, cfg.scan_dimension)
+        raster_sc.bidirectional_segments = cfg.bidirectional
+        raster_sc.bidirectional_volumes = cfg.bidirectional
+        raster_sc.samples_per_second = cfg.swept_source.triggers_per_second
+        raster_sc.loop = True
+        raster_sc.flags = Flags(0x1)
+
+        raster_scan = RasterScan()
+        raster_scan.initialize(raster_sc)
+        self._raster_scan = raster_scan
 
 
         #
@@ -52,7 +100,7 @@ class VtxEngine(Engine):
         pc = CUDAProcessorConfig()
 
         # match acquisition settings
-        pc.samples_per_record = cfg.samples_per_record
+        pc.samples_per_record = cfg.samples_per_ascan
         pc.ascans_per_block = cfg.ascans_per_block
 
         pc.slots = cfg.process_slots
@@ -61,7 +109,7 @@ class VtxEngine(Engine):
         pc.resampling_samples = resampling
 
         # spectral filter with dispersion correction
-        window = hanning(pc.samples_per_ascan)
+        window = np.hanning(pc.samples_per_ascan)
         phasor = dispersion_phasor(len(window), cfg.dispersion)
         pc.spectral_filter = window * phasor
 
@@ -71,6 +119,33 @@ class VtxEngine(Engine):
         process = CUDAProcessor(get_logger('process', cfg.log_level))
         process.initialize(pc)
         self._process = process
+
+        #
+        # format planners
+        #
+
+        fc = FormatPlannerConfig()
+        fc.segments_per_volume = cfg.bscans_per_volume
+        fc.records_per_segment = cfg.ascans_per_bscan
+        fc.adapt_shape = False
+
+        fc.mask = raster_sc.flags
+        stack_format = FormatPlanner(get_logger('raster format', cfg.log_level))
+        stack_format.initialize(fc)
+        self._stack_format = stack_format
+
+        # format executors
+        cfec = StackFormatExecutorConfig()
+        # only keep half of the spectrum
+        cfec.sample_slice = SimpleSlice(self._process.config.samples_per_ascan // 2)
+        samples_to_save = cfec.sample_slice.count()
+
+
+        cfe = StackFormatExecutor()
+        cfe.initialize(cfec)
+        stack_tensor_endpoint = StackDeviceTensorEndpoint(cfe, (raster_sc.bscans_per_volume, raster_sc.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
+        self._stack_tensor_endpoint = stack_tensor_endpoint
+
 
         #
         # galvo control
@@ -108,4 +183,29 @@ class VtxEngine(Engine):
             strobe.initialize(sc)
             self._strobe = strobe
 
+
+        #
+        # engine setup
+        #
+
+        ec = EngineConfig()
+        ec.add_acquisition(self._acquire, [self._process])
+        ec.add_processor(self._process, [stack_format])
+        ec.add_formatter(stack_format, [stack_tensor_endpoint])
+        if cfg.doIO:
+            ec.add_io(self._io_out, lead_samples=round(cfg.galvo_delay * self._io_out.config.samples_per_second))
+            ec.galvo_output_channels = len(self._io_out.config.channels)
+        if cfg.doStrobe:
+            ec.add_io(self._strobe)
+
+        ec.preload_count = cfg.preload_count
+        ec.records_per_block = cfg.ascans_per_block
+        ec.blocks_to_allocate = cfg.blocks_to_allocate
+        ec.blocks_to_acquire = cfg.blocks_to_acquire
+
+
+        engine = Engine(get_logger('engine', cfg.log_level))
+        engine.initialize(ec)
+        engine.prepare()
+        self._engine = engine
 
