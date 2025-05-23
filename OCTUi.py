@@ -65,6 +65,7 @@ class OCTUi():
 
 
         # put something into the scan queue
+        self._vtxengine._engine.scan_queue.clear()
         self._vtxengine._engine.scan_queue.append(self._vtxengine._raster_scan)
 
         # now start the actual engine

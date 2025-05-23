@@ -156,18 +156,12 @@ class VtxEngine():
             ioc_out.samples_per_block = ac.records_per_block
             ioc_out.samples_per_second = cfg.swept_source.triggers_per_second
             ioc_out.blocks_to_buffer = cfg.preload_count
-            
-            ioc_out.clock.source = "pfi0"
-
-            sc = ioc_out.copy()
-
+            ioc_out.clock.source = "pfi12"
             ioc_out.name = 'output'
 
             stream = Block.StreamIndex.GalvoTarget
             ioc_out.channels.append(daqmx.AnalogVoltageOutput('Dev1/ao0', 15 / 10, stream, 0))
             ioc_out.channels.append(daqmx.AnalogVoltageOutput('Dev1/ao1', 15 / 10, stream, 1))
-
-
 
             io_out = DAQmxIO(get_logger(ioc_out.name, cfg.log_level))
             io_out.initialize(ioc_out)
