@@ -169,10 +169,16 @@ class VtxEngine():
 
 
         if cfg.doStrobe:
-            sc.name = 'strobe'
-            sc.channels.append(daqmx.DigitalOutput('Dev1/port0', Block.StreamIndex.Strobes))
-            strobe = DAQmxIO(get_logger(sc.name, cfg.log_level))
-            strobe.initialize(sc)
+            # examples show this being a copy of ioc_out. Make a new one instead.
+            strobec = DAQmxConfig()
+            strobec.samples_per_block = ac.records_per_block
+            strobec.samples_per_second = cfg.swept_source.triggers_per_second
+            strobec.blocks_to_buffer = cfg.preload_count
+            strobec.clock.source = "pfi12"
+            strobec.name = 'strobe'
+            strobec.channels.append(daqmx.DigitalOutput('Dev1/port0', Block.StreamIndex.Strobes))
+            strobe = DAQmxIO(get_logger(strobec.name, cfg.log_level))
+            strobe.initialize(strobec)
             self._strobe = strobe
 
 
