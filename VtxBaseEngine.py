@@ -3,6 +3,7 @@ from vortex.marker import Flags
 from vortex.engine import Engine, EngineConfig, Block, dispersion_phasor, StackDeviceTensorEndpointInt8 as StackDeviceTensorEndpoint
 from vortex.acquire import AlazarConfig, AlazarAcquisition, alazar, FileAcquisitionConfig, FileAcquisition
 from vortex.process import CUDAProcessor, CUDAProcessorConfig
+from vortex.process import NullProcessor, NullProcessorConfig
 from vortex.io import DAQmxIO, DAQmxConfig, daqmx
 from VtxEngineParams import VtxEngineParams, AcquisitionType
 from vortex.scan import RasterScanConfig, RasterScan
@@ -118,6 +119,12 @@ class VtxBaseEngine():
         process = CUDAProcessor(get_logger('process', cfg.log_level))
         process.initialize(pc)
         self._process = process
+
+        # nc = NullProcessorConfig()
+        # process = NullProcessor(get_logger('process', cfg.log_level))
+        # process.initialize(nc)
+        # self._process = process
+
 
         #
         # format planners

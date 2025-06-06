@@ -3,7 +3,7 @@ from VtxEngineParams import DEFAULT_VTX_ENGINE_PARAMS, VtxEngineParams
 from VtxEngineParamsDialog import VtxEngineParamsDialog
 from VtxEngine import VtxEngine
 from OCTDialog import OCTDialog
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
 from TraceWidget import TraceWidget
 import logging
@@ -42,7 +42,8 @@ class OCTUi():
                 self._octDialog = OCTDialog()
                 self._octDialog.pbStart.clicked.connect(self.startClicked)
                 self._octDialog.pbStop.clicked.connect(self.stopClicked)
-                self._octDialog.pbStart.enabled = False                
+                self._octDialog.pbStart.enabled = False  
+                self._octDialog.resize(1000,800)              
                 self._octDialog.show()
         else:
             sys.exit()
@@ -55,17 +56,27 @@ class OCTUi():
         # set up plots
         # We need access to both the engine (the endpoints) and the gui (display widgets). 
         # Choosing to handle this here instead of in constructor.
-        stack_widget = RasterEnFaceWidget(self._vtxengine._stack_tensor_endpoint)
-        self._octDialog.tabWidgetPlots.addTab(stack_widget, "Raster")
+        # stack_widget = RasterEnFaceWidget(self._vtxengine._stack_tensor_endpoint)
+        # self._octDialog.tabWidgetPlots.addTab(stack_widget, "Raster")
         cross_widget = CrossSectionImageWidget(self._vtxengine._stack_tensor_endpoint)
-        self._octDialog.tabWidgetPlots.addTab(cross_widget, "cross")
+        #self._octDialog.tabWidgetPlots.addTab(cross_widget, "cross")
         #trace_widget = TraceWidget(self._vtxengine._stack_tensor_endpoint, debug=True)
         trace_widget = TraceWidget(self._vtxengine._stack_tensor_endpoint)
-        self._octDialog.tabWidgetPlots.addTab(trace_widget, "trace")
+        #self._octDialog.tabWidgetPlots.addTab(trace_widget, "trace")
+
+        # make horizontal layout and add the plots, then set it as layout for widgetDummy
+        hbox = QHBoxLayout()
+        hbox.addWidget(cross_widget)
+        hbox.addWidget(trace_widget)
+        self._octDialog.widgetDummy.setLayout(hbox)
+        self._octDialog.widgetDummy.show()
+        #trace_widget.show()
+        #cross_widget.show()
+        #trace_widget.show()
 
         # argument (v) here is a number - index pointing to a segment in allocated segments.
         def cb(v):
-            stack_widget.notify_segments(v)
+            #stack_widget.notify_segments(v)
             cross_widget.notify_segments(v)
         self._vtxengine._stack_tensor_endpoint.aggregate_segment_callback = cb
 

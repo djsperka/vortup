@@ -15,10 +15,8 @@ class Ui_OCTDialog(object):
     def setupUi(self, OCTDialog):
         OCTDialog.setObjectName("OCTDialog")
         OCTDialog.resize(1089, 753)
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout(OCTDialog)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(OCTDialog)
+        self.horizontalLayout.setObjectName("horizontalLayout")
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
@@ -29,17 +27,14 @@ class Ui_OCTDialog(object):
         self.pbStop = QtWidgets.QPushButton(OCTDialog)
         self.pbStop.setObjectName("pbStop")
         self.verticalLayout.addWidget(self.pbStop)
-        self.horizontalLayout_2.addLayout(self.verticalLayout)
-        self.tabWidgetPlots = QtWidgets.QTabWidget(OCTDialog)
-        self.tabWidgetPlots.setObjectName("tabWidgetPlots")
-        self.horizontalLayout_2.addWidget(self.tabWidgetPlots)
-        self.verticalLayout_2.addLayout(self.horizontalLayout_2)
-        self.labelStatus = QtWidgets.QLabel(OCTDialog)
-        self.labelStatus.setObjectName("labelStatus")
-        self.verticalLayout_2.addWidget(self.labelStatus)
+        self.horizontalLayout.addLayout(self.verticalLayout)
+        self.widgetDummy = QtWidgets.QWidget(OCTDialog)
+        self.widgetDummy.setObjectName("widgetDummy")
+        self.horizontalLayout.addWidget(self.widgetDummy)
+        self.horizontalLayout.setStretch(0, 1)
+        self.horizontalLayout.setStretch(1, 4)
 
         self.retranslateUi(OCTDialog)
-        self.tabWidgetPlots.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(OCTDialog)
 
     def retranslateUi(self, OCTDialog):
@@ -47,4 +42,13 @@ class Ui_OCTDialog(object):
         OCTDialog.setWindowTitle(_translate("OCTDialog", "UCD OCT Dev Tool"))
         self.pbStart.setText(_translate("OCTDialog", "Start"))
         self.pbStop.setText(_translate("OCTDialog", "Stop"))
-        self.labelStatus.setText(_translate("OCTDialog", "TextLabel"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    OCTDialog = QtWidgets.QDialog()
+    ui = Ui_OCTDialog()
+    ui.setupUi(OCTDialog)
+    OCTDialog.show()
+    sys.exit(app.exec_())
