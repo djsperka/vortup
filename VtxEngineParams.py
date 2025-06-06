@@ -59,7 +59,7 @@ DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
     scan_dimension=5,
     bidirectional=False,
     ascans_per_bscan=500,
-    bscans_per_volume=500,
+    bscans_per_volume=1,
     galvo_delay=95e-6,
 
     # acquisition parameters
@@ -80,8 +80,8 @@ DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
     clock_channel=alazar.Channel.B,    # only relevant if internal_clock is True
     input_channel=alazar.Channel.A,
     input_channel_range_millivolts=1000,
-    doIO=False,
-    doStrobe=False,
+    doIO=True,
+    doStrobe=True,
     trigger_range_millivolts=5000,
     trigger_level_fraction=0.10,
 
