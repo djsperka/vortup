@@ -5,8 +5,11 @@ from VtxEngine import VtxEngine
 from OCTDialog import OCTDialog
 from PyQt5.QtWidgets import QApplication
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
+from TraceWidget import TraceWidget
 import logging
 from rainbow_logging_handler import RainbowLoggingHandler
+import cupy
+import numpy
 
 
 class OCTUi():
@@ -56,6 +59,9 @@ class OCTUi():
         self._octDialog.tabWidgetPlots.addTab(stack_widget, "Raster")
         cross_widget = CrossSectionImageWidget(self._vtxengine._stack_tensor_endpoint)
         self._octDialog.tabWidgetPlots.addTab(cross_widget, "cross")
+        #trace_widget = TraceWidget(self._vtxengine._stack_tensor_endpoint, debug=True)
+        trace_widget = TraceWidget(self._vtxengine._stack_tensor_endpoint)
+        self._octDialog.tabWidgetPlots.addTab(trace_widget, "trace")
 
         # argument (v) here is a number - index pointing to a segment in allocated segments.
         def cb(v):
@@ -63,6 +69,10 @@ class OCTUi():
             cross_widget.notify_segments(v)
         self._vtxengine._stack_tensor_endpoint.aggregate_segment_callback = cb
 
+        # 
+        def cb_volume(sample_idx, scan_idx, volume_idx):
+            trace_widget.update_trace()
+        self._vtxengine._stack_tensor_endpoint.volume_callback = cb_volume
 
         # put something into the scan queue
         self._vtxengine._engine.scan_queue.clear()
