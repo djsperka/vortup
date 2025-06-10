@@ -18,6 +18,8 @@ class OCTUi():
         super().__init__() # Call the inherited class' __init__ method
 
         #self._app = QApplication(sys.argv)
+        self._cross_widget = None
+        self._trace_widget = None
         self._cfg = DEFAULT_VTX_ENGINE_PARAMS
         self.showParamsDialog()
 
@@ -43,47 +45,69 @@ class OCTUi():
                 self._octDialog.pbStart.clicked.connect(self.startClicked)
                 self._octDialog.pbStop.clicked.connect(self.stopClicked)
                 self._octDialog.pbStart.enabled = False  
+                self.addPlotsToDialog()
                 self._octDialog.resize(1000,800)              
                 self._octDialog.show()
         else:
             sys.exit()
 
+    def addPlotsToDialog(self):
+        # set up plots
+        # We need access to both the engine (the endpoints) and the gui (display widgets). 
+        if not self._cross_widget:
+            self._cross_widget = CrossSectionImageWidget(self._vtxengine._stack_tensor_endpoint)
+            self._trace_widget = TraceWidget(self._vtxengine._stack_tensor_endpoint)
+
+            # make horizontal layout and add the plots, then set it as layout for widgetDummy
+            hbox = QHBoxLayout()
+            hbox.addWidget(self._cross_widget)
+            hbox.addWidget(self._trace_widget)
+            self._octDialog.widgetDummy.setLayout(hbox)
+            self._octDialog.widgetDummy.show()
+
+            # argument (v) here is a number - index pointing to a segment in allocated segments.
+            def cb(v):
+                #stack_widget.notify_segments(v)
+                self._cross_widget.notify_segments(v)
+            self._vtxengine._stack_tensor_endpoint.aggregate_segment_callback = cb
+
+            # 
+            def cb_volume(sample_idx, scan_idx, volume_idx):
+                self._trace_widget.update_trace()
+            self._vtxengine._stack_tensor_endpoint.volume_callback = cb_volume
+
+
     def startClicked(self):
-        print("startClicked")
         self._octDialog.pbStart.enabled = False
         self._octDialog.pbStop.enabled = True
 
-        # set up plots
-        # We need access to both the engine (the endpoints) and the gui (display widgets). 
-        # Choosing to handle this here instead of in constructor.
-        # stack_widget = RasterEnFaceWidget(self._vtxengine._stack_tensor_endpoint)
-        # self._octDialog.tabWidgetPlots.addTab(stack_widget, "Raster")
-        cross_widget = CrossSectionImageWidget(self._vtxengine._stack_tensor_endpoint)
-        #self._octDialog.tabWidgetPlots.addTab(cross_widget, "cross")
-        #trace_widget = TraceWidget(self._vtxengine._stack_tensor_endpoint, debug=True)
-        trace_widget = TraceWidget(self._vtxengine._stack_tensor_endpoint)
-        #self._octDialog.tabWidgetPlots.addTab(trace_widget, "trace")
+        # # set up plots
+        # # We need access to both the engine (the endpoints) and the gui (display widgets). 
+        # if not self._cross_widget:
+        #     self._cross_widget = CrossSectionImageWidget(self._vtxengine._stack_tensor_endpoint)
+        #     self._trace_widget = TraceWidget(self._vtxengine._stack_tensor_endpoint)
 
-        # make horizontal layout and add the plots, then set it as layout for widgetDummy
-        hbox = QHBoxLayout()
-        hbox.addWidget(cross_widget)
-        hbox.addWidget(trace_widget)
-        self._octDialog.widgetDummy.setLayout(hbox)
-        self._octDialog.widgetDummy.show()
-        #trace_widget.show()
-        #cross_widget.show()
-        #trace_widget.show()
+        #     # make horizontal layout and add the plots, then set it as layout for widgetDummy
+        #     hbox = QHBoxLayout()
+        #     hbox.addWidget(self._cross_widget)
+        #     hbox.addWidget(self._trace_widget)
+        #     self._octDialog.widgetDummy.setLayout(hbox)
+        #     self._octDialog.widgetDummy.show()
 
-        # argument (v) here is a number - index pointing to a segment in allocated segments.
-        def cb(v):
-            #stack_widget.notify_segments(v)
-            cross_widget.notify_segments(v)
-        self._vtxengine._stack_tensor_endpoint.aggregate_segment_callback = cb
+        #     # argument (v) here is a number - index pointing to a segment in allocated segments.
+        #     def cb(v):
+        #         #stack_widget.notify_segments(v)
+        #         self._cross_widget.notify_segments(v)
+        #     self._vtxengine._stack_tensor_endpoint.aggregate_segment_callback = cb
 
-        # 
-        def cb_volume(sample_idx, scan_idx, volume_idx):
-            trace_widget.update_trace()
-        self._vtxengine._stack_tensor_endpoint.volume_callback = cb_volume
+        #     # 
+        #     def cb_volume(sample_idx, scan_idx, volume_idx):
+        #         self._trace_widget.update_trace()
+        #     self._vtxengine._stack_tensor_endpoint.volume_callback = cb_volume
+        # else:
+        #     # clear axes
+        #     #self._cross_widget.notify_segments()
+        #     self._trace_widget.clear()
 
         # put something into the scan queue
         self._vtxengine._engine.scan_queue.clear()
@@ -93,7 +117,6 @@ class OCTUi():
         self._vtxengine._engine.start()
 
     def stopClicked(self):
-        print("stopClicked")
         self._octDialog.pbStart.enabled = True
         self._octDialog.pbStop.enabled = False
         self._vtxengine._engine.stop()

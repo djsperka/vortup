@@ -48,3 +48,5 @@ class TraceWidget(FigureCanvas):
         self._invalidated = True
         self.update()
 
+    def clear():
+        self._axes.clear()

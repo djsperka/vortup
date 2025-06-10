@@ -3,6 +3,7 @@ from PyQt5 import uic
 from myengine import DEFAULT_ENGINE_PARAMS, StandardEngineParams
 from StandardEngineParamsDialog import StandardEngineParamsDialog
 from Ui_OCTDialog import Ui_OCTDialog
+from ScanConfigWidget import ScanConfigWidget
 
 class OCTDialog(QDialog, Ui_OCTDialog):
     """Wrapper class around designer-generated user interface. 
@@ -26,4 +27,8 @@ class OCTDialog(QDialog, Ui_OCTDialog):
         super().__init__() # Call the inherited class' __init__ method
         self.setupUi(self)  # Use Ui_OCTDialog.py- WARNING! pyuic5 -o Ui_OCTDialog.py OCTDialog.ui
         # uic.loadUi('OCTDialog.ui', self) # Load the .ui file
+
+        # replace placeholder with scan type widget
+        self.scanConfigWidget = ScanConfigWidget(self)
+        self.verticalLayoutSidebar.insertWidget(0, self.scanConfigWidget)
 
