@@ -4,6 +4,7 @@ from myengine import DEFAULT_ENGINE_PARAMS, StandardEngineParams
 from StandardEngineParamsDialog import StandardEngineParamsDialog
 from Ui_OCTDialog import Ui_OCTDialog
 from ScanConfigWidget import ScanConfigWidget
+from AcqParamsWidget import AcqParamsWidget
 
 class OCTDialog(QDialog, Ui_OCTDialog):
     """Wrapper class around designer-generated user interface. 
@@ -31,4 +32,7 @@ class OCTDialog(QDialog, Ui_OCTDialog):
         # replace placeholder with scan type widget
         self.scanConfigWidget = ScanConfigWidget(self)
         self.verticalLayoutSidebar.insertWidget(0, self.scanConfigWidget)
+        print("adding acq")
+        self.acqParamsWidget = AcqParamsWidget(self)
+        self.verticalLayoutSidebar.insertWidget(1, self.acqParamsWidget)
 
