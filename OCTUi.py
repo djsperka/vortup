@@ -5,7 +5,9 @@ from VtxEngine import VtxEngine
 from OCTDialog import OCTDialog
 from PyQt5.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
+from vortex.scan import RasterScanConfig
 from TraceWidget import TraceWidget
+from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
 import logging
 from rainbow_logging_handler import RainbowLoggingHandler
 import cupy
@@ -16,25 +18,34 @@ class OCTUi():
     
     def __init__(self):
         super().__init__() # Call the inherited class' __init__ method
-
-        #self._app = QApplication(sys.argv)
         self._cross_widget = None
         self._trace_widget = None
-        self._cfg = DEFAULT_VTX_ENGINE_PARAMS
-        self.showParamsDialog()
+        self._engineParams = DEFAULT_VTX_ENGINE_PARAMS
+        self._scanConfig = RasterScanConfig()
+        self._acqParams = DEFAULT_ACQ_PARAMS
+
+        self._octDialog = OCTDialog()
+        self._octDialog.pbStart.clicked.connect(self.startClicked)
+        self._octDialog.pbStop.clicked.connect(self.stopClicked)
+        self._octDialog.pbStart.enabled = False  
+        #self.addPlotsToDialog()
+        self._octDialog.resize(1000,800)              
+        self._octDialog.show()
+
+
 
     def showParamsDialog(self):
-        self._cfgDialog = VtxEngineParamsDialog(self._cfg)
+        self._cfgDialog = VtxEngineParamsDialog(self._engineParams)
         self._cfgDialog.finished.connect(self.cfgFinished)
         self._cfgDialog.show()
 
     def cfgFinished(self, v):
 
         if v == 1:
-            self._cfg = self._cfgDialog.getEngineParameters()
+            self._engineParams = self._cfgDialog.getEngineParameters()
             try:
                 # get oct engine ready
-                self._vtxengine = VtxEngine(self._cfg)
+                self._vtxengine = VtxEngine(self._engineParams)
 
             except RuntimeError as e:
                 print("RuntimeError:")
