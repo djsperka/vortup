@@ -27,7 +27,8 @@ class OCTUi():
         self._octDialog = OCTDialog()
         self._octDialog.pbStart.clicked.connect(self.startClicked)
         self._octDialog.pbStop.clicked.connect(self.stopClicked)
-        self._octDialog.pbStart.enabled = False  
+        self._octDialog.pbStart.enabled = True  
+        self._octDialog.pbStop.enabled = False  
         #self.addPlotsToDialog()
         self._octDialog.resize(1000,800)              
         self._octDialog.show()
@@ -40,27 +41,8 @@ class OCTUi():
         self._cfgDialog.show()
 
     def cfgFinished(self, v):
-
         if v == 1:
             self._engineParams = self._cfgDialog.getEngineParameters()
-            try:
-                # get oct engine ready
-                self._vtxengine = VtxEngine(self._engineParams)
-
-            except RuntimeError as e:
-                print("RuntimeError:")
-                print(e)
-                self.showParamsDialog()
-            else:    
-                self._octDialog = OCTDialog()
-                self._octDialog.pbStart.clicked.connect(self.startClicked)
-                self._octDialog.pbStop.clicked.connect(self.stopClicked)
-                self._octDialog.pbStart.enabled = False  
-                self.addPlotsToDialog()
-                self._octDialog.resize(1000,800)              
-                self._octDialog.show()
-        else:
-            sys.exit()
 
     def addPlotsToDialog(self):
         # set up plots
@@ -92,40 +74,27 @@ class OCTUi():
         self._octDialog.pbStart.enabled = False
         self._octDialog.pbStop.enabled = True
 
-        # # set up plots
-        # # We need access to both the engine (the endpoints) and the gui (display widgets). 
-        # if not self._cross_widget:
-        #     self._cross_widget = CrossSectionImageWidget(self._vtxengine._stack_tensor_endpoint)
-        #     self._trace_widget = TraceWidget(self._vtxengine._stack_tensor_endpoint)
+        try:
+            # fetch current configuration for acq and scan params. The items 
+            # in the engineConfig are updated when that dlg is accepted, so no 
+            # fetch here.
+            self._acqParams = self._octDialog.acqParamsWidget.getAcqParams()
+            self._scanConfig = self._octDialog.scanConfigWidget.getScanConfig()
 
-        #     # make horizontal layout and add the plots, then set it as layout for widgetDummy
-        #     hbox = QHBoxLayout()
-        #     hbox.addWidget(self._cross_widget)
-        #     hbox.addWidget(self._trace_widget)
-        #     self._octDialog.widgetDummy.setLayout(hbox)
-        #     self._octDialog.widgetDummy.show()
+            # get oct engine ready
+            self._vtxengine = VtxEngine(self._engineParams)
 
-        #     # argument (v) here is a number - index pointing to a segment in allocated segments.
-        #     def cb(v):
-        #         #stack_widget.notify_segments(v)
-        #         self._cross_widget.notify_segments(v)
-        #     self._vtxengine._stack_tensor_endpoint.aggregate_segment_callback = cb
+            # put something into the scan queue
+            self._vtxengine._engine.scan_queue.clear()
+            self._vtxengine._engine.scan_queue.append(self._vtxengine._raster_scan)
 
-        #     # 
-        #     def cb_volume(sample_idx, scan_idx, volume_idx):
-        #         self._trace_widget.update_trace()
-        #     self._vtxengine._stack_tensor_endpoint.volume_callback = cb_volume
-        # else:
-        #     # clear axes
-        #     #self._cross_widget.notify_segments()
-        #     self._trace_widget.clear()
+            # now start the actual engine
+            self._vtxengine._engine.start()
 
-        # put something into the scan queue
-        self._vtxengine._engine.scan_queue.clear()
-        self._vtxengine._engine.scan_queue.append(self._vtxengine._raster_scan)
+        except RuntimeError as e:
+            print("RuntimeError:")
+            print(e)
 
-        # now start the actual engine
-        self._vtxengine._engine.start()
 
     def stopClicked(self):
         self._octDialog.pbStart.enabled = True

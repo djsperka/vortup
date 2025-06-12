@@ -14,23 +14,13 @@ class VtxEngineParams:
     # acquisition type
     acquisition_type: AcquisitionType
 
-    # scan parameters
-    scan_dimension: float
-    bidirectional: bool
-    ascans_per_bscan: int
-    bscans_per_volume: int
+    # left over from scan parameters
     galvo_delay: float
-
-    # acquisition parameters
-    clock_samples_per_second: int
-    blocks_to_acquire: int
-    ascans_per_block: int
-    samples_per_ascan: int
-    trigger_delay_seconds: float
 
     # hardware configuration
     swept_source: Source
     internal_clock: bool
+    clock_samples_per_second: int
     external_clock_level_pct: int
     clock_channel: alazar.Channel
     input_channel: alazar.Channel
@@ -54,19 +44,7 @@ class VtxEngineParams:
 DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
 
     acquisition_type=AcquisitionType.ALAZAR_ACQUISITION,
-
-    # scan parameters
-    scan_dimension=5,
-    bidirectional=False,
-    ascans_per_bscan=500,
-    bscans_per_volume=1,
-    galvo_delay=95e-6,
-
-    # acquisition parameters
-    blocks_to_acquire=0,
-    ascans_per_block=500,
-    samples_per_ascan=1376,     # Axsun 100k
-    trigger_delay_seconds=0,
+    galvo_delay=0.0,
 
     # These are probably rig-specific? Hasn't been an issue to use these. 
     blocks_to_allocate=128,
