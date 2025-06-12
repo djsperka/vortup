@@ -7,5 +7,5 @@ class AcqParams:
     blocks_to_acquire: int
     trigger_delay_seconds: float
 
-DEFAULT_ACQ_PARAMS = AcqParams(500, 1376, 0, 0)
+DEFAULT_ACQ_PARAMS = AcqParams(500, 1280, 0, 0)
 
