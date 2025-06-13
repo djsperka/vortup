@@ -20,6 +20,9 @@ class Ui_OCTDialog(object):
         self.verticalLayoutSidebar = QtWidgets.QVBoxLayout()
         self.verticalLayoutSidebar.setSizeConstraint(QtWidgets.QLayout.SetMinimumSize)
         self.verticalLayoutSidebar.setObjectName("verticalLayoutSidebar")
+        self.pbEtc = QtWidgets.QPushButton(OCTDialog)
+        self.pbEtc.setObjectName("pbEtc")
+        self.verticalLayoutSidebar.addWidget(self.pbEtc)
         self.pbStart = QtWidgets.QPushButton(OCTDialog)
         self.pbStart.setObjectName("pbStart")
         self.verticalLayoutSidebar.addWidget(self.pbStart)
@@ -39,6 +42,7 @@ class Ui_OCTDialog(object):
     def retranslateUi(self, OCTDialog):
         _translate = QtCore.QCoreApplication.translate
         OCTDialog.setWindowTitle(_translate("OCTDialog", "UCD OCT Dev Tool"))
+        self.pbEtc.setText(_translate("OCTDialog", "Etc"))
         self.pbStart.setText(_translate("OCTDialog", "Start"))
         self.pbStop.setText(_translate("OCTDialog", "Stop"))
 

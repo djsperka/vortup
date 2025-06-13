@@ -20,6 +20,13 @@
       <enum>QLayout::SetMinimumSize</enum>
      </property>
      <item>
+      <widget class="QPushButton" name="pbEtc">
+       <property name="text">
+        <string>Etc</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pbStart">
        <property name="text">
         <string>Start</string>

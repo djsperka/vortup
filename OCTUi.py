@@ -27,6 +27,7 @@ class OCTUi():
         self._acqParams = DEFAULT_ACQ_PARAMS
 
         self._octDialog = OCTDialog()
+        self._octDialog.pbEtc.clicked.connect(self.etcClicked)
         self._octDialog.pbStart.clicked.connect(self.startClicked)
         self._octDialog.pbStop.clicked.connect(self.stopClicked)
         self._octDialog.pbStart.enabled = True  
@@ -37,12 +38,12 @@ class OCTUi():
 
 
 
-    def showParamsDialog(self):
+    def etcClicked(self):
         self._cfgDialog = VtxEngineParamsDialog(self._engineParams)
-        self._cfgDialog.finished.connect(self.cfgFinished)
+        self._cfgDialog.finished.connect(self.etcFinished)
         self._cfgDialog.show()
 
-    def cfgFinished(self, v):
+    def etcFinished(self, v):
         if v == 1:
             self._engineParams = self._cfgDialog.getEngineParameters()
 

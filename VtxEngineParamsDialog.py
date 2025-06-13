@@ -28,9 +28,6 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         v = QDoubleValidator()
         v.setNotation(QDoubleValidator.Notation.ScientificNotation)
         self.lineEditGalvoDelay.setValidator(v)
-        v = QDoubleValidator()
-        v.setNotation(QDoubleValidator.Notation.ScientificNotation)
-        self.lineEditTriggerDelay.setValidator(v)
 
         # plain double validators
         v = QDoubleValidator()
@@ -40,20 +37,6 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         v.setNotation(QDoubleValidator.Notation.ScientificNotation)
         self.lineEditDispersion1.setValidator(v)
 
-        # int validators
-        v = QIntValidator(0,10)
-        self.lineEditScanDimension.setValidator(v)
-        v = QIntValidator(1,1000000)
-        self.lineEditAscansPerBscan.setValidator(v)
-        v = QIntValidator(1,1000000)
-        self.lineEditBscansPerVolume.setValidator(v)
-        v = QIntValidator(0,1000000)
-        self.lineEditBlocksToAcquire.setValidator(v)
-        v = QIntValidator(1,1000000)
-        self.lineEditAscansPerBlock.setValidator(v)
-        v = QIntValidator(1,100000)
-        self.lineEditSamplesPerAscan.setValidator(v)
-        v = QIntValidator(1,1000)
         self.lineEditBlocksToAllocate.setValidator(v)
         v = QIntValidator(1, 1000)
         self.lineEditPreloadCount.setValidator(v)
@@ -73,9 +56,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         # assign id to each radio button. then assign buttonClicked signal to a slot here. 
         # That signal is called once when a radio button is clicked. Use checkedId() in slot.
         self.buttonGroupSource.setId(self.rbAxsun100k, 1)
-        self.buttonGroupSource.setId(self.rbAxsun200k, 2)
-        self.buttonGroupSource.setId(self.rbThorlabs400k, 3)
-        self.buttonGroupSource.setId(self.rbCustom, 4)
+        self.buttonGroupSource.setId(self.rbCustom, 2)
 
         self.buttonGroupSource.buttonClicked.connect(self.rbClicked)
         self.initializeDialog(cfg)        # takes whatever is in cfg and inits dlg
@@ -94,20 +75,12 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
             case 1:
                 self.setClockSourceWidgetValues(source.Axsun100k)
             case 2:
-                self.setClockSourceWidgetValues(source.Axsun200k)
-            case 3:
-                self.setClockSourceWidgetValues(source.ThorlabsVCSEL400k)
-            case 4:
                 # When changing to "Custom", do not change values in widgets. 
                 pass
 
     def setClockSourceRadioButton(self, sscfg: Source):
         if sscfg == source.Axsun100k:
             self.rbAxsun100k.setChecked(True)
-        elif sscfg == source.Axsun200k:
-            self.rbAxsun200k.setChecked(True)
-        elif sscfg == source.ThorlabsVCSEL400k:
-            self.rbThorlabs400k.setChecked(True)
         else:
             self.rbCustom.setChecked(True)
         
@@ -120,30 +93,17 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
     def getClockSourceValues(self) -> Source:
         if self.rbAxsun100k.isChecked():
             return source.Axsun100k
-        elif self.rbAxsun200k.isChecked():
-            return source.Axsun200k
-        elif self.rbThorlabs400k.isChecked():
-            return source.ThorlabsVCSEL400k
         else:
             return Source(int(self.lineEditTriggersPerSecond.text()), int(self.lineEditClockRisingEdgesPerTrigger.text()), float(self.lineEditDutyCycle.text()), float(self.lineEditImagingDepth.text()))
         
-    def initializeDialog(self, cfg):
+    def initializeDialog(self, cfg: VtxEngineParams):
         self._cfg = cfg
         if self._cfg.acquisition_type==AcquisitionType.ALAZAR_ACQUISITION:
             self.radioButtonAlazarAcquisition.setChecked(True)
         elif self._cfg.acquisition_type==AcquisitionType.FILE_ACQUISITION:
             self.radioButtonFileAcquisition.setChecked(True)
 
-        self.lineEditScanDimension.setText(str(cfg.scan_dimension))
-        self.checkBoxBidirectional.setChecked(cfg.bidirectional)
-        self.lineEditAscansPerBscan.setText(str(cfg.ascans_per_bscan))
-        self.lineEditBscansPerVolume.setText(str(cfg.bscans_per_volume))
         self.lineEditGalvoDelay.setText(str(cfg.galvo_delay))
-
-        self.lineEditBlocksToAcquire.setText(str(cfg.blocks_to_acquire))
-        self.lineEditAscansPerBlock.setText(str(cfg.ascans_per_block))
-        self.lineEditSamplesPerAscan.setText(str(cfg.samples_per_ascan))
-        self.lineEditTriggerDelay.setText(str(cfg.trigger_delay_seconds))
 
         # Handle swept_source separately because of source types
         self.setClockSourceRadioButton(cfg.swept_source)
@@ -153,8 +113,6 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.lineEditInternalClockRate.setText(str(cfg.clock_samples_per_second))
         self.lineEditExternalClockLevelPct.setText(str(cfg.external_clock_level_pct))
         # input channel and clock channel ignored for now - we cannot load vortex.acquire.alazar....
-        self.checkBoxDoIO.setChecked(cfg.doIO)
-        self.checkBoxDoStrobe.setChecked(cfg.doStrobe)
         self.lineEditTriggerRange.setText(str(cfg.trigger_range_millivolts))
         self.lineEditTriggerLevelFraction.setText(str(cfg.trigger_level_fraction))
 
@@ -172,23 +130,10 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         elif self.radioButtonFileAcquisition.isChecked():
             s.acquisition_type = AcquisitionType.FILE_ACQUISITION
 
-        s.scan_dimension = float(self.lineEditScanDimension.text())
-        s.bidirectional = self.checkBoxBidirectional.isChecked()
-        s.ascans_per_bscan = int(self.lineEditAscansPerBscan.text())
-        s.bscans_per_volume = int(self.lineEditBscansPerVolume.text())
-        s.galvo_delay = float(self.lineEditGalvoDelay.text())
-        s.clock_samples_per_second = int(self.lineEditBlocksToAcquire.text())
-        s.blocks_to_acquire = int(self.lineEditBlocksToAcquire.text())
-        s.ascans_per_block = int(self.lineEditAscansPerBlock.text())
-        s.samples_per_ascan = int(self.lineEditSamplesPerAscan.text())
-        s.trigger_delay_seconds = float(self.lineEditTriggerDelay.text())
+        s.clock_samples_per_second = int(self.lineEditInternalClockRate.text())
         s.swept_source = self.getClockSourceValues()
         s.internal_clock = bool(self.checkBoxInternalClock.isChecked())
         s.external_clock_level_pct = int(self.lineEditExternalClockLevelPct.text())
-        #s.clock_channel = 
-        #s.input_channel = 
-        s.doIO = bool(self.checkBoxDoIO.isChecked())
-        s.doStrobe = bool(self.checkBoxDoStrobe.isChecked())
         s.trigger_range_millivolts = int(self.lineEditTriggerRange.text())
         s.trigger_level_fraction = float(self.lineEditTriggerLevelFraction.text())
         s.blocks_to_allocate = int(self.lineEditBlocksToAllocate.text())
