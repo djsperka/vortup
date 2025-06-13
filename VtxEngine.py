@@ -59,12 +59,14 @@ class VtxEngine(VtxBaseEngine):
         ec.add_acquisition(self._acquire, [self._process])
         ec.add_processor(self._process, [stack_format])
         ec.add_formatter(stack_format, [stack_tensor_endpoint])
-        if cfg.doIO:
-            ec.add_io(self._io_out, lead_samples=round(cfg.galvo_delay * self._io_out.config.samples_per_second))
-            ec.galvo_output_channels = len(self._io_out.config.channels)
-            print("there are {0:d} galvo channels".format(ec.galvo_output_channels))
-        if cfg.doStrobe:
-            ec.add_io(self._strobe)
+
+        # add galvo output
+        ec.add_io(self._io_out, lead_samples=round(cfg.galvo_delay * self._io_out.config.samples_per_second))
+        ec.galvo_output_channels = len(self._io_out.config.channels)
+        print("there are {0:d} galvo channels".format(ec.galvo_output_channels))
+
+        # strobe output
+        ec.add_io(self._strobe)
 
         ec.preload_count = cfg.preload_count
         ec.records_per_block = acq.ascans_per_block

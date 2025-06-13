@@ -5,6 +5,7 @@ from PyQt5 import uic
 from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, AcquisitionType
 from Ui_VtxEngineParamsDialog import Ui_VtxEngineParamsDialog
 from vortex.engine import source, Source
+from vortex import Range
 
 class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
     """Dialog for setting VtxEngineParameters.     
@@ -36,6 +37,19 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         v = QDoubleValidator()
         v.setNotation(QDoubleValidator.Notation.ScientificNotation)
         self.lineEditDispersion1.setValidator(v)
+        v = QDoubleValidator(-10,10,3)
+        self.lineEditGalvoXmin.setValidator(v)
+        v = QDoubleValidator(-10,10,3)
+        self.lineEditGalvoXmax.setValidator(v)
+        v = QDoubleValidator(-10,10,3)
+        self.lineEditGalvoYmin.setValidator(v)
+        v = QDoubleValidator(-10,10,3)
+        self.lineEditGalvoYmax.setValidator(v)
+        
+        v = QDoubleValidator(0,2,3)
+        self.lineEditXUnitsPerVolt.setValidator(v)
+        v = QDoubleValidator(0,2,3)
+        self.lineEditYUnitsPerVolt.setValidator(v)
 
         self.lineEditBlocksToAllocate.setValidator(v)
         v = QIntValidator(1, 1000)
@@ -105,6 +119,13 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
 
         self.lineEditGalvoDelay.setText(str(cfg.galvo_delay))
 
+        self.lineEditGalvoXmin.setText(str(cfg.galvo_x_voltage_range.min))
+        self.lineEditGalvoXmax.setText(str(cfg.galvo_x_voltage_range.max))
+        self.lineEditGalvoYmin.setText(str(cfg.galvo_y_voltage_range.min))
+        self.lineEditGalvoYmax.setText(str(cfg.galvo_y_voltage_range.max))
+        self.lineEditXUnitsPerVolt.setText(str(cfg.galvo_x_units_per_volt))
+        self.lineEditYUnitsPerVolt.setText(str(cfg.galvo_y_units_per_volt))
+
         # Handle swept_source separately because of source types
         self.setClockSourceRadioButton(cfg.swept_source)
         self.setClockSourceWidgetValues(cfg.swept_source)
@@ -129,6 +150,12 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
             s.acquisition_type = AcquisitionType.ALAZAR_ACQUISITION
         elif self.radioButtonFileAcquisition.isChecked():
             s.acquisition_type = AcquisitionType.FILE_ACQUISITION
+
+        s.galvo_delay = float(self.lineEditGalvoDelay.text())
+        s.galvo_x_voltage_range = Range(float(self.lineEditGalvoXmin.text()), float(self.lineEditGalvoXmax.text()))
+        s.galvo_y_voltage_range = Range(float(self.lineEditGalvoYmin.text()), float(self.lineEditGalvoYmax.text()))
+        s.galvo_x_units_per_volt = float(self.lineEditXUnitsPerVolt.text())
+        s.galvo_y_units_per_volt = float(self.lineEditYUnitsPerVolt.text())
 
         s.clock_samples_per_second = int(self.lineEditInternalClockRate.text())
         s.swept_source = self.getClockSourceValues()

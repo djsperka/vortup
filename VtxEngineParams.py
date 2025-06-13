@@ -1,3 +1,4 @@
+from vortex import Range
 from vortex.acquire import alazar
 from vortex.engine import source, Source
 from typing import Tuple
@@ -17,6 +18,12 @@ class VtxEngineParams:
     # left over from scan parameters
     galvo_delay: float
 
+    # other galvo stuff
+    galvo_x_voltage_range: Range
+    galvo_y_voltage_range: Range
+    galvo_x_units_per_volt: float
+    galvo_y_units_per_volt: float
+    
     # hardware configuration
     swept_source: Source
     internal_clock: bool
@@ -25,8 +32,6 @@ class VtxEngineParams:
     clock_channel: alazar.Channel
     input_channel: alazar.Channel
     input_channel_range_millivolts: int
-    doIO: bool
-    doStrobe: bool
     trigger_range_millivolts: int
     trigger_level_fraction: float
 
@@ -45,6 +50,10 @@ DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
 
     acquisition_type=AcquisitionType.ALAZAR_ACQUISITION,
     galvo_delay=0.0,
+    galvo_x_voltage_range=Range(-3,3),
+    galvo_y_voltage_range=Range(-3,3),
+    galvo_x_units_per_volt=1.5,
+    galvo_y_units_per_volt=1.5,
 
     # These are probably rig-specific? Hasn't been an issue to use these. 
     blocks_to_allocate=128,
@@ -58,8 +67,6 @@ DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
     clock_channel=alazar.Channel.B,    # only relevant if internal_clock is True
     input_channel=alazar.Channel.A,
     input_channel_range_millivolts=1000,
-    doIO=True,
-    doStrobe=True,
     trigger_range_millivolts=5000,
     trigger_level_fraction=0.10,
 

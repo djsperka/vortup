@@ -1,4 +1,4 @@
-from vortex import get_console_logger as get_logger
+from vortex import Range, get_console_logger as get_logger
 from vortex.engine import Block, dispersion_phasor
 from vortex.acquire import AlazarConfig, AlazarAcquisition, alazar, FileAcquisitionConfig, FileAcquisition
 from vortex.process import CUDAProcessor, CUDAProcessorConfig
@@ -101,33 +101,35 @@ class VtxBaseEngine():
         # galvo control
         #
 
-        if cfg.doIO:
-            # output
-            ioc_out = DAQmxConfig()
-            ioc_out.samples_per_block = ac.records_per_block
-            ioc_out.samples_per_second = cfg.swept_source.triggers_per_second
-            ioc_out.blocks_to_buffer = cfg.preload_count
-            ioc_out.clock.source = "pfi12"
-            ioc_out.name = 'output'
+        # output
+        ioc_out = DAQmxConfig()
+        ioc_out.samples_per_block = ac.records_per_block
+        ioc_out.samples_per_second = cfg.swept_source.triggers_per_second
+        ioc_out.blocks_to_buffer = cfg.preload_count
+        ioc_out.clock.source = "pfi12"
+        ioc_out.name = 'output'
 
-            stream = Block.StreamIndex.GalvoTarget
-            ioc_out.channels.append(daqmx.AnalogVoltageOutput('Dev1/ao0', 15 / 10, stream, 0))
-            ioc_out.channels.append(daqmx.AnalogVoltageOutput('Dev1/ao1', 15 / 10, stream, 1))
+        stream = Block.StreamIndex.GalvoTarget
+        xAVO = daqmx.AnalogVoltageOutput('Dev1/ao0', cfg.galvo_x_units_per_volt, stream, 0)
+        xAVO.limits = cfg.galvo_x_voltage_range
+        ioc_out.channels.append(xAVO)
+        yAVO = daqmx.AnalogVoltageOutput('Dev1/ao1', cfg.galvo_y_units_per_volt, stream, 1)
+        yAVO.limits = cfg.galvo_y_voltage_range
+        ioc_out.channels.append(yAVO)
 
-            io_out = DAQmxIO(get_logger(ioc_out.name, cfg.log_level))
-            io_out.initialize(ioc_out)
-            self._io_out = io_out
+        io_out = DAQmxIO(get_logger(ioc_out.name, cfg.log_level))
+        io_out.initialize(ioc_out)
+        self._io_out = io_out
 
 
-        if cfg.doStrobe:
-            # examples show this being a copy of ioc_out. Make a new one instead.
-            strobec = DAQmxConfig()
-            strobec.samples_per_block = ac.records_per_block
-            strobec.samples_per_second = cfg.swept_source.triggers_per_second
-            strobec.blocks_to_buffer = cfg.preload_count
-            strobec.clock.source = "pfi12"
-            strobec.name = 'strobe'
-            strobec.channels.append(daqmx.DigitalOutput('Dev1/port0', Block.StreamIndex.Strobes))
-            strobe = DAQmxIO(get_logger(strobec.name, cfg.log_level))
-            strobe.initialize(strobec)
-            self._strobe = strobe
+        # examples show this being a copy of ioc_out. Make a new one instead.
+        strobec = DAQmxConfig()
+        strobec.samples_per_block = ac.records_per_block
+        strobec.samples_per_second = cfg.swept_source.triggers_per_second
+        strobec.blocks_to_buffer = cfg.preload_count
+        strobec.clock.source = "pfi12"
+        strobec.name = 'strobe'
+        strobec.channels.append(daqmx.DigitalOutput('Dev1/port0', Block.StreamIndex.Strobes))
+        strobe = DAQmxIO(get_logger(strobec.name, cfg.log_level))
+        strobe.initialize(strobec)
+        self._strobe = strobe

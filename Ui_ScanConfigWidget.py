@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_ScanConfigWidget(object):
     def setupUi(self, ScanConfigWidget):
         ScanConfigWidget.setObjectName("ScanConfigWidget")
-        ScanConfigWidget.resize(146, 200)
+        ScanConfigWidget.resize(193, 279)
         self.verticalLayout = QtWidgets.QVBoxLayout(ScanConfigWidget)
         self.verticalLayout.setObjectName("verticalLayout")
         self.cbScanTypes = QtWidgets.QComboBox(ScanConfigWidget)
@@ -108,6 +108,9 @@ class Ui_ScanConfigWidget(object):
         self.gridLayout_2.addWidget(self.cbLBidirectional, 3, 1, 1, 1)
         self.stackScanTypes.addWidget(self.page_2)
         self.verticalLayout.addWidget(self.stackScanTypes)
+        self.pushButtonShowPattern = QtWidgets.QPushButton(ScanConfigWidget)
+        self.pushButtonShowPattern.setObjectName("pushButtonShowPattern")
+        self.verticalLayout.addWidget(self.pushButtonShowPattern)
 
         self.retranslateUi(ScanConfigWidget)
         self.cbScanTypes.setCurrentIndex(0)
@@ -136,6 +139,7 @@ class Ui_ScanConfigWidget(object):
         self.label_9.setText(_translate("ScanConfigWidget", "A per B"))
         self.leLAperB.setText(_translate("ScanConfigWidget", "500"))
         self.label_8.setText(_translate("ScanConfigWidget", "bidirectional?"))
+        self.pushButtonShowPattern.setText(_translate("ScanConfigWidget", "Show Pattern"))
 
 
 if __name__ == "__main__":

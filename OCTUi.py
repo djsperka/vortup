@@ -51,14 +51,18 @@ class OCTUi():
 
         # We need access to both the engine (the endpoints) and the gui (display widgets). 
         if not self._cross_widget:
+            self._raster_widget = RasterEnFaceWidget(self._vtxengine._stack_tensor_endpoint)
             self._cross_widget = CrossSectionImageWidget(self._vtxengine._stack_tensor_endpoint)
             self._trace_widget = TraceWidget(self._vtxengine._stack_tensor_endpoint)
 
-            # make horizontal layout and add the plots, then set it as layout for widgetDummy
+            # 
+            vbox = QVBoxLayout()
             hbox = QHBoxLayout()
+            hbox.addWidget(self._raster_widget)
             hbox.addWidget(self._cross_widget)
-            hbox.addWidget(self._trace_widget)
-            self._octDialog.widgetDummy.setLayout(hbox)
+            vbox.addLayout(hbox)
+            vbox.addWidget(self._trace_widget)
+            self._octDialog.widgetDummy.setLayout(vbox)
             self._octDialog.widgetDummy.show()
 
         else:
@@ -70,6 +74,7 @@ class OCTUi():
 
     def cb_segments(self, v):
         # argument (v) here is a number - index pointing to a segment in allocated segments.
+        self._raster_widget.notify_segments(v)
         self._cross_widget.notify_segments(v)
 
     def cb_volume(self, sample_idx, scan_idx, volume_idx):

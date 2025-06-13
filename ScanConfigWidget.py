@@ -1,10 +1,13 @@
 import sys
-from vortex.scan import RasterScanConfig
+from vortex.scan import RasterScanConfig, RasterScan, Limits
 from vortex import Range
 from PyQt5.QtWidgets import QGroupBox, QApplication, QWidget
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QRegExpValidator
 from PyQt5.QtCore import QRegExp
 from Ui_ScanConfigWidget import Ui_ScanConfigWidget
+from vortex_tools.scan import plot_annotated_waveforms_time, plot_annotated_waveforms_space
+from matplotlib import pyplot
+import traceback
 
 class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
     def __init__(self, parent: QWidget=None, cfg: RasterScanConfig=RasterScanConfig()):
@@ -25,7 +28,24 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
         self.leBperV.setValidator(QIntValidator(1,5000))
         self.leXextent.setValidator(QRegExpValidator(self._regexForExtents))
         self.leYextent.setValidator(QRegExpValidator(self._regexForExtents))
+        self.pushButtonShowPattern.clicked.connect(self.showPatternClicked)
 
+    def showPatternClicked(self):
+        try:
+            cfg = self.getScanConfig()
+            scan = RasterScan()
+            scan.initialize(cfg)
+            name = "scan pattern"
+            fig, _ = plot_annotated_waveforms_time(cfg.sampling_interval, scan.scan_buffer(), scan.scan_markers())
+            fig.suptitle(name)
+            fig.show()
+            fig, _ = plot_annotated_waveforms_space(scan.scan_buffer(), scan.scan_markers())
+            fig.suptitle(name)
+            fig.show()
+            pyplot.show()
+        except RuntimeError as e:
+            print("RuntimeError:")
+            traceback.print_exception(e)
 
     def getRangeFromTextEntry(self, txt) -> Range:
         # match regex. Validator should ensure that there is ALWAYS a match, but throw exception if not.
@@ -58,8 +78,8 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
             cfg.ascans_per_bscan = int(self.leLAperB.text())
             cfg.bscans_per_volume = 1
             cfg.bidirectional_segments = self.cbLBidirectional.isChecked()
-            cfg.segment_extent = getRangeFromTextEntry(self.leLextent.text())
-            cfg.bscan_extent = Range(0)
+            cfg.segment_extent = self.getRangeFromTextEntry(self.leLextent.text())
+            cfg.bscan_extent = Range(0, 0)
         else:
             raise RuntimeError("Scan type not handled by getScanConfig()")
         return cfg

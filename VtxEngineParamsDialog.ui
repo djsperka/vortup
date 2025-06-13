@@ -98,37 +98,57 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="1" colspan="2">
+        <item row="0" column="1" colspan="3">
          <widget class="QLineEdit" name="lineEditGalvoDelay"/>
         </item>
-        <item row="1" column="0">
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>X units/V</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2" colspan="2">
+         <widget class="QLineEdit" name="lineEditXUnitsPerVolt"/>
+        </item>
+        <item row="2" column="0">
          <widget class="QLabel" name="label_2">
           <property name="text">
            <string>X limits(V)</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
+        <item row="2" column="1" colspan="2">
          <widget class="QLineEdit" name="lineEditGalvoXmin"/>
         </item>
-        <item row="1" column="2">
+        <item row="2" column="3">
          <widget class="QLineEdit" name="lineEditGalvoXmax"/>
         </item>
-        <item row="2" column="0">
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Y units/V</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2" colspan="2">
+         <widget class="QLineEdit" name="lineEditYUnitsPerVolt"/>
+        </item>
+        <item row="4" column="0">
          <widget class="QLabel" name="label_3">
           <property name="text">
            <string>X limits(V)</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="4" column="1" colspan="2">
          <widget class="QLineEdit" name="lineEditGalvoYmin">
           <property name="text">
            <string/>
           </property>
          </widget>
         </item>
-        <item row="2" column="2">
+        <item row="4" column="3">
          <widget class="QLineEdit" name="lineEditGalvoYmax">
           <property name="text">
            <string/>
