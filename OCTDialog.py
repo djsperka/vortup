@@ -27,12 +27,11 @@ class OCTDialog(QDialog, Ui_OCTDialog):
     def __init__(self):
         super().__init__() # Call the inherited class' __init__ method
         self.setupUi(self)  # Use Ui_OCTDialog.py- WARNING! pyuic5 -o Ui_OCTDialog.py OCTDialog.ui
-        # uic.loadUi('OCTDialog.ui', self) # Load the .ui file
 
         # replace placeholder with scan type widget
         self.scanConfigWidget = ScanConfigWidget(self)
         self.verticalLayoutSidebar.insertWidget(0, self.scanConfigWidget)
-        print("adding acq")
         self.acqParamsWidget = AcqParamsWidget(self)
         self.verticalLayoutSidebar.insertWidget(1, self.acqParamsWidget)
+        self.verticalLayoutSidebar.insertStretch(2)
 

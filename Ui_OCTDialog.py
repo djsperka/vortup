@@ -20,8 +20,6 @@ class Ui_OCTDialog(object):
         self.verticalLayoutSidebar = QtWidgets.QVBoxLayout()
         self.verticalLayoutSidebar.setSizeConstraint(QtWidgets.QLayout.SetMinimumSize)
         self.verticalLayoutSidebar.setObjectName("verticalLayoutSidebar")
-        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayoutSidebar.addItem(spacerItem)
         self.pbStart = QtWidgets.QPushButton(OCTDialog)
         self.pbStart.setObjectName("pbStart")
         self.verticalLayoutSidebar.addWidget(self.pbStart)

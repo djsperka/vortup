@@ -16,11 +16,15 @@ class TraceWidget(FigureCanvas):
         self._line2d = None
         self._xdata = None
         self._invalidated = False
+        self._shape = None
         super().__init__(fig)
 
     def paintEvent(self, e: QPaintEvent) -> None:
         if self._invalidated:
             self._invalidated = False
+            if not self._shape:
+                self._shape = self._endpoint.tensor.shape
+
             if self._endpoint.tensor.shape:
                 with self._endpoint.tensor as volume:
                     if isinstance(volume, cupy.ndarray):
@@ -29,10 +33,12 @@ class TraceWidget(FigureCanvas):
                         self._endpoint.stream.synchronize()
                     else:
                         ytmp = volume.mean(axis=1)
+                    print("ytmp/vol shape:", numpy.shape(ytmp), numpy.shape(volume))
                 ydata = ytmp.flatten()
-                if self._line2d:
+                if self._line2d and self._shape == self._endpoint.tensor.shape:
                     self._line2d.set_ydata(ydata)
                 else:
+                    self._shape = self._endpoint.tensor.shape
                     xdata = list(range(1,len(ydata)+1))
                     line2ds = self._axes.plot(xdata, ydata)
                     self._line2d = line2ds[0]
@@ -48,5 +54,5 @@ class TraceWidget(FigureCanvas):
         self._invalidated = True
         self.update()
 
-    def clear():
+    def clear(self):
         self._axes.clear()

@@ -12,12 +12,14 @@ import logging
 from rainbow_logging_handler import RainbowLoggingHandler
 import cupy
 import numpy
-
+import traceback
 
 class OCTUi():
     
     def __init__(self):
         super().__init__() # Call the inherited class' __init__ method
+        self._logger = logging.getLogger('OCTUi')
+        self._vtxengine = None
         self._cross_widget = None
         self._trace_widget = None
         self._engineParams = DEFAULT_VTX_ENGINE_PARAMS
@@ -45,7 +47,7 @@ class OCTUi():
             self._engineParams = self._cfgDialog.getEngineParameters()
 
     def addPlotsToDialog(self):
-        # set up plots
+
         # We need access to both the engine (the endpoints) and the gui (display widgets). 
         if not self._cross_widget:
             self._cross_widget = CrossSectionImageWidget(self._vtxengine._stack_tensor_endpoint)
@@ -58,16 +60,19 @@ class OCTUi():
             self._octDialog.widgetDummy.setLayout(hbox)
             self._octDialog.widgetDummy.show()
 
-            # argument (v) here is a number - index pointing to a segment in allocated segments.
-            def cb(v):
-                #stack_widget.notify_segments(v)
-                self._cross_widget.notify_segments(v)
-            self._vtxengine._stack_tensor_endpoint.aggregate_segment_callback = cb
+        else:
+            self._cross_widget._endpoint = self._vtxengine._stack_tensor_endpoint
+            self._trace_widget._endpoint = self._vtxengine._stack_tensor_endpoint
 
-            # 
-            def cb_volume(sample_idx, scan_idx, volume_idx):
-                self._trace_widget.update_trace()
-            self._vtxengine._stack_tensor_endpoint.volume_callback = cb_volume
+        self._vtxengine._stack_tensor_endpoint.aggregate_segment_callback = self.cb_segments
+        self._vtxengine._stack_tensor_endpoint.volume_callback = self.cb_volume
+
+    def cb_segments(self, v):
+        # argument (v) here is a number - index pointing to a segment in allocated segments.
+        self._cross_widget.notify_segments(v)
+
+    def cb_volume(self, sample_idx, scan_idx, volume_idx):
+        self._trace_widget.update_trace()
 
 
     def startClicked(self):
@@ -82,18 +87,31 @@ class OCTUi():
             self._scanConfig = self._octDialog.scanConfigWidget.getScanConfig()
 
             # get oct engine ready
-            self._vtxengine = VtxEngine(self._engineParams)
+            if self._vtxengine:
+                if not self._vtxengine._engine.done:
+                    self._logger.warning('engine is not stopped')
+                    return
+                del self._vtxengine
+            self._vtxengine = None
+
+            # create engine
+
+            self._vtxengine = VtxEngine(self._engineParams, self._acqParams, self._scanConfig)
 
             # put something into the scan queue
             self._vtxengine._engine.scan_queue.clear()
             self._vtxengine._engine.scan_queue.append(self._vtxengine._raster_scan)
+
+            # setup plots
+            self.addPlotsToDialog()
 
             # now start the actual engine
             self._vtxengine._engine.start()
 
         except RuntimeError as e:
             print("RuntimeError:")
-            print(e)
+            traceback.print_exception(e)
+            sys.exit(-1)
 
 
     def stopClicked(self):
@@ -108,6 +126,7 @@ def setup_logging():
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.NOTSET)
     logging.getLogger("matplotlib").setLevel(logging.WARNING)
+    logging.getLogger("OCTUi").setLevel(logging.WARNING)
 
     formatter = logging.Formatter('%(asctime)s.%(msecs)03d [%(name)s] %(filename)s:%(lineno)d\t%(levelname)s:\t%(message)s')
 
