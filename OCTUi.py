@@ -6,6 +6,7 @@ from OCTDialog import OCTDialog
 from PyQt5.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
 from vortex.scan import RasterScanConfig
+from vortex.storage import HDF5StackUInt16, HDF5StackInt8, HDF5StackConfig, HDF5StackHeader, SimpleStackUInt16, SimpleStackInt8, SimpleStackConfig, SimpleStackHeader
 from TraceWidget import TraceWidget
 from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
 import logging
@@ -82,8 +83,9 @@ class OCTUi():
 
 
     def startClicked(self):
-        self._octDialog.pbStart.enabled = False
-        self._octDialog.pbStop.enabled = True
+        self._octDialog.pbEtc.setEnabled(False)
+        self._octDialog.pbStart.setEnabled(False)
+        self._octDialog.pbStop.setEnabled(True)
 
         try:
             # fetch current configuration for acq and scan params. The items 
@@ -121,8 +123,9 @@ class OCTUi():
 
 
     def stopClicked(self):
-        self._octDialog.pbStart.enabled = True
-        self._octDialog.pbStop.enabled = False
+        self._octDialog.pbEtc.setEnabled(True)
+        self._octDialog.pbStart.setEnabled(True)
+        self._octDialog.pbStop.setEnabled(False)
         self._vtxengine._engine.stop()
 
 
