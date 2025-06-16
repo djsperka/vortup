@@ -1,7 +1,7 @@
 from vortex import Range, get_console_logger as get_logger
 from vortex.engine import Block, dispersion_phasor
 from vortex.acquire import AlazarConfig, AlazarAcquisition, alazar, FileAcquisitionConfig, FileAcquisition
-from vortex.process import CUDAProcessor, CUDAProcessorConfig
+from vortex.process import CUDAProcessor, CUDAProcessorConfig, NullProcessor, NullProcessorConfig
 from vortex.io import DAQmxIO, DAQmxConfig, daqmx
 from VtxEngineParams import VtxEngineParams, AcquisitionType
 from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
@@ -92,9 +92,18 @@ class VtxBaseEngine():
         # DC subtraction per block
         pc.average_window = 2 * pc.ascans_per_block
 
-        process = CUDAProcessor(get_logger('process', cfg.log_level))
-        process.initialize(pc)
-        self._process = process
+        self._octprocess = CUDAProcessor(get_logger('process', cfg.log_level))
+        self._octprocess.initialize(pc)
+
+        #
+        # make a Null processor to pass data untouched
+        #
+
+        ncfg = NullProcessorConfig()
+        ncfg.samples_per_record = acq.samples_per_ascan
+        ncfg.ascans_per_block = acq.ascans_per_block
+        self._nullprocess = NullProcessor()
+        self._nullprocess.initialize(ncfg)
 
 
         #

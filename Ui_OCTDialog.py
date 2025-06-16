@@ -18,8 +18,13 @@ class Ui_OCTDialog(object):
         self.horizontalLayout = QtWidgets.QHBoxLayout(OCTDialog)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.verticalLayoutSidebar = QtWidgets.QVBoxLayout()
-        self.verticalLayoutSidebar.setSizeConstraint(QtWidgets.QLayout.SetMinimumSize)
         self.verticalLayoutSidebar.setObjectName("verticalLayoutSidebar")
+        self.cbSaveToDisk = QtWidgets.QCheckBox(OCTDialog)
+        self.cbSaveToDisk.setObjectName("cbSaveToDisk")
+        self.verticalLayoutSidebar.addWidget(self.cbSaveToDisk)
+        self.pbSelectFile = QtWidgets.QPushButton(OCTDialog)
+        self.pbSelectFile.setObjectName("pbSelectFile")
+        self.verticalLayoutSidebar.addWidget(self.pbSelectFile)
         self.pbEtc = QtWidgets.QPushButton(OCTDialog)
         self.pbEtc.setObjectName("pbEtc")
         self.verticalLayoutSidebar.addWidget(self.pbEtc)
@@ -34,7 +39,7 @@ class Ui_OCTDialog(object):
         self.widgetDummy.setObjectName("widgetDummy")
         self.horizontalLayout.addWidget(self.widgetDummy)
         self.horizontalLayout.setStretch(0, 1)
-        self.horizontalLayout.setStretch(1, 5)
+        self.horizontalLayout.setStretch(1, 4)
 
         self.retranslateUi(OCTDialog)
         QtCore.QMetaObject.connectSlotsByName(OCTDialog)
@@ -42,16 +47,8 @@ class Ui_OCTDialog(object):
     def retranslateUi(self, OCTDialog):
         _translate = QtCore.QCoreApplication.translate
         OCTDialog.setWindowTitle(_translate("OCTDialog", "UCD OCT Dev Tool"))
+        self.cbSaveToDisk.setText(_translate("OCTDialog", "Save to disk"))
+        self.pbSelectFile.setText(_translate("OCTDialog", "Select file"))
         self.pbEtc.setText(_translate("OCTDialog", "Etc"))
         self.pbStart.setText(_translate("OCTDialog", "Start"))
         self.pbStop.setText(_translate("OCTDialog", "Stop"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    OCTDialog = QtWidgets.QDialog()
-    ui = Ui_OCTDialog()
-    ui.setupUi(OCTDialog)
-    OCTDialog.show()
-    sys.exit(app.exec_())

@@ -1,9 +1,10 @@
 import sys
+import os
 from VtxEngineParams import DEFAULT_VTX_ENGINE_PARAMS, VtxEngineParams
 from VtxEngineParamsDialog import VtxEngineParamsDialog
 from VtxEngine import VtxEngine
 from OCTDialog import OCTDialog
-from PyQt5.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QFileDialog, QMessageBox
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
 from vortex.scan import RasterScanConfig
 from vortex.storage import HDF5StackUInt16, HDF5StackInt8, HDF5StackConfig, HDF5StackHeader, SimpleStackUInt16, SimpleStackInt8, SimpleStackConfig, SimpleStackHeader
@@ -26,8 +27,12 @@ class OCTUi():
         self._engineParams = DEFAULT_VTX_ENGINE_PARAMS
         self._scanConfig = RasterScanConfig()
         self._acqParams = DEFAULT_ACQ_PARAMS
+        self._typeExt = None
 
         self._octDialog = OCTDialog()
+        self._octDialog.pbSelectFile.setEnabled(False)
+        self._octDialog.cbSaveToDisk.toggled.connect(self._octDialog.pbSelectFile.setEnabled)
+        self._octDialog.pbSelectFile.clicked.connect(self.selectFileClicked)
         self._octDialog.pbEtc.clicked.connect(self.etcClicked)
         self._octDialog.pbStart.clicked.connect(self.startClicked)
         self._octDialog.pbStop.clicked.connect(self.stopClicked)
@@ -37,7 +42,42 @@ class OCTUi():
         self._octDialog.resize(1000,800)              
         self._octDialog.show()
 
+    def selectFileClicked(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
 
+
+        # When the user hits Cancel, the filename returned is empty.
+        bTryAgain = True
+        self._typeExt = None
+        self._saveFilename = None
+        while bTryAgain:
+            fileName, _ = QFileDialog.getSaveFileName(self._octDialog,"Filename for OCT data","","MATLAB (*.mat);;HD5 (*.h5);;Numpy (*.npy)", options=options)
+            if fileName:
+                d = os.path.dirname(fileName)
+                b = os.path.basename(fileName)
+                n,ext = os.path.splitext(b)
+                print("dir: {0:s} base: {1:s} n: {2:s} ext: {3:s}".format(d,b,n,ext))
+                if ext:
+                    match ext.lower():
+                        case '.mat':
+                            self._typeExt = 'mat'
+                            bTryAgain = False
+                        case 'h5':
+                            self._typeExt = '.h5'
+                            bTryAgain = False
+                        case 'npy':
+                            self._typeExt = '.npy'
+                            bTryAgain = False
+                else:
+                    bTryAgain = True
+            else:
+                bTryAgain = False
+            if bTryAgain:
+               QMessageBox.information(self._octDialog, "Oops", "Cannot determine file type. Please choose a file with extension \".mat\", \".h5\", or \".npy\".")
+            else:
+                self._saveFilename = fileName
+                print("Got output filename: {0:s}".format(self._saveFilename))
 
     def etcClicked(self):
         self._cfgDialog = VtxEngineParamsDialog(self._engineParams)
