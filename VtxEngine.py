@@ -1,7 +1,7 @@
 from VtxBaseEngine import VtxBaseEngine
 from vortex import Range, get_console_logger as get_logger
 from vortex.marker import Flags
-from vortex.engine import Engine, EngineConfig, Block, dispersion_phasor, StackDeviceTensorEndpointInt8 as StackDeviceTensorEndpoint
+from vortex.engine import Engine, EngineConfig, Block, dispersion_phasor, StackDeviceTensorEndpointInt8
 from vortex.acquire import AlazarConfig, AlazarAcquisition, alazar, FileAcquisitionConfig, FileAcquisition
 from vortex.process import CUDAProcessor, CUDAProcessorConfig
 from vortex.io import DAQmxIO, DAQmxConfig, daqmx
@@ -46,7 +46,7 @@ class VtxEngine(VtxBaseEngine):
         sfec_spectra = StackFormatExecutorConfig()
         sfe_spectra  = StackFormatExecutor()
         sfe_spectra.initialize(sfec_spectra)
-        ep = StackDeviceTensorEndpoint(sfe_spectra, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
+        ep = StackDeviceTensorEndpointInt8(sfe_spectra, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
         self._endpoint_spectra_list = [ep]
 
         # make another for saving spectra
@@ -61,7 +61,7 @@ class VtxEngine(VtxBaseEngine):
         samples_to_save = sfec_ascans.sample_slice.count()
         sfe = StackFormatExecutor()
         sfe.initialize(sfec_ascans)
-        self._endpoint_ascans = StackDeviceTensorEndpoint(sfe, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
+        self._endpoint_ascans = StackDeviceTensorEndpointInt8(sfe, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
 
 
 
@@ -110,8 +110,9 @@ class VtxEngine(VtxBaseEngine):
 
             storage = HDF5StackUInt16(gcl('hdf5-spectra', cfg.log_level))
             storage.open(h5sc)
-            
 
+            # TODO I have no idea what the difference between these is. The docs for volume_to_disk.py, where this code comes from, 
+            # says that 'direct_mode'
             if args.direct_mode:
                 spectra_endpoints.append(SpectraHDF5StackEndpoint(self._stack_spectra_storage, log=gcl('spectra', cfg.log_level)))
             else:
