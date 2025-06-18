@@ -1,12 +1,12 @@
 import sys
 import os
-from VtxEngineParams import DEFAULT_VTX_ENGINE_PARAMS, VtxEngineParams
+from VtxEngineParams import DEFAULT_VTX_ENGINE_PARAMS, FileSaveConfig
 from VtxEngineParamsDialog import VtxEngineParamsDialog
 from VtxEngine import VtxEngine
 from OCTDialog import OCTDialog
 from PyQt5.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QFileDialog, QMessageBox
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
-from vortex.scan import RasterScanConfig
+from vortex.scan import RasterScanConfig, RasterScan
 from vortex.storage import HDF5StackUInt16, HDF5StackInt8, HDF5StackConfig, HDF5StackHeader, SimpleStackUInt16, SimpleStackInt8, SimpleStackConfig, SimpleStackHeader
 from TraceWidget import TraceWidget
 from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
@@ -27,11 +27,15 @@ class OCTUi():
         self._engineParams = DEFAULT_VTX_ENGINE_PARAMS
         self._scanConfig = RasterScanConfig()
         self._acqParams = DEFAULT_ACQ_PARAMS
+        self._saveFilename = None
         self._typeExt = None
 
         self._octDialog = OCTDialog()
         self._octDialog.pbSelectFile.setEnabled(False)
-        self._octDialog.cbSaveToDisk.toggled.connect(self._octDialog.pbSelectFile.setEnabled)
+
+        # connections. 
+        #self._octDialog.cbSaveToDisk.toggled.connect(self._octDialog.pbSelectFile.setEnabled)
+        self._octDialog.cbSaveToDisk.toggled.connect(self.cbSaveToggled)
         self._octDialog.pbSelectFile.clicked.connect(self.selectFileClicked)
         self._octDialog.pbEtc.clicked.connect(self.etcClicked)
         self._octDialog.pbStart.clicked.connect(self.startClicked)
@@ -41,6 +45,24 @@ class OCTUi():
         #self.addPlotsToDialog()
         self._octDialog.resize(1000,800)              
         self._octDialog.show()
+
+    def cbSaveToggled(self, bChecked):
+        print("Checked: ", str(bChecked))
+        if bChecked:
+            # See if filename selected. If not, open dialog.
+            if self._saveFilename is None:
+                self.selectFileClicked()
+                if self._saveFilename is None:
+                    # un-check the box if they canceled
+                    print("No file chosen: Un-checking box")
+                    self._octDialog.cbSaveToDisk.setChecked(False)
+                    self._octDialog.pbSelectFile.setEnabled(False)
+                else:
+                    self._octDialog.pbSelectFile.setEnabled(True)
+            else:
+                self._octDialog.pbSelectFile.setEnabled(True)
+
+
 
     def selectFileClicked(self):
         options = QFileDialog.Options()
@@ -57,17 +79,17 @@ class OCTUi():
                 d = os.path.dirname(fileName)
                 b = os.path.basename(fileName)
                 n,ext = os.path.splitext(b)
-                print("dir: {0:s} base: {1:s} n: {2:s} ext: {3:s}".format(d,b,n,ext))
+                #print("dir: {0:s} base: {1:s} n: {2:s} ext: {3:s}".format(d,b,n,ext))
                 if ext:
                     match ext.lower():
                         case '.mat':
                             self._typeExt = 'mat'
                             bTryAgain = False
                         case 'h5':
-                            self._typeExt = '.h5'
+                            self._typeExt = 'h5'
                             bTryAgain = False
                         case 'npy':
-                            self._typeExt = '.npy'
+                            self._typeExt = 'npy'
                             bTryAgain = False
                 else:
                     bTryAgain = True
@@ -76,8 +98,7 @@ class OCTUi():
             if bTryAgain:
                QMessageBox.information(self._octDialog, "Oops", "Cannot determine file type. Please choose a file with extension \".mat\", \".h5\", or \".npy\".")
             else:
-                self._saveFilename = fileName
-                print("Got output filename: {0:s}".format(self._saveFilename))
+                self._saveFilename = fileName if fileName else None
 
     def etcClicked(self):
         self._cfgDialog = VtxEngineParamsDialog(self._engineParams)
@@ -92,9 +113,9 @@ class OCTUi():
 
         # We need access to both the engine (the endpoints) and the gui (display widgets). 
         if not self._cross_widget:
-            self._raster_widget = RasterEnFaceWidget(self._vtxengine._stack_tensor_endpoint)
-            self._cross_widget = CrossSectionImageWidget(self._vtxengine._stack_tensor_endpoint)
-            self._trace_widget = TraceWidget(self._vtxengine._stack_tensor_endpoint)
+            self._raster_widget = RasterEnFaceWidget(self._vtxengine._endpoint_ascans)
+            self._cross_widget = CrossSectionImageWidget(self._vtxengine._endpoint_ascans)
+            self._trace_widget = TraceWidget(self._vtxengine._endpoint_ascans)
 
             # 
             vbox = QVBoxLayout()
@@ -107,11 +128,11 @@ class OCTUi():
             self._octDialog.widgetDummy.show()
 
         else:
-            self._cross_widget._endpoint = self._vtxengine._stack_tensor_endpoint
-            self._trace_widget._endpoint = self._vtxengine._stack_tensor_endpoint
+            self._cross_widget._endpoint = self._vtxengine._endpoint_ascans
+            self._trace_widget._endpoint = self._vtxengine._endpoint_ascans
 
-        self._vtxengine._stack_tensor_endpoint.aggregate_segment_callback = self.cb_segments
-        self._vtxengine._stack_tensor_endpoint.volume_callback = self.cb_volume
+        self._vtxengine._endpoint_ascans.aggregate_segment_callback = self.cb_segments
+        self._vtxengine._endpoint_ascans.volume_callback = self.cb_volume
 
     def cb_segments(self, v):
         # argument (v) here is a number - index pointing to a segment in allocated segments.
@@ -133,6 +154,7 @@ class OCTUi():
             # fetch here.
             self._acqParams = self._octDialog.acqParamsWidget.getAcqParams()
             self._scanConfig = self._octDialog.scanConfigWidget.getScanConfig()
+            self._fileConfig = self.getFileConfig()
 
             # get oct engine ready
             if self._vtxengine:
@@ -144,11 +166,13 @@ class OCTUi():
 
             # create engine
 
-            self._vtxengine = VtxEngine(self._engineParams, self._acqParams, self._scanConfig)
+            self._vtxengine = VtxEngine(self._engineParams, self._acqParams, self._scanConfig, self._fileConfig)
 
             # put something into the scan queue
+            self._raster_scan = RasterScan()
+            self._raster_scan.initialize(self._scanConfig)
             self._vtxengine._engine.scan_queue.clear()
-            self._vtxengine._engine.scan_queue.append(self._vtxengine._raster_scan)
+            self._vtxengine._engine.scan_queue.append(self._raster_scan)
 
             # setup plots
             self.addPlotsToDialog()
@@ -160,6 +184,13 @@ class OCTUi():
             print("RuntimeError:")
             traceback.print_exception(e)
             sys.exit(-1)
+
+    def getFileConfig(self):
+        cfg = FileSaveConfig()
+        cfg.save_spectra = self._octDialog.cbSaveToDisk.isChecked()
+        cfg.filename_spectra = self._saveFilename if cfg.save_spectra else None
+        cfg.ext_spectra = self._typeExt if cfg.save_spectra else None
+        return cfg
 
 
     def stopClicked(self):

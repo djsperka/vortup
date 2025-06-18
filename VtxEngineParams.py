@@ -77,3 +77,12 @@ DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
     # logging
     log_level=1,                        # 1 is normal, 0 is debug-level
 )
+
+@dataclass
+class FileSaveConfig:
+    save_spectra: bool = False
+    filename_spectra: str = ''
+    ext_spectra: str = ''
+    save_ascans: bool = False
+    filename_ascans: str = ''
+    ext_ascans: str = ''
