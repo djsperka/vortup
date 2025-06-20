@@ -1,7 +1,7 @@
 from VtxBaseEngine import VtxBaseEngine
 from vortex import Range, get_console_logger as get_logger
 from vortex.marker import Flags
-from vortex.engine import Engine, EngineConfig, Block, dispersion_phasor, StackDeviceTensorEndpointInt8, StackHostTensorEndpointInt8, AscanStackEndpoint
+from vortex.engine import Engine, EngineConfig, Block, dispersion_phasor, StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, AscanStackEndpoint, SpectraStackEndpoint
 # from vortex.acquire import AlazarConfig, AlazarAcquisition, alazar, FileAcquisitionConfig, FileAcquisition
 # from vortex.process import CUDAProcessor, CUDAProcessorConfig
 # from vortex.io import DAQmxIO, DAQmxConfig, daqmx
@@ -62,11 +62,11 @@ class VtxEngine(VtxBaseEngine):
 
         stack_format_ascans = FormatPlanner(get_logger('raster format', cfg.log_level))
         stack_format_ascans.initialize(fc)
-        self._stack_format_ascans = stack_format_ascans
+        self._format_planner_ascans = stack_format_ascans
 
         stack_format_spectra = FormatPlanner(get_logger('raster format', cfg.log_level))
         stack_format_spectra.initialize(fc)
-        self._stack_format_spectra = stack_format_spectra
+        self._format_planner_spectra = stack_format_spectra
 
 
         # Now create endpoints for ascans (oct-processed data)
@@ -78,8 +78,27 @@ class VtxEngine(VtxBaseEngine):
 
         sfe = StackFormatExecutor()
         sfe.initialize(sfec)
+
+        # endpoint for display
         stack_tensor_endpoint = StackDeviceTensorEndpointInt8(sfe, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
         self._endpoint_ascans = stack_tensor_endpoint
+
+        # endpoint for saving ascan data
+        # Will save ascans - a full volume at a time.
+        # Shape of data will be like (4, 500, 500, 640, 1)
+        # (# of volumes, bscans per volume, ascans per bscan, samples per ascan, #channels)
+        # The storage object 'SimpleStackInt8' doesn't save data until you call open().
+
+        npsc = SimpleStackConfig()
+        npsc.shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save, 1)
+        print("SimpleStackConfig shape ", npsc.shape)
+        npsc.header = SimpleStackHeader.NumPy
+        npsc.path = 'test-ascans.npy'
+
+        self._ascan_storage = SimpleStackInt8(get_logger('npy-ascan', cfg.log_level))
+        #self._stack_ascan_storage.open(npsc)
+        self._endpoint_ascans_storage = AscanStackEndpoint(sfe, self._ascan_storage, log=get_logger('npy-ascan', cfg.log_level))
+
 
         # format executor and endpoint for spectra
         # Executor config has only three properties:
@@ -96,56 +115,19 @@ class VtxEngine(VtxBaseEngine):
         sfec_spectra = StackFormatExecutorConfig()
         sfe_spectra  = StackFormatExecutor()
         sfe_spectra.initialize(sfec_spectra)
-        ep = StackHostTensorEndpointInt8(sfe_spectra, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
+        ep = SpectraStackHostTensorEndpointUInt16(sfe_spectra, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
         self._endpoint_spectra = ep
 
-
-        # format executor and endpoint for the ascans. Configured to retain half the spectrum.
-        sfec_ascans = StackFormatExecutorConfig()
-        sfec_ascans.sample_slice = SimpleSlice(self._octprocess.config.samples_per_ascan // 2)
-        samples_to_save = sfec_ascans.sample_slice.count()
-        sfe = StackFormatExecutor()
-        sfe.initialize(sfec_ascans)
-        self._endpoint_ascans = StackDeviceTensorEndpointInt8(sfe, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
-
-        # save ascan data. Use the same format executor as above when creating the endpoint.
-        # Will save ascans - a full volume at a time.
-        # Shape of data will be like (4, 500, 500, 640, 1)
-        # (# of volumes, bscans per volume, ascans per bscan, samples per ascan, #channels)
-        # The storage object 'SimpleStackInt8' doesn't save data until you call open().
-
+        # make an endpoint for saving spectra data
         npsc = SimpleStackConfig()
-        npsc.shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save, 1)
-        print("SimpleStackConfig shape ", npsc.shape)
+        npsc.shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, self._octprocess.config.samples_per_ascan, 1)
+
         npsc.header = SimpleStackHeader.NumPy
-        npsc.path = 'test-ascans.npy'
+        npsc.path = 'test-spectra.npy'
 
-        self._stack_ascan_storage = SimpleStackInt8(get_logger('npy-ascan', cfg.log_level))
-        #self._stack_ascan_storage.open(npsc)
-        self._endpoint_ascans_storage = AscanStackEndpoint(sfe, self._stack_ascan_storage, log=get_logger('npy-ascan', cfg.log_level))
-
-
-        # format executor and endpoint for the spectra. All samples saved (for ascan above we only save half?)
-        sfec_spectra = StackFormatExecutorConfig()
-        sfe_spectra = StackFormatExecutor()
-        sfe_spectra.initialize(sfec_spectra)
-        self._endpoint_ascans = StackDeviceTensorEndpointInt8(sfe_spectra, (scfg.bscans_per_volume, scfg.ascans_per_bscan, acq.samples_per_ascan), get_logger('stack', cfg.log_level))
-
-        # save ascan data. Use the same format executor as above when creating the endpoint.
-        # Will save ascans - a full volume at a time.
-        # Shape of data will be like (4, 500, 500, 640, 1)
-        # (# of volumes, bscans per volume, ascans per bscan, samples per ascan, #channels)
-        # The storage object 'SimpleStackInt8' doesn't save data until you call open().
-
-        npsc = SimpleStackConfig()
-        npsc.shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save, 1)
-        print("SimpleStackConfig shape ", npsc.shape)
-        npsc.header = SimpleStackHeader.NumPy
-        npsc.path = 'test-ascans.npy'
-
-        self._stack_ascan_storage = SimpleStackInt8(get_logger('npy-ascan', cfg.log_level))
-        #self._stack_ascan_storage.open(npsc)
-        self._endpoint_ascans_storage = AscanStackEndpoint(sfe, self._stack_ascan_storage, log=get_logger('npy-ascan', cfg.log_level))
+        self._spectra_storage = SimpleStackUInt16(get_logger('npy-spectra', cfg.log_level))
+        self._spectra_storage.open(npsc)
+        self._endpoint_spectra_storage = SpectraStackEndpoint(sfe_spectra, self._spectra_storage, log=get_logger('spectra', cfg.log_level))
 
 
 
@@ -157,10 +139,10 @@ class VtxEngine(VtxBaseEngine):
 
         ec = EngineConfig()
         ec.add_acquisition(self._acquire, [self._octprocess, self._nullprocess])
-        ec.add_processor(self._octprocess, [self._stack_format_ascans])
-        ec.add_formatter(self._stack_format_ascans, [self._endpoint_ascans, self._endpoint_ascans_storage])
-        ec.add_processor(self._nullprocess, [self._stack_format_spectra])
-        ec.add_formatter(self._stack_format_spectra, [self._endpoint_spectra])
+        ec.add_processor(self._octprocess, [self._format_planner_ascans])
+        ec.add_formatter(self._format_planner_ascans, [self._endpoint_ascans, self._endpoint_ascans_storage])
+        ec.add_processor(self._nullprocess, [self._format_planner_spectra])
+        ec.add_formatter(self._format_planner_spectra, [self._endpoint_spectra, self._endpoint_spectra_storage])
 
         # add galvo output
         ec.add_io(self._io_out, lead_samples=round(cfg.galvo_delay * self._io_out.config.samples_per_second))

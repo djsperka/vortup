@@ -197,7 +197,8 @@ class OCTUi():
         self._octDialog.pbEtc.setEnabled(True)
         self._octDialog.pbStart.setEnabled(True)
         self._octDialog.pbStop.setEnabled(False)
-        self._vtxengine._stack_ascan_storage.close()
+        self._vtxengine._ascan_storage.close()
+        self._vtxengine._spectra_storage.close()
         self._vtxengine._engine.stop()
 
 
