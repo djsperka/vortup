@@ -4,7 +4,9 @@ from VtxEngineParams import DEFAULT_VTX_ENGINE_PARAMS, FileSaveConfig
 from VtxEngineParamsDialog import VtxEngineParamsDialog
 from VtxEngine import VtxEngine
 from OCTDialog import OCTDialog
+from CbFileSaveWidget import CbFileSaveWidget
 from PyQt5.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QFileDialog, QMessageBox
+from vortex import get_console_logger as gcl
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
 from vortex.scan import RasterScanConfig, RasterScan
 from vortex.storage import HDF5StackUInt16, HDF5StackInt8, HDF5StackConfig, HDF5StackHeader, SimpleStackUInt16, SimpleStackInt8, SimpleStackConfig, SimpleStackHeader
@@ -27,78 +29,28 @@ class OCTUi():
         self._engineParams = DEFAULT_VTX_ENGINE_PARAMS
         self._scanConfig = RasterScanConfig()
         self._acqParams = DEFAULT_ACQ_PARAMS
-        self._saveFilename = None
-        self._typeExt = None
+        self._saveFilenameAscans = ''
+        self._typeExtAscans = ''
+        self._saveFilenameSpectra = ''
+        self._typeExtSpectra = ''
 
         self._octDialog = OCTDialog()
-        self._octDialog.pbSelectFile.setEnabled(False)
+
+        self._cbSaveAscans = CbFileSaveWidget(self._octDialog, self._saveFilenameAscans, 'ascans')
+        self._cbSaveSpectra = CbFileSaveWidget(self._octDialog, self._saveFilenameSpectra, 'spectra')
+        layout = QVBoxLayout()
+        layout.addWidget(self._cbSaveAscans)
+        layout.addWidget(self._cbSaveSpectra)
+        self._octDialog.horizontalLayoutStartStop.addLayout(layout)
 
         # connections. 
-        #self._octDialog.cbSaveToDisk.toggled.connect(self._octDialog.pbSelectFile.setEnabled)
-        self._octDialog.cbSaveToDisk.toggled.connect(self.cbSaveToggled)
-        self._octDialog.pbSelectFile.clicked.connect(self.selectFileClicked)
         self._octDialog.pbEtc.clicked.connect(self.etcClicked)
         self._octDialog.pbStart.clicked.connect(self.startClicked)
         self._octDialog.pbStop.clicked.connect(self.stopClicked)
         self._octDialog.pbStart.enabled = True  
         self._octDialog.pbStop.enabled = False  
-        #self.addPlotsToDialog()
         self._octDialog.resize(1000,800)              
         self._octDialog.show()
-
-    def cbSaveToggled(self, bChecked):
-        print("Checked: ", str(bChecked))
-        if bChecked:
-            # See if filename selected. If not, open dialog.
-            if self._saveFilename is None:
-                self.selectFileClicked()
-                if self._saveFilename is None:
-                    # un-check the box if they canceled
-                    print("No file chosen: Un-checking box")
-                    self._octDialog.cbSaveToDisk.setChecked(False)
-                    self._octDialog.pbSelectFile.setEnabled(False)
-                else:
-                    self._octDialog.pbSelectFile.setEnabled(True)
-            else:
-                self._octDialog.pbSelectFile.setEnabled(True)
-
-
-
-    def selectFileClicked(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
-
-
-        # When the user hits Cancel, the filename returned is empty.
-        bTryAgain = True
-        self._typeExt = None
-        self._saveFilename = None
-        while bTryAgain:
-            fileName, _ = QFileDialog.getSaveFileName(self._octDialog,"Filename for OCT data","","MATLAB (*.mat);;HD5 (*.h5);;Numpy (*.npy)", options=options)
-            if fileName:
-                d = os.path.dirname(fileName)
-                b = os.path.basename(fileName)
-                n,ext = os.path.splitext(b)
-                #print("dir: {0:s} base: {1:s} n: {2:s} ext: {3:s}".format(d,b,n,ext))
-                if ext:
-                    match ext.lower():
-                        case '.mat':
-                            self._typeExt = 'mat'
-                            bTryAgain = False
-                        case 'h5':
-                            self._typeExt = 'h5'
-                            bTryAgain = False
-                        case 'npy':
-                            self._typeExt = 'npy'
-                            bTryAgain = False
-                else:
-                    bTryAgain = True
-            else:
-                bTryAgain = False
-            if bTryAgain:
-               QMessageBox.information(self._octDialog, "Oops", "Cannot determine file type. Please choose a file with extension \".mat\", \".h5\", or \".npy\".")
-            else:
-                self._saveFilename = fileName if fileName else None
 
     def etcClicked(self):
         self._cfgDialog = VtxEngineParamsDialog(self._engineParams)
@@ -113,9 +65,9 @@ class OCTUi():
 
         # We need access to both the engine (the endpoints) and the gui (display widgets). 
         if not self._cross_widget:
-            self._raster_widget = RasterEnFaceWidget(self._vtxengine._endpoint_ascans)
-            self._cross_widget = CrossSectionImageWidget(self._vtxengine._endpoint_ascans)
-            self._trace_widget = TraceWidget(self._vtxengine._endpoint_ascans)
+            self._raster_widget = RasterEnFaceWidget(self._vtxengine._endpoint_ascan_display)
+            self._cross_widget = CrossSectionImageWidget(self._vtxengine._endpoint_ascan_display)
+            self._trace_widget = TraceWidget(self._vtxengine._endpoint_ascan_display)
 
             # 
             vbox = QVBoxLayout()
@@ -128,11 +80,11 @@ class OCTUi():
             self._octDialog.widgetDummy.show()
 
         else:
-            self._cross_widget._endpoint = self._vtxengine._endpoint_ascans
-            self._trace_widget._endpoint = self._vtxengine._endpoint_ascans
+            self._cross_widget._endpoint = self._vtxengine._endpoint_ascan_display
+            self._trace_widget._endpoint = self._vtxengine._endpoint_ascan_display
 
-        self._vtxengine._endpoint_ascans.aggregate_segment_callback = self.cb_segments
-        self._vtxengine._endpoint_ascans.volume_callback = self.cb_volume
+        self._vtxengine._endpoint_ascan_display.aggregate_segment_callback = self.cb_segments
+        self._vtxengine._endpoint_ascan_display.volume_callback = self.cb_volume
 
     def cb_segments(self, v):
         # argument (v) here is a number - index pointing to a segment in allocated segments.
@@ -154,7 +106,10 @@ class OCTUi():
             # fetch here.
             self._acqParams = self._octDialog.acqParamsWidget.getAcqParams()
             self._scanConfig = self._octDialog.scanConfigWidget.getScanConfig()
-            self._fileConfig = self.getFileConfig()
+            self._filesaveAscans = self._cbSaveAscans.getFileSaveConfig()
+            print("ascan save? ", self._filesaveAscans)
+            self._filesaveSpectra = self._cbSaveSpectra.getFileSaveConfig()
+            print("spectra save? ", self._filesaveSpectra)
 
             # get oct engine ready
             if self._vtxengine:
@@ -166,7 +121,7 @@ class OCTUi():
 
             # create engine
 
-            self._vtxengine = VtxEngine(self._engineParams, self._acqParams, self._scanConfig, self._fileConfig)
+            self._vtxengine = VtxEngine(self._engineParams, self._acqParams, self._scanConfig)
 
             # put something into the scan queue
             self._raster_scan = RasterScan()
@@ -187,9 +142,9 @@ class OCTUi():
 
     def getFileConfig(self):
         cfg = FileSaveConfig()
-        cfg.save_spectra = self._octDialog.cbSaveToDisk.isChecked()
-        cfg.filename_spectra = self._saveFilename if cfg.save_spectra else None
-        cfg.ext_spectra = self._typeExt if cfg.save_spectra else None
+        # cfg.save_spectra = self._octDialog.cbSaveToDisk.isChecked()
+        # cfg.filename_spectra = self._saveFilename if cfg.save_spectra else None
+        # cfg.ext_spectra = self._typeExt if cfg.save_spectra else None
         return cfg
 
 
@@ -197,9 +152,7 @@ class OCTUi():
         self._octDialog.pbEtc.setEnabled(True)
         self._octDialog.pbStart.setEnabled(True)
         self._octDialog.pbStop.setEnabled(False)
-        self._vtxengine._ascan_storage.close()
-        self._vtxengine._spectra_storage.close()
-        self._vtxengine._engine.stop()
+        self._vtxengine.stop()
 
 
 

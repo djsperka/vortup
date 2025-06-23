@@ -10,14 +10,18 @@ from vortex.scan import RasterScanConfig
 from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, SimpleSlice
 from vortex.storage import HDF5StackUInt16, HDF5StackInt8, HDF5StackConfig, HDF5StackHeader, SimpleStackUInt16, SimpleStackInt8, SimpleStackConfig, SimpleStackHeader
 import numpy as np
+import logging
 from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
 
 class VtxEngine(VtxBaseEngine):
-    def __init__(self, cfg: VtxEngineParams, acq: AcqParams=DEFAULT_ACQ_PARAMS, scfg: RasterScanConfig=RasterScanConfig(), fcfg: FileSaveConfig=FileSaveConfig()):
+    def __init__(self, cfg: VtxEngineParams, acq: AcqParams=DEFAULT_ACQ_PARAMS, scfg: RasterScanConfig=RasterScanConfig(), fcfg_ascans: FileSaveConfig=FileSaveConfig(), fcfg_spectra: FileSaveConfig=FileSaveConfig()):
 
         # base class 
         super().__init__(cfg)
+        self._fcfg_ascans = fcfg_ascans
+        self._fcfg_spectra = fcfg_spectra
 
+        self._logger = logging.getLogger(__name__)
         # Base class has stuff made, but no engine constructed:
         # self._acquire
         # self._octprocess  - CUDA based processing
@@ -60,6 +64,7 @@ class VtxEngine(VtxBaseEngine):
         fc.adapt_shape = False
         fc.mask = scfg.flags
 
+
         stack_format_ascans = FormatPlanner(get_logger('raster format', cfg.log_level))
         stack_format_ascans.initialize(fc)
         self._format_planner_ascans = stack_format_ascans
@@ -69,38 +74,41 @@ class VtxEngine(VtxBaseEngine):
         self._format_planner_spectra = stack_format_spectra
 
 
-        # Now create endpoints for ascans (oct-processed data)
+        # Now create endpoints
+        ascan_endpoints = []
+        spectra_endpoints = []
 
+        #  for ascans (oct-processed data), slice away half the data
         sfec = StackFormatExecutorConfig()
-        # only keep half of the spectrum
         sfec.sample_slice = SimpleSlice(self._octprocess.config.samples_per_ascan // 2)
         samples_to_save = sfec.sample_slice.count()
-
         sfe = StackFormatExecutor()
         sfe.initialize(sfec)
 
         # endpoint for display
-        stack_tensor_endpoint = StackDeviceTensorEndpointInt8(sfe, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
-        self._endpoint_ascans = stack_tensor_endpoint
+        self._endpoint_ascan_display = StackDeviceTensorEndpointInt8(sfe, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
+        ascan_endpoints.append(self._endpoint_ascan_display)
 
-        # endpoint for saving ascan data
-        # Will save ascans - a full volume at a time.
-        # Shape of data will be like (4, 500, 500, 640, 1)
-        # (# of volumes, bscans per volume, ascans per bscan, samples per ascan, #channels)
-        # The storage object 'SimpleStackInt8' doesn't save data until you call open().
+        if fcfg_ascans.save:
+            # endpoint for saving ascan data
+            # Will save ascans - a full volume at a time.
+            # Shape of data will be like (4, 500, 500, 640, 1)
+            # (# of volumes, bscans per volume, ascans per bscan, samples per ascan, #channels)
+            # The storage object 'SimpleStackInt8' doesn't save data until you call open().
 
-        npsc = SimpleStackConfig()
-        npsc.shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save, 1)
-        print("SimpleStackConfig shape ", npsc.shape)
-        npsc.header = SimpleStackHeader.NumPy
-        npsc.path = 'test-ascans.npy'
+            npsc = SimpleStackConfig()
+            npsc.shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save, 1)
+            print("SimpleStackConfig shape ", npsc.shape)
+            npsc.header = SimpleStackHeader.NumPy
+            npsc.path = 'test-ascans.npy'
 
-        self._ascan_storage = SimpleStackInt8(get_logger('npy-ascan', cfg.log_level))
-        #self._stack_ascan_storage.open(npsc)
-        self._endpoint_ascans_storage = AscanStackEndpoint(sfe, self._ascan_storage, log=get_logger('npy-ascan', cfg.log_level))
+            self._ascan_storage = SimpleStackInt8(get_logger('npy-ascan', cfg.log_level))
+            #self._stack_ascan_storage.open(npsc)
+            self._endpoint_ascan_storage = AscanStackEndpoint(sfe, self._ascan_storage, log=get_logger('npy-ascan', cfg.log_level))
+            ascan_endpoints.append(self._endpoint_ascan_storage)
 
 
-        # format executor and endpoint for spectra
+
         # Executor config has only three properties:
         #
         # property erase_after_volume - not sure
@@ -111,27 +119,27 @@ class VtxEngine(VtxBaseEngine):
         # But - when the Endpoint class is created, the executor is the first
         # arg to the constructor. 
 
+        # format executor and endpoint for spectra
+
         # data passes through NullProcessor -> cannot use StackDeviceTensorEndpointInt8 "RuntimeError: A-scans must arrive in device memory for device tensor endpoints"
         sfec_spectra = StackFormatExecutorConfig()
         sfe_spectra  = StackFormatExecutor()
         sfe_spectra.initialize(sfec_spectra)
-        ep = SpectraStackHostTensorEndpointUInt16(sfe_spectra, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
-        self._endpoint_spectra = ep
+        self._endpoint_spectra = SpectraStackHostTensorEndpointUInt16(sfe_spectra, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
+        spectra_endpoints.append(self._endpoint_spectra)
+        if fcfg_ascans.save:
 
-        # make an endpoint for saving spectra data
-        npsc = SimpleStackConfig()
-        npsc.shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, self._octprocess.config.samples_per_ascan, 1)
+            # make an endpoint for saving spectra data
+            npsc = SimpleStackConfig()
+            npsc.shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, self._octprocess.config.samples_per_ascan, 1)
 
-        npsc.header = SimpleStackHeader.NumPy
-        npsc.path = 'test-spectra.npy'
+            npsc.header = SimpleStackHeader.NumPy
+            npsc.path = 'test-spectra.npy'
 
-        self._spectra_storage = SimpleStackUInt16(get_logger('npy-spectra', cfg.log_level))
-        self._spectra_storage.open(npsc)
-        self._endpoint_spectra_storage = SpectraStackEndpoint(sfe_spectra, self._spectra_storage, log=get_logger('spectra', cfg.log_level))
-
-
-
-
+            self._spectra_storage = SimpleStackUInt16(get_logger('npy-spectra', cfg.log_level))
+            self._spectra_storage.open(npsc)
+            self._endpoint_spectra_storage = SpectraStackEndpoint(sfe_spectra, self._spectra_storage, log=get_logger('spectra', cfg.log_level))
+            spectra_endpoints.append(self._endpoint_spectra_storage)
 
         #
         # engine setup
@@ -140,14 +148,14 @@ class VtxEngine(VtxBaseEngine):
         ec = EngineConfig()
         ec.add_acquisition(self._acquire, [self._octprocess, self._nullprocess])
         ec.add_processor(self._octprocess, [self._format_planner_ascans])
-        ec.add_formatter(self._format_planner_ascans, [self._endpoint_ascans, self._endpoint_ascans_storage])
+        ec.add_formatter(self._format_planner_ascans, ascan_endpoints)
         ec.add_processor(self._nullprocess, [self._format_planner_spectra])
-        ec.add_formatter(self._format_planner_spectra, [self._endpoint_spectra, self._endpoint_spectra_storage])
+        ec.add_formatter(self._format_planner_spectra, spectra_endpoints)
 
         # add galvo output
         ec.add_io(self._io_out, lead_samples=round(cfg.galvo_delay * self._io_out.config.samples_per_second))
         ec.galvo_output_channels = len(self._io_out.config.channels)
-        print("there are {0:d} galvo channels".format(ec.galvo_output_channels))
+        self._logger.info("there are {0:d} galvo channels".format(ec.galvo_output_channels))
 
         # strobe output
         ec.add_io(self._strobe)
@@ -156,7 +164,7 @@ class VtxEngine(VtxBaseEngine):
         ec.records_per_block = acq.ascans_per_block
         ec.blocks_to_allocate = cfg.blocks_to_allocate
         ec.blocks_to_acquire = acq.blocks_to_acquire
-        print("blocks to acquire {0:d}".format(ec.blocks_to_acquire))
+        self._logger.info("blocks to acquire {0:d}".format(ec.blocks_to_acquire))
 
 
         engine = Engine(get_logger('engine', cfg.log_level))
@@ -164,3 +172,14 @@ class VtxEngine(VtxBaseEngine):
         engine.prepare()
         self._engine = engine
 
+    def stop(self):
+        # only if we are running
+        if self._engine and not self._engine.done:
+            if self._fcfg_spectra.save:
+                self._spectra_storage.close()
+            if self._fcfg_ascans.save:
+                self._ascan_storage.close()
+            self._engine.stop()
+        else:
+            self._logger.warning('engine is not running')
+            

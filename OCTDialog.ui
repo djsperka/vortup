@@ -7,36 +7,33 @@
     <x>0</x>
     <y>0</y>
     <width>1089</width>
-    <height>562</height>
+    <height>634</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>UCD OCT Dev Tool</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,4">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayoutSidebar">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QCheckBox" name="cbSaveToDisk">
-       <property name="text">
-        <string>Save to disk</string>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayoutSidebar">
+       <item>
+        <widget class="QPushButton" name="pbEtc">
+         <property name="text">
+          <string>Etc</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
-      <widget class="QPushButton" name="pbSelectFile">
-       <property name="text">
-        <string>Select file</string>
-       </property>
-      </widget>
+      <widget class="QWidget" name="widgetDummy" native="true"/>
      </item>
-     <item>
-      <widget class="QPushButton" name="pbEtc">
-       <property name="text">
-        <string>Etc</string>
-       </property>
-      </widget>
-     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayoutStartStop">
      <item>
       <widget class="QPushButton" name="pbStart">
        <property name="text">
@@ -52,9 +49,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QWidget" name="widgetDummy" native="true"/>
    </item>
   </layout>
  </widget>

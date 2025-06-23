@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QStyle
 from PyQt5 import uic
 from myengine import DEFAULT_ENGINE_PARAMS, StandardEngineParams
 from StandardEngineParamsDialog import StandardEngineParamsDialog
@@ -35,3 +35,6 @@ class OCTDialog(QDialog, Ui_OCTDialog):
         self.verticalLayoutSidebar.insertWidget(1, self.acqParamsWidget)
         self.verticalLayoutSidebar.insertStretch(2)
 
+        # icons
+        self.pbStart.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
+        self.pbStop.setIcon(self.style().standardIcon(QStyle.SP_MediaStop))

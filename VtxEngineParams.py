@@ -80,9 +80,6 @@ DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
 
 @dataclass
 class FileSaveConfig:
-    save_spectra: bool = False
-    filename_spectra: str = ''
-    ext_spectra: str = ''
-    save_ascans: bool = False
-    filename_ascans: str = ''
-    ext_ascans: str = ''
+    save: bool = False
+    filename: str = ''
+    extension: str = ''

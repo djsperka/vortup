@@ -2,22 +2,34 @@ import sys
 import os
 from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QMessageBox
 from Ui_CbFileSaveWidget import Ui_CbFileSaveWidget
+from VtxEngineParams import FileSaveConfig
 
 class CbFileSaveWidget(QWidget, Ui_CbFileSaveWidget):
-    def __init__(self, parent: QWidget=None, filename: str=''):
+    def __init__(self, parent: QWidget=None, filename: str='', datatype: str = 'data'):
         super().__init__(parent)
         self.setupUi(self)
         self._filename = filename
         self._extension = ''
+        self._labelDataType = datatype
+
+        # text
+        self._cb.setText("Save {0:s} data".format(self._labelDataType))
 
         # callbacks
-        self._cb.toggled.connect(self.cbToggled)
-        self._pb.clicked.connect(self.selectFileClicked)
+        self._cb.toggled.connect(self.__cbToggled)
+        self._pb.clicked.connect(self.__selectFileClicked)
 
         # enable/disable
-        self.enableDisable()
+        self.__enableDisable()
 
-    def enableDisable(self):
+    def getFileSaveConfig(self):
+        cfg = FileSaveConfig()
+        cfg.save = self._cb.isChecked()
+        cfg.filename = self._filename
+        cfg.extension = self._extension
+        return cfg
+
+    def __enableDisable(self):
         if self._cb.isChecked():
             if self._filename:
                 self._pb.setEnabled(True)
@@ -29,18 +41,18 @@ class CbFileSaveWidget(QWidget, Ui_CbFileSaveWidget):
             self._pb.setEnabled(False)
             self._label.setText("not saving data")
 
-    def cbToggled(self, bChecked):
+    def __cbToggled(self, bChecked):
         print("Checked: ", str(bChecked))
         if bChecked:
             # See if filename selected. If not, open dialog.
             if not self._filename:
-                filename, extension = self.getFileNameExt(self._filename)
+                filename, extension = self.__getFileNameExt(self._filename)
                 if filename:
                     self._filename = filename
                     self._extension = extension
-        self.enableDisable()
+        self.__enableDisable()
 
-    def getFileNameExt(self, filename: str=''):
+    def __getFileNameExt(self, filename: str='') -> FileSaveConfig:
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
 
@@ -48,7 +60,7 @@ class CbFileSaveWidget(QWidget, Ui_CbFileSaveWidget):
         selectedFileExtension = ''
         bTryAgain = True
         while bTryAgain:
-            fileName, _ = QFileDialog.getSaveFileName(self,"Select filename for data",filename,"MATLAB (*.mat);;HD5 (*.h5);;Numpy (*.npy)", options=options)
+            fileName, _ = QFileDialog.getSaveFileName(self,"Select filename for {0:s}".format(self._labelDataType),filename,"MATLAB (*.mat);;HD5 (*.h5);;Numpy (*.npy)", options=options)
             if fileName:
                 d = os.path.dirname(fileName)
                 b = os.path.basename(fileName)
@@ -75,12 +87,12 @@ class CbFileSaveWidget(QWidget, Ui_CbFileSaveWidget):
         return selectedFileName, selectedFileExtension
 
 
-    def selectFileClicked(self):
-        filename, extension = self.getFileNameExt(self._filename)
+    def __selectFileClicked(self):
+        filename, extension = self.__getFileNameExt(self._filename)
         if filename:
             self._filename = filename
             self._extension = extension
-        self.enableDisable()
+        self.__enableDisable()
 
 if __name__ == "__main__":
     import sys
