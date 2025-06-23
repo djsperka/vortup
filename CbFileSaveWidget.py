@@ -8,6 +8,7 @@ class CbFileSaveWidget(QWidget, Ui_CbFileSaveWidget):
         super().__init__(parent)
         self.setupUi(self)
         self._filename = filename
+        self._extension = ''
 
         # callbacks
         self._cb.toggled.connect(self.cbToggled)
@@ -57,10 +58,10 @@ class CbFileSaveWidget(QWidget, Ui_CbFileSaveWidget):
                         case '.mat':
                             selectedFileExtension = 'mat'
                             bTryAgain = False
-                        case 'h5':
+                        case '.h5':
                             selectedFileExtension = 'h5'
                             bTryAgain = False
-                        case 'npy':
+                        case '.npy':
                             selectedFileExtension = 'npy'
                             bTryAgain = False
                 else:
@@ -89,4 +90,4 @@ if __name__ == "__main__":
     w.show()
     app.exec()
     print("w._filename {0:s}\nw._extension {1:s}".format(w._filename, w._extension))
-    sys.exit(app.exec_())
+    sys.exit()
