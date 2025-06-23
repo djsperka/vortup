@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CbFileSaveWidget</class>
+ <widget class="QWidget" name="CbFileSaveWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>468</width>
+    <height>41</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,4">
+   <item>
+    <widget class="QCheckBox" name="_cb">
+     <property name="text">
+      <string>Save ascans</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="_pb">
+     <property name="text">
+      <string>Select File</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="_label">
+     <property name="text">
+      <string>C:datafolderfilename-ascans.npy</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
