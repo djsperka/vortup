@@ -121,7 +121,7 @@ class OCTUi():
 
             # create engine
 
-            self._vtxengine = VtxEngine(self._engineParams, self._acqParams, self._scanConfig)
+            self._vtxengine = VtxEngine(self._engineParams, self._acqParams, self._scanConfig, self._filesaveAscans, self._filesaveSpectra)
 
             # put something into the scan queue
             self._raster_scan = RasterScan()

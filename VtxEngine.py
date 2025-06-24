@@ -18,9 +18,9 @@ class VtxEngine(VtxBaseEngine):
 
         # base class 
         super().__init__(cfg)
+        self._cfg = cfg
         self._fcfg_ascans = fcfg_ascans
         self._fcfg_spectra = fcfg_spectra
-
         self._logger = logging.getLogger(__name__)
         # Base class has stuff made, but no engine constructed:
         # self._acquire
@@ -96,16 +96,20 @@ class VtxEngine(VtxBaseEngine):
             # (# of volumes, bscans per volume, ascans per bscan, samples per ascan, #channels)
             # The storage object 'SimpleStackInt8' doesn't save data until you call open().
 
-            npsc = SimpleStackConfig()
-            npsc.shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save, 1)
-            print("SimpleStackConfig shape ", npsc.shape)
-            npsc.header = SimpleStackHeader.NumPy
-            npsc.path = 'test-ascans.npy'
+            shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, acq.samples_per_ascan, 1)
+            self._endpoint_ascan_storage, self._ascan_storage = self.getStorageEndpoint(fcfg_ascans, shape)
+            ascan_endpoints.append(self._endpoint_spectra_storage)
 
-            self._ascan_storage = SimpleStackInt8(get_logger('npy-ascan', cfg.log_level))
-            #self._stack_ascan_storage.open(npsc)
-            self._endpoint_ascan_storage = AscanStackEndpoint(sfe, self._ascan_storage, log=get_logger('npy-ascan', cfg.log_level))
-            ascan_endpoints.append(self._endpoint_ascan_storage)
+            # npsc = SimpleStackConfig()
+            # npsc.shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save, 1)
+            # print("SimpleStackConfig shape ", npsc.shape)
+            # npsc.header = SimpleStackHeader.NumPy
+            # npsc.path = fcfg_ascans.filename
+
+            # self._ascan_storage = SimpleStackInt8(get_logger('npy-ascan', cfg.log_level))
+            # self._stack_ascan_storage.open(npsc)
+            # self._endpoint_ascan_storage = AscanStackEndpoint(sfe, self._ascan_storage, log=get_logger('npy-ascan', cfg.log_level))
+            # ascan_endpoints.append(self._endpoint_ascan_storage)
 
 
 
@@ -127,19 +131,23 @@ class VtxEngine(VtxBaseEngine):
         sfe_spectra.initialize(sfec_spectra)
         self._endpoint_spectra = SpectraStackHostTensorEndpointUInt16(sfe_spectra, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
         spectra_endpoints.append(self._endpoint_spectra)
-        if fcfg_ascans.save:
+        if fcfg_spectra.save:
 
             # make an endpoint for saving spectra data
-            npsc = SimpleStackConfig()
-            npsc.shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, self._octprocess.config.samples_per_ascan, 1)
-
-            npsc.header = SimpleStackHeader.NumPy
-            npsc.path = 'test-spectra.npy'
-
-            self._spectra_storage = SimpleStackUInt16(get_logger('npy-spectra', cfg.log_level))
-            self._spectra_storage.open(npsc)
-            self._endpoint_spectra_storage = SpectraStackEndpoint(sfe_spectra, self._spectra_storage, log=get_logger('spectra', cfg.log_level))
+            shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, acq.samples_per_ascan, 1)
+            self._endpoint_spectra_storage, self._spectra_storage = self.getStorageEndpoint(fcfg_spectra, shape)
             spectra_endpoints.append(self._endpoint_spectra_storage)
+
+            # npsc = SimpleStackConfig()
+            # npsc.shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, self._octprocess.config.samples_per_ascan, 1)
+
+            # npsc.header = SimpleStackHeader.NumPy
+            # npsc.path = fcfg_spectra.filename
+
+            # self._spectra_storage = SimpleStackUInt16(get_logger('npy-spectra', cfg.log_level))
+            # self._spectra_storage.open(npsc)
+            # self._endpoint_spectra_storage = SpectraStackEndpoint(sfe_spectra, self._spectra_storage, log=get_logger('spectra', cfg.log_level))
+            # spectra_endpoints.append(self._endpoint_spectra_storage)
 
         #
         # engine setup
@@ -183,3 +191,20 @@ class VtxEngine(VtxBaseEngine):
         else:
             self._logger.warning('engine is not running')
             
+    def getStorageEndpoint(self, fcfg: FileSaveConfig, shape):
+
+        if fcfg.extension == "npy":
+            npsc = SimpleStackConfig()
+            npsc.shape = shape
+            npsc.header = SimpleStackHeader.NumPy
+            npsc.path = fcfg.filename
+            self._spectra_storage = SimpleStackUInt16(get_logger('npy-spectra', self._cfg.log_level))
+            self._spectra_storage.open(npsc)
+            self._endpoint_spectra_storage = SpectraStackEndpoint(sfe_spectra, self._spectra_storage, log=get_logger('spectra', cfg.log_level))
+            spectra_endpoints.append(self._endpoint_spectra_storage)
+
+
+
+
+
+        return endpoint, storage
