@@ -114,9 +114,7 @@ class OCTUi():
             self._acqParams = self._octDialog.acqParamsWidget.getAcqParams()
             self._scanConfig = self._octDialog.scanConfigWidget.getScanConfig()
             self._filesaveAscans = self._cbSaveAscans.getFileSaveConfig()
-            print("ascan save? ", self._filesaveAscans)
             self._filesaveSpectra = self._cbSaveSpectra.getFileSaveConfig()
-            print("spectra save? ", self._filesaveSpectra)
 
             # get oct engine ready
             if self._vtxengine:
