@@ -11,10 +11,11 @@ from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecuto
 from vortex.storage import HDF5StackUInt16, HDF5StackInt8, HDF5StackConfig, HDF5StackHeader, SimpleStackUInt16, SimpleStackInt8, SimpleStackConfig, SimpleStackHeader
 import numpy as np
 import logging
+from typing import Tuple, Union, Any
 from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
 
 class VtxEngine(VtxBaseEngine):
-    def __init__(self, cfg: VtxEngineParams, acq: AcqParams=DEFAULT_ACQ_PARAMS, scfg: RasterScanConfig=RasterScanConfig(), fcfg_ascans: FileSaveConfig=FileSaveConfig(), fcfg_spectra: FileSaveConfig=FileSaveConfig()):
+    def __init__(self, cfg: VtxEngineParams, acq: AcqParams=DEFAULT_ACQ_PARAMS, scfg: RasterScanConfig=RasterScanConfig(), fcfg_ascans: FileSaveConfig=FileSaveConfig('ascans'), fcfg_spectra: FileSaveConfig=FileSaveConfig('spectra')):
 
         # base class 
         super().__init__(cfg)
@@ -98,37 +99,13 @@ class VtxEngine(VtxBaseEngine):
 
             shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, acq.samples_per_ascan, 1)
             self._endpoint_ascan_storage, self._ascan_storage = self.getStorageEndpoint(fcfg_ascans, shape)
-            ascan_endpoints.append(self._endpoint_spectra_storage)
-
-            # npsc = SimpleStackConfig()
-            # npsc.shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save, 1)
-            # print("SimpleStackConfig shape ", npsc.shape)
-            # npsc.header = SimpleStackHeader.NumPy
-            # npsc.path = fcfg_ascans.filename
-
-            # self._ascan_storage = SimpleStackInt8(get_logger('npy-ascan', cfg.log_level))
-            # self._stack_ascan_storage.open(npsc)
-            # self._endpoint_ascan_storage = AscanStackEndpoint(sfe, self._ascan_storage, log=get_logger('npy-ascan', cfg.log_level))
-            # ascan_endpoints.append(self._endpoint_ascan_storage)
+            ascan_endpoints.append(self._endpoint_ascan_storage)
 
 
-
-        # Executor config has only three properties:
-        #
-        # property erase_after_volume - not sure
-        # property sample_slice  - Collect only a slice of samples from each ascan
-        # property sample_transform - not sure
-        # 
-        # So basically, I'm not sure what the executor's role is here. 
-        # But - when the Endpoint class is created, the executor is the first
-        # arg to the constructor. 
-
-        # format executor and endpoint for spectra
-
-        # data passes through NullProcessor -> cannot use StackDeviceTensorEndpointInt8 "RuntimeError: A-scans must arrive in device memory for device tensor endpoints"
         sfec_spectra = StackFormatExecutorConfig()
         sfe_spectra  = StackFormatExecutor()
         sfe_spectra.initialize(sfec_spectra)
+        # data passes through NullProcessor -> cannot use StackDeviceTensorEndpointInt8 "RuntimeError: A-scans must arrive in device memory for device tensor endpoints"
         self._endpoint_spectra = SpectraStackHostTensorEndpointUInt16(sfe_spectra, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
         spectra_endpoints.append(self._endpoint_spectra)
         if fcfg_spectra.save:
@@ -137,17 +114,6 @@ class VtxEngine(VtxBaseEngine):
             shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, acq.samples_per_ascan, 1)
             self._endpoint_spectra_storage, self._spectra_storage = self.getStorageEndpoint(fcfg_spectra, shape)
             spectra_endpoints.append(self._endpoint_spectra_storage)
-
-            # npsc = SimpleStackConfig()
-            # npsc.shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, self._octprocess.config.samples_per_ascan, 1)
-
-            # npsc.header = SimpleStackHeader.NumPy
-            # npsc.path = fcfg_spectra.filename
-
-            # self._spectra_storage = SimpleStackUInt16(get_logger('npy-spectra', cfg.log_level))
-            # self._spectra_storage.open(npsc)
-            # self._endpoint_spectra_storage = SpectraStackEndpoint(sfe_spectra, self._spectra_storage, log=get_logger('spectra', cfg.log_level))
-            # spectra_endpoints.append(self._endpoint_spectra_storage)
 
         #
         # engine setup
@@ -191,20 +157,57 @@ class VtxEngine(VtxBaseEngine):
         else:
             self._logger.warning('engine is not running')
             
-    def getStorageEndpoint(self, fcfg: FileSaveConfig, shape):
+    def getStorageEndpoint(self, fcfg: FileSaveConfig, shape) -> Tuple[Any, Any]:
 
-        if fcfg.extension == "npy":
-            npsc = SimpleStackConfig()
-            npsc.shape = shape
-            npsc.header = SimpleStackHeader.NumPy
-            npsc.path = fcfg.filename
-            self._spectra_storage = SimpleStackUInt16(get_logger('npy-spectra', self._cfg.log_level))
-            self._spectra_storage.open(npsc)
-            self._endpoint_spectra_storage = SpectraStackEndpoint(sfe_spectra, self._spectra_storage, log=get_logger('spectra', cfg.log_level))
-            spectra_endpoints.append(self._endpoint_spectra_storage)
+        # The 'type' of the fcfg should be either 'spectra' or 'ascans'
+        if fcfg.type=='spectra':
+
+            if fcfg.extension == "npy":
+                npsc = SimpleStackConfig()
+                npsc.shape = shape
+                npsc.header = SimpleStackHeader.NumPy
+                npsc.path = fcfg.filename
+                storage = SimpleStackUInt16(get_logger('npy-spectra', self._cfg.log_level))
+                storage.open(npsc)
+
+                # Executor config has only three properties:
+                #
+                # property erase_after_volume - not sure
+                # property sample_slice  - Collect only a slice of samples from each ascan
+                # property sample_transform - not sure
+                # 
+                # So basically, I'm not sure what the executor's role is here. 
+                # But - when the Endpoint class is created, the executor is the first
+                # arg to the constructor. 
+
+                sfec = StackFormatExecutorConfig()
+                sfe = StackFormatExecutor()
+                sfe.initialize(sfec)
+                endpoint_storage = SpectraStackEndpoint(sfe, storage, log=get_logger('npy-spectra', self._cfg.log_level))
+            else:
+                self._logger.warning('extension {0:s} not supported yet sorry, use npy'.format(fcfg.extension))
+                raise NotImplementedError('extension {0:s} not supported yet sorry, use npy'.format(fcfg.extension))
+
+        elif fcfg.type=='ascans':
+            if fcfg.extension == "npy":
+                npsc = SimpleStackConfig()
+                npsc.shape = shape
+                npsc.header = SimpleStackHeader.NumPy
+                npsc.path = fcfg.filename
+
+                sfec = StackFormatExecutorConfig()
+                sfe = StackFormatExecutor()
+                sfe.initialize(sfec)
+                storage = SimpleStackInt8(get_logger('npy-ascan', self._cfg.log_level))
+                storage.open(npsc)
+                endpoint_storage = AscanStackEndpoint(sfe, storage, log=get_logger('npy-ascan', self._cfg.log_level))
+
+            else:
+                self._logger.warning('extension {0:s} not supported yet sorry, use npy'.format(fcfg.extension))
+                raise NotImplementedError('extension {0:s} not supported yet sorry, use npy'.format(fcfg.extension))
+
+        else:
+            raise ValueError('FileSaveConfig.type must be either ascans or spectra. ''{0:s}'' not supported.'.format(fcfg.type))
 
 
-
-
-
-        return endpoint, storage
+        return endpoint_storage, storage

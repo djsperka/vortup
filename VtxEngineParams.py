@@ -46,6 +46,9 @@ class VtxEngineParams:
     # logging
     log_level: int
 
+    # other
+    save_profiler_data: bool
+
 DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
 
     acquisition_type=AcquisitionType.ALAZAR_ACQUISITION,
@@ -76,10 +79,14 @@ DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
 
     # logging
     log_level=1,                        # 1 is normal, 0 is debug-level
+
+    # other
+    save_profiler_data=False
 )
 
 @dataclass
 class FileSaveConfig:
+    type: str       # should be 'ascans' or 'spectra'
     save: bool = False
     filename: str = ''
     extension: str = ''

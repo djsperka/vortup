@@ -143,6 +143,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.lineEditDispersion0.setText(str(cfg.dispersion[0]))
         self.lineEditDispersion1.setText(str(cfg.dispersion[1]))
         self.lineEditLogLevel.setText(str(cfg.log_level))
+        self.cbSaveProfilerData.setChecked(cfg.save_profiler_data)
 
     def getEngineParameters(self) -> VtxEngineParams:
         s = DEFAULT_VTX_ENGINE_PARAMS   # TODO: would be nice to have an empty obj
@@ -168,6 +169,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         s.process_slots = int(self.lineEditProcessSlots.text())
         s.dispersion = (float(self.lineEditDispersion0.text()), float(self.lineEditDispersion1.text()))
         s.log_level = int(self.lineEditLogLevel.text())
+        s.save_profiler_data = self.cbSaveProfilerData.isChecked()
         return s
 
 

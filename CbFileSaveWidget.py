@@ -3,17 +3,18 @@ import os
 from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QMessageBox
 from Ui_CbFileSaveWidget import Ui_CbFileSaveWidget
 from VtxEngineParams import FileSaveConfig
+from typing import Tuple
 
 class CbFileSaveWidget(QWidget, Ui_CbFileSaveWidget):
-    def __init__(self, parent: QWidget=None, filename: str='', datatype: str = 'data'):
+    def __init__(self, saveDataType: str, parent: QWidget=None, filename: str=''):
         super().__init__(parent)
         self.setupUi(self)
         self._filename = filename
         self._extension = ''
-        self._labelDataType = datatype
+        self._saveDataType = saveDataType
 
         # text
-        self._cb.setText("Save {0:s} data".format(self._labelDataType))
+        self._cb.setText("Save {0:s} data".format(self._saveDataType))
 
         # callbacks
         self._cb.toggled.connect(self.__cbToggled)
@@ -23,7 +24,7 @@ class CbFileSaveWidget(QWidget, Ui_CbFileSaveWidget):
         self.__enableDisable()
 
     def getFileSaveConfig(self):
-        cfg = FileSaveConfig()
+        cfg = FileSaveConfig(self._saveDataType)
         cfg.save = self._cb.isChecked()
         cfg.filename = self._filename
         cfg.extension = self._extension
@@ -52,7 +53,7 @@ class CbFileSaveWidget(QWidget, Ui_CbFileSaveWidget):
                     self._extension = extension
         self.__enableDisable()
 
-    def __getFileNameExt(self, filename: str='') -> FileSaveConfig:
+    def __getFileNameExt(self, filename: str='') -> Tuple[str,str]:
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
 
@@ -60,7 +61,7 @@ class CbFileSaveWidget(QWidget, Ui_CbFileSaveWidget):
         selectedFileExtension = ''
         bTryAgain = True
         while bTryAgain:
-            fileName, _ = QFileDialog.getSaveFileName(self,"Select filename for {0:s}".format(self._labelDataType),filename,"MATLAB (*.mat);;HD5 (*.h5);;Numpy (*.npy)", options=options)
+            fileName, _ = QFileDialog.getSaveFileName(self,"Select filename for {0:s}".format(self._saveDataType),filename,"MATLAB (*.mat);;HD5 (*.h5);;Numpy (*.npy)", options=options)
             if fileName:
                 d = os.path.dirname(fileName)
                 b = os.path.basename(fileName)

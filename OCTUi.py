@@ -36,8 +36,8 @@ class OCTUi():
 
         self._octDialog = OCTDialog()
 
-        self._cbSaveAscans = CbFileSaveWidget(self._octDialog, self._saveFilenameAscans, 'ascans')
-        self._cbSaveSpectra = CbFileSaveWidget(self._octDialog, self._saveFilenameSpectra, 'spectra')
+        self._cbSaveAscans = CbFileSaveWidget('ascans', self._octDialog, self._saveFilenameAscans)
+        self._cbSaveSpectra = CbFileSaveWidget('spectra', self._octDialog, self._saveFilenameSpectra)
         layout = QVBoxLayout()
         layout.addWidget(self._cbSaveAscans)
         layout.addWidget(self._cbSaveSpectra)
@@ -100,6 +100,13 @@ class OCTUi():
         self._octDialog.pbStart.setEnabled(False)
         self._octDialog.pbStop.setEnabled(True)
 
+        # check if profiling was requested
+        if self._engineParams.save_profiler_data:
+            os.environ['VORTEX_PROFILER_LOG'] = 'profiler.log'
+        elif os.environ.get('VORTEX_PROFILER_LOG') is not None:
+            os.environ['VORTEX_PROFILER_LOG'] = ''
+
+        # now build engine
         try:
             # fetch current configuration for acq and scan params. The items 
             # in the engineConfig are updated when that dlg is accepted, so no 
@@ -139,14 +146,6 @@ class OCTUi():
             print("RuntimeError:")
             traceback.print_exception(e)
             sys.exit(-1)
-
-    def getFileConfig(self):
-        cfg = FileSaveConfig()
-        # cfg.save_spectra = self._octDialog.cbSaveToDisk.isChecked()
-        # cfg.filename_spectra = self._saveFilename if cfg.save_spectra else None
-        # cfg.ext_spectra = self._typeExt if cfg.save_spectra else None
-        return cfg
-
 
     def stopClicked(self):
         self._octDialog.pbEtc.setEnabled(True)
