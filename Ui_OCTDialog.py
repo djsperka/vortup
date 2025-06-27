@@ -26,6 +26,7 @@ class Ui_OCTDialog(object):
         self.verticalLayoutSidebar.addWidget(self.pbEtc)
         self.horizontalLayout_2.addLayout(self.verticalLayoutSidebar)
         self.widgetDummy = QtWidgets.QWidget(OCTDialog)
+        self.widgetDummy.setMinimumSize(QtCore.QSize(800, 800))
         self.widgetDummy.setObjectName("widgetDummy")
         self.horizontalLayout_2.addWidget(self.widgetDummy)
         self.verticalLayout.addLayout(self.horizontalLayout_2)

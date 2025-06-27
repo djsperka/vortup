@@ -28,7 +28,14 @@
       </layout>
      </item>
      <item>
-      <widget class="QWidget" name="widgetDummy" native="true"/>
+      <widget class="QWidget" name="widgetDummy" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>800</width>
+         <height>800</height>
+        </size>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
