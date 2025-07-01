@@ -125,6 +125,7 @@ class VtxEngine(VtxBaseEngine):
         ec.add_formatter(self._format_planner_ascans, ascan_endpoints)
         ec.add_processor(self._nullprocess, [self._format_planner_spectra])
         ec.add_formatter(self._format_planner_spectra, spectra_endpoints)
+        #ec.add_formatter(self._format_planner_spectra, [self._endpoint_spectra_storage])
 
         # add galvo output
         ec.add_io(self._io_out, lead_samples=round(cfg.galvo_delay * self._io_out.config.samples_per_second))
