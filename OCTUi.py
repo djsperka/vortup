@@ -10,13 +10,15 @@ from vortex import get_console_logger as gcl
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
 from vortex.scan import RasterScanConfig, RasterScan
 from vortex.storage import HDF5StackUInt16, HDF5StackInt8, HDF5StackConfig, HDF5StackHeader, SimpleStackUInt16, SimpleStackInt8, SimpleStackConfig, SimpleStackHeader
-from TraceWidget import TraceWidget
+#from TraceWidget import TraceWidget
+from BScanTraceWidget import BScanTraceWidget
 from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
 import logging
 from rainbow_logging_handler import RainbowLoggingHandler
 import cupy
 import numpy
 import traceback
+import matplotlib as mpl
 
 class OCTUi():
     
@@ -67,15 +69,19 @@ class OCTUi():
         if not self._cross_widget:
             self._raster_widget = RasterEnFaceWidget(self._vtxengine._endpoint_ascan_display)
             self._cross_widget = CrossSectionImageWidget(self._vtxengine._endpoint_ascan_display)
-            self._trace_widget = TraceWidget(self._vtxengine._endpoint_ascan_display)
+            self._ascan_trace_widget = BScanTraceWidget(self._vtxengine._endpoint_ascan_display, title="ascan")
+            self._spectra_trace_widget = BScanTraceWidget(self._vtxengine._endpoint_spectra_display, title="raw spectra")
 
             # 
             vbox = QVBoxLayout()
-            hbox = QHBoxLayout()
-            hbox.addWidget(self._raster_widget)
-            hbox.addWidget(self._cross_widget)
-            vbox.addLayout(hbox)
-            vbox.addWidget(self._trace_widget)
+            hbox_upper = QHBoxLayout()
+            hbox_upper.addWidget(self._raster_widget)
+            hbox_upper.addWidget(self._cross_widget)
+            hbox_lower = QHBoxLayout()
+            hbox_lower.addWidget(self._spectra_trace_widget)
+            hbox_lower.addWidget(self._ascan_trace_widget)
+            vbox.addLayout(hbox_upper)
+            vbox.addLayout(hbox_lower)
             self._octDialog.widgetDummy.setLayout(vbox)
             self._octDialog.widgetDummy.show()
 
@@ -84,14 +90,18 @@ class OCTUi():
             self._trace_widget._endpoint = self._vtxengine._endpoint_ascan_display
 
         self._vtxengine._endpoint_ascan_display.aggregate_segment_callback = self.cb_segments
-        self._vtxengine._endpoint_ascan_display.volume_callback = self.cb_volume
+        #self._vtxengine._endpoint_ascan_display.volume_callback = self.cb_volume
 
     def cb_segments(self, v):
         # argument (v) here is a number - index pointing to a segment in allocated segments.
+        #print("agg segment cb: v=", v)
         self._raster_widget.notify_segments(v)
         self._cross_widget.notify_segments(v)
+        self._ascan_trace_widget.update_trace(v)
+        self._spectra_trace_widget.update_trace(v)
 
     def cb_volume(self, sample_idx, scan_idx, volume_idx):
+        print("volume cb: sample_idx=",sample_idx, "scan_idx=", scan_idx, "volume_idx=", volume_idx)
         self._trace_widget.update_trace()
 
 
@@ -168,9 +178,14 @@ def setup_logging():
     root_logger.addHandler(console_handler)
 
 
+def setup_plotting():
+    mpl.rcParams['axes.facecolor'] = 'k'
+    mpl.rcParams['lines.linewidth'] = 1
+
 
 if __name__ == '__main__':
     setup_logging()
+    setup_plotting()
     app = QApplication(sys.argv)
     octui = OCTUi()
     app.exec_()
