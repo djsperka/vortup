@@ -106,8 +106,8 @@ class VtxEngine(VtxBaseEngine):
         sfe_spectra  = StackFormatExecutor()
         sfe_spectra.initialize(sfec_spectra)
         # data passes through NullProcessor -> cannot use StackDeviceTensorEndpointInt8 "RuntimeError: A-scans must arrive in device memory for device tensor endpoints"
-        self._endpoint_spectra = SpectraStackHostTensorEndpointUInt16(sfe_spectra, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
-        spectra_endpoints.append(self._endpoint_spectra)
+        self._endpoint_spectra_display = SpectraStackHostTensorEndpointUInt16(sfe_spectra, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
+        spectra_endpoints.append(self._endpoint_spectra_display)
         if fcfg_spectra.save:
 
             # make an endpoint for saving spectra data
