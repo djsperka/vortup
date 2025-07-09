@@ -76,7 +76,7 @@ class VtxEngine(VtxBaseEngine):
 
 
         # Now create endpoints
-        ascan_endpoints = []
+        endpoints = []
         spectra_endpoints = []
 
         #  for ascans (oct-processed data), slice away half the data
@@ -88,7 +88,7 @@ class VtxEngine(VtxBaseEngine):
 
         # endpoint for display
         self._endpoint_ascan_display = StackDeviceTensorEndpointInt8(sfe, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
-        ascan_endpoints.append(self._endpoint_ascan_display)
+        endpoints.append(self._endpoint_ascan_display)
 
         if fcfg_ascans.save:
             # endpoint for saving ascan data
@@ -99,21 +99,24 @@ class VtxEngine(VtxBaseEngine):
 
             shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, acq.samples_per_ascan, 1)
             self._endpoint_ascan_storage, self._ascan_storage = self.getStorageEndpoint(fcfg_ascans, shape)
-            ascan_endpoints.append(self._endpoint_ascan_storage)
+            endpoints.append(self._endpoint_ascan_storage)
 
 
         sfec_spectra = StackFormatExecutorConfig()
         sfe_spectra  = StackFormatExecutor()
         sfe_spectra.initialize(sfec_spectra)
+
         # data passes through NullProcessor -> cannot use StackDeviceTensorEndpointInt8 "RuntimeError: A-scans must arrive in device memory for device tensor endpoints"
-        self._endpoint_spectra_display = SpectraStackHostTensorEndpointUInt16(sfe_spectra, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
-        spectra_endpoints.append(self._endpoint_spectra_display)
+        # use sfe self._endpoint_spectra_display = SpectraStackHostTensorEndpointUInt16(sfe_spectra, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
+        self._endpoint_spectra_display = SpectraStackHostTensorEndpointUInt16(sfe, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
+        #spectra_endpoints.append(self._endpoint_spectra_display)
+        endpoints.append(self._endpoint_spectra_display)
         if fcfg_spectra.save:
 
             # make an endpoint for saving spectra data
             shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, acq.samples_per_ascan, 1)
             self._endpoint_spectra_storage, self._spectra_storage = self.getStorageEndpoint(fcfg_spectra, shape)
-            spectra_endpoints.append(self._endpoint_spectra_storage)
+            endpoints.append(self._endpoint_spectra_storage)
 
         #
         # engine setup
@@ -122,10 +125,9 @@ class VtxEngine(VtxBaseEngine):
         ec = EngineConfig()
         ec.add_acquisition(self._acquire, [self._octprocess, self._nullprocess])
         ec.add_processor(self._octprocess, [self._format_planner_ascans])
-        ec.add_formatter(self._format_planner_ascans, ascan_endpoints)
-        ec.add_processor(self._nullprocess, [self._format_planner_spectra])
-        ec.add_formatter(self._format_planner_spectra, spectra_endpoints)
-        #ec.add_formatter(self._format_planner_spectra, [self._endpoint_spectra_storage])
+        ec.add_formatter(self._format_planner_ascans, endpoints)
+        #ec.add_processor(self._nullprocess, [self._format_planner_spectra])
+        #ec.add_formatter(self._format_planner_spectra, spectra_endpoints)
 
         # add galvo output
         ec.add_io(self._io_out, lead_samples=round(cfg.galvo_delay * self._io_out.config.samples_per_second))

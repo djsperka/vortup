@@ -86,12 +86,22 @@ class OCTUi():
             self._octDialog.widgetDummy.show()
 
         else:
-            self._raster_widget._endpoint = self._vtxengine._endpoint_ascan_display
+            self._raster_widget._endpoint = self._vtxengine._endpoint_spectra_display
             self._cross_widget._endpoint = self._vtxengine._endpoint_ascan_display
             self._ascan_trace_widget._endpoint = self._vtxengine._endpoint_ascan_display
             self._spectra_trace_widget._endpoint = self._vtxengine._endpoint_spectra_display
 
-        self._vtxengine._endpoint_ascan_display.aggregate_segment_callback = self.cb_segments
+        def cb_ascan(v):
+            self._cross_widget.notify_segments(v)
+            self._ascan_trace_widget.update_trace(v)
+        self._vtxengine._endpoint_ascan_display.aggregate_segment_callback = cb_ascan
+
+        def cb_spectra(v):
+            self._raster_widget.notify_segments(v)
+            self._spectra_trace_widget.update_trace(v)
+        self._vtxengine._endpoint_spectra_display.aggregate_segment_callback = cb_spectra
+
+
         #self._vtxengine._endpoint_ascan_display.volume_callback = self.cb_volume
 
     def cb_segments(self, v):
