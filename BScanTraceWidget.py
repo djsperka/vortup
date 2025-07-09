@@ -37,6 +37,8 @@ class BScanTraceWidget(FigureCanvasQTAgg):
             self._line2d = line2ds[0]
         else:
             self._line2d.set_ydata(self._ydata)
+        # self._axes.relim()
+        # self._axes.autoscale_view()
         self.draw()
         super().paintEvent(e)
 
@@ -51,7 +53,6 @@ class BScanTraceWidget(FigureCanvasQTAgg):
             if isinstance(volume, cupy.ndarray):
                 # asynchronous on GPU
                 with self._endpoint.stream:
-                    #self.data = volume[self._idx].T.get()
                     self._ydata = volume[self._bidx].mean(axis=0).get()
             else:
                 self._ydata = volume[self._bidx].mean(axis=0)
