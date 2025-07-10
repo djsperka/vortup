@@ -79,7 +79,7 @@ class VtxEngine(VtxBaseEngine):
         endpoints = []
         spectra_endpoints = []
 
-        #  for ascans (oct-processed data), slice away half the data
+        #  for DISPLAYING ascans (oct-processed data), slice away half the data
         sfec = StackFormatExecutorConfig()
         sfec.sample_slice = SimpleSlice(self._octprocess.config.samples_per_ascan // 2)
         samples_to_save = sfec.sample_slice.count()
@@ -92,8 +92,8 @@ class VtxEngine(VtxBaseEngine):
 
         if fcfg_ascans.save:
             # endpoint for saving ascan data
-            # Will save ascans - a full volume at a time.
-            # Shape of data will be like (4, 500, 500, 640, 1)
+            # Will save ascans - a full volume at a time. Save all data acquired!
+            # Shape of data SAVED will be like (4, 500, 500, 1280, 1)
             # (# of volumes, bscans per volume, ascans per bscan, samples per ascan, #channels)
             # The storage object 'SimpleStackInt8' doesn't save data until you call open().
 
@@ -106,10 +106,7 @@ class VtxEngine(VtxBaseEngine):
         sfe_spectra  = StackFormatExecutor()
         sfe_spectra.initialize(sfec_spectra)
 
-        # data passes through NullProcessor -> cannot use StackDeviceTensorEndpointInt8 "RuntimeError: A-scans must arrive in device memory for device tensor endpoints"
-        # use sfe self._endpoint_spectra_display = SpectraStackHostTensorEndpointUInt16(sfe_spectra, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
-        self._endpoint_spectra_display = SpectraStackHostTensorEndpointUInt16(sfe, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
-        #spectra_endpoints.append(self._endpoint_spectra_display)
+        self._endpoint_spectra_display = SpectraStackHostTensorEndpointUInt16(sfe_spectra, (scfg.bscans_per_volume, scfg.ascans_per_bscan, acq.samples_per_ascan), get_logger('stack', cfg.log_level))
         endpoints.append(self._endpoint_spectra_display)
         if fcfg_spectra.save:
 
@@ -126,8 +123,6 @@ class VtxEngine(VtxBaseEngine):
         ec.add_acquisition(self._acquire, [self._octprocess, self._nullprocess])
         ec.add_processor(self._octprocess, [self._format_planner_ascans])
         ec.add_formatter(self._format_planner_ascans, endpoints)
-        #ec.add_processor(self._nullprocess, [self._format_planner_spectra])
-        #ec.add_formatter(self._format_planner_spectra, spectra_endpoints)
 
         # add galvo output
         ec.add_io(self._io_out, lead_samples=round(cfg.galvo_delay * self._io_out.config.samples_per_second))
