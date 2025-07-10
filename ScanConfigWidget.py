@@ -1,4 +1,5 @@
 import sys
+import math
 from vortex.scan import RasterScanConfig, RasterScan, Limits
 from vortex import Range
 from PyQt5.QtWidgets import QGroupBox, QApplication, QWidget
@@ -59,6 +60,7 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
                 r = Range(-iVal, iVal)
         else:
             raise RuntimeError("Cannot parse X extents: ", )
+        print("got range from entry ", txt, "(", r.min, ",", r.max,")")
         return r
 
     def getScanConfig(self) -> RasterScanConfig:
@@ -71,15 +73,16 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
             cfg.bscans_per_volume = int(self.leBperV.text())
             cfg.bidirectional_segments = self.cbBidirectional.isChecked()
             cfg.segment_extent = self.getRangeFromTextEntry(self.leXextent.text())
-            cfg.bscan_extent = self.getRangeFromTextEntry(self.leYextent.text())
+            cfg.volume_extent = self.getRangeFromTextEntry(self.leYextent.text())
         elif self.cbScanTypes.currentIndex() == 1:
             # line scan
-            cfg.angle = float(self.leLAngle.text())
+            degrees = float(self.leLAngle.text())
+            cfg.angle = degrees * math.pi / 180.0
             cfg.ascans_per_bscan = int(self.leLAperB.text())
             cfg.bscans_per_volume = 1
             cfg.bidirectional_segments = self.cbLBidirectional.isChecked()
             cfg.segment_extent = self.getRangeFromTextEntry(self.leLextent.text())
-            cfg.bscan_extent = Range(0, 0)
+            cfg.volume_extent = Range(0, 0)
         else:
             raise RuntimeError("Scan type not handled by getScanConfig()")
         return cfg
