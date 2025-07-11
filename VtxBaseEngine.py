@@ -96,17 +96,6 @@ class VtxBaseEngine():
         self._octprocess.initialize(pc)
 
         #
-        # make a Null processor to pass data untouched
-        #
-
-        ncfg = NullProcessorConfig()
-        ncfg.samples_per_record = acq.samples_per_ascan
-        ncfg.ascans_per_block = acq.ascans_per_block
-        self._nullprocess = NullProcessor()
-        self._nullprocess.initialize(ncfg)
-
-
-        #
         # galvo control
         #
 

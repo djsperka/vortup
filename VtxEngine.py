@@ -1,7 +1,7 @@
 from VtxBaseEngine import VtxBaseEngine
 from vortex import Range, get_console_logger as get_logger
 from vortex.marker import Flags
-from vortex.engine import Engine, EngineConfig, Block, dispersion_phasor, StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, AscanStackEndpoint, SpectraStackEndpoint
+from vortex.engine import Engine, EngineConfig, Block, dispersion_phasor, StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, AscanStackEndpoint, SpectraStackEndpoint, VolumeStrobe, SegmentStrobe
 # from vortex.acquire import AlazarConfig, AlazarAcquisition, alazar, FileAcquisitionConfig, FileAcquisition
 # from vortex.process import CUDAProcessor, CUDAProcessorConfig
 # from vortex.io import DAQmxIO, DAQmxConfig, daqmx
@@ -26,7 +26,6 @@ class VtxEngine(VtxBaseEngine):
         # Base class has stuff made, but no engine constructed:
         # self._acquire
         # self._octprocess  - CUDA based processing
-        # self._nullprocess - no processing pass-through
         # self._io_out
         # self._strobe
 
@@ -75,11 +74,12 @@ class VtxEngine(VtxBaseEngine):
         self._format_planner_spectra = stack_format_spectra
 
 
-        # Now create endpoints
+        # As endpoints are created, stuff them into this list. 
+        # They are added to the engine all at once.
         endpoints = []
-        spectra_endpoints = []
 
-        #  for DISPLAYING ascans (oct-processed data), slice away half the data
+        # For DISPLAYING ascans (oct-processed data), slice away half the data. 
+        # This stack format executor isn't used with the other endpoints.
         sfec = StackFormatExecutorConfig()
         sfec.sample_slice = SimpleSlice(self._octprocess.config.samples_per_ascan // 2)
         samples_to_save = sfec.sample_slice.count()
@@ -93,8 +93,7 @@ class VtxEngine(VtxBaseEngine):
         if fcfg_ascans.save:
             # endpoint for saving ascan data
             # Will save ascans - a full volume at a time. Save all data acquired!
-            # Shape of data SAVED will be like (4, 500, 500, 1280, 1)
-            # (# of volumes, bscans per volume, ascans per bscan, samples per ascan, #channels)
+            # Shape of data SAVED will be different than the displayed data. Here we save all samples, not half of them.
             # The storage object 'SimpleStackInt8' doesn't save data until you call open().
 
             shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, acq.samples_per_ascan, 1)
@@ -120,7 +119,7 @@ class VtxEngine(VtxBaseEngine):
         #
 
         ec = EngineConfig()
-        ec.add_acquisition(self._acquire, [self._octprocess, self._nullprocess])
+        ec.add_acquisition(self._acquire, [self._octprocess])
         ec.add_processor(self._octprocess, [self._format_planner_ascans])
         ec.add_formatter(self._format_planner_ascans, endpoints)
 
@@ -130,6 +129,9 @@ class VtxEngine(VtxBaseEngine):
         self._logger.info("there are {0:d} galvo channels".format(ec.galvo_output_channels))
 
         # strobe output
+        # default is [SampleStrobe(0, 2), SampleStrobe(1, 1000), SampleStrobe(2, 1000, Polarity.Low), SegmentStrobe(3), VolumeStrobe(4)]
+        # ec.strobes = [VolumeStrobe(0)]
+        ec.strobes = [SegmentStrobe(0)]
         ec.add_io(self._strobe)
 
         ec.preload_count = cfg.preload_count
