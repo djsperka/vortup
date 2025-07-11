@@ -131,7 +131,7 @@ class VtxEngine(VtxBaseEngine):
         # strobe output
         # default is [SampleStrobe(0, 2), SampleStrobe(1, 1000), SampleStrobe(2, 1000, Polarity.Low), SegmentStrobe(3), VolumeStrobe(4)]
         # ec.strobes = [VolumeStrobe(0)]
-        ec.strobes = [SegmentStrobe(0)]
+        # ec.strobes = [SegmentStrobe(0)]
         ec.add_io(self._strobe)
 
         ec.preload_count = cfg.preload_count
