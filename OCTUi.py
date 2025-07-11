@@ -4,8 +4,7 @@ from VtxEngineParams import DEFAULT_VTX_ENGINE_PARAMS, FileSaveConfig
 from VtxEngineParamsDialog import VtxEngineParamsDialog
 from VtxEngine import VtxEngine
 from OCTDialog import OCTDialog
-from CbFileSaveWidget import CbFileSaveWidget
-from PyQt5.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout
 from vortex import get_console_logger as gcl
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
 from vortex.scan import RasterScanConfig, RasterScan
@@ -38,12 +37,12 @@ class OCTUi():
 
         self._octDialog = OCTDialog()
 
-        self._cbSaveAscans = CbFileSaveWidget('ascans', self._octDialog, self._saveFilenameAscans)
-        self._cbSaveSpectra = CbFileSaveWidget('spectra', self._octDialog, self._saveFilenameSpectra)
-        layout = QVBoxLayout()
-        layout.addWidget(self._cbSaveAscans)
-        layout.addWidget(self._cbSaveSpectra)
-        self._octDialog.horizontalLayoutStartStop.addLayout(layout)
+        # self._cbSaveAscans = CbFileSaveWidget('ascans', self._octDialog, self._saveFilenameAscans)
+        # self._cbSaveSpectra = CbFileSaveWidget('spectra', self._octDialog, self._saveFilenameSpectra)
+        # layout = QVBoxLayout()
+        # layout.addWidget(self._cbSaveAscans)
+        # layout.addWidget(self._cbSaveSpectra)
+        # self._octDialog.horizontalLayoutStartStop.addLayout(layout)
 
         # connections. 
         self._octDialog.pbEtc.clicked.connect(self.etcClicked)
@@ -135,8 +134,8 @@ class OCTUi():
             # fetch here.
             self._acqParams = self._octDialog.acqParamsWidget.getAcqParams()
             self._scanConfig = self._octDialog.scanConfigWidget.getScanConfig()
-            self._filesaveAscans = self._cbSaveAscans.getFileSaveConfig()
-            self._filesaveSpectra = self._cbSaveSpectra.getFileSaveConfig()
+            self._filesaveAscans = self._octDialog.saveAscans.getFileSaveConfig()
+            self._filesaveSpectra = self._octDialog.saveSpectra.getFileSaveConfig()
 
             # get oct engine ready
             if self._vtxengine:

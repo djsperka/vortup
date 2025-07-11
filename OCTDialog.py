@@ -1,3 +1,5 @@
+import sys
+from PyQt5.QtWidgets import QDialog, QApplication, QStyle, QVBoxLayout
 from PyQt5.QtWidgets import QDialog, QStyle
 from PyQt5 import uic
 from myengine import DEFAULT_ENGINE_PARAMS, StandardEngineParams
@@ -5,6 +7,7 @@ from StandardEngineParamsDialog import StandardEngineParamsDialog
 from Ui_OCTDialog import Ui_OCTDialog
 from ScanConfigWidget import ScanConfigWidget
 from AcqParamsWidget import AcqParamsWidget
+from CbFileSaveWidget import CbFileSaveWidget
 
 class OCTDialog(QDialog, Ui_OCTDialog):
     """Wrapper class around designer-generated user interface. 
@@ -38,3 +41,19 @@ class OCTDialog(QDialog, Ui_OCTDialog):
         # icons
         self.pbStart.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
         self.pbStop.setIcon(self.style().standardIcon(QStyle.SP_MediaStop))
+
+        self.saveAscans = CbFileSaveWidget('ascans', self)
+        self.saveSpectra = CbFileSaveWidget('spectra', self)
+        layout = QVBoxLayout()
+        layout.addWidget(self.saveAscans)
+        layout.addWidget(self.saveSpectra)
+        self.horizontalLayoutStartStop.addLayout(layout)
+
+
+if __name__ == '__main__':
+
+    app = QApplication(sys.argv)
+    dlg = OCTDialog()
+    dlg.show()
+    app.exec_()
+    print("exec() done")
