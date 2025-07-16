@@ -1,5 +1,4 @@
 import sys
-from PyQt5.QtWidgets import QDialog, QApplication
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5 import uic
 from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, AcquisitionType
