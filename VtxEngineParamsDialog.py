@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
-from PyQt5 import uic
+from PyQt5.QtWidgets import QDialog
 from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, AcquisitionType
 from Ui_VtxEngineParamsDialog import Ui_VtxEngineParamsDialog
 from vortex.engine import source, Source
