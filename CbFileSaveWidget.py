@@ -95,6 +95,14 @@ class CbFileSaveWidget(QWidget, Ui_CbFileSaveWidget):
             self._extension = extension
         self.__enableDisable()
 
+class CbAscansFileSaveWidget(CbFileSaveWidget):
+    def __init__(self, parent: QWidget=None, filename: str=''):
+        super().__init__('ascans', parent, filename)
+
+class CbSpectraFileSaveWidget(CbFileSaveWidget):
+    def __init__(self, parent: QWidget=None, filename: str=''):
+        super().__init__('spectra', parent, filename)
+
 if __name__ == "__main__":
     import sys
     app = QApplication(sys.argv)

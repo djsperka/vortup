@@ -7,23 +7,56 @@
     <x>0</x>
     <y>0</y>
     <width>1089</width>
-    <height>634</height>
+    <height>851</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>UCD OCT Dev Tool</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <layout class="QVBoxLayout" name="verticalLayoutSidebar">
+       <item>
+        <widget class="ScanConfigWidget" name="widgetScanConfig" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>80</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="AcqParamsWidget" name="widgetAcqParams" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>80</height>
+          </size>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QPushButton" name="pbEtc">
          <property name="text">
           <string>Etc</string>
          </property>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </item>
@@ -40,7 +73,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayoutStartStop">
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="pbStart">
        <property name="text">
@@ -55,10 +88,60 @@
        </property>
       </widget>
      </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="CbAscansFileSaveWidget" name="widget_2" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>800</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="CbSpectraFileSaveWidget" name="widget" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>800</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
     </layout>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ScanConfigWidget</class>
+   <extends>QWidget</extends>
+   <header>ScanConfigWidget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AcqParamsWidget</class>
+   <extends>QWidget</extends>
+   <header>AcqParamsWidget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CbAscansFileSaveWidget</class>
+   <extends>QWidget</extends>
+   <header>CbFileSaveWidget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CbSpectraFileSaveWidget</class>
+   <extends>QWidget</extends>
+   <header>CbFileSaveWidget</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

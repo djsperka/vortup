@@ -1,9 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QDialog, QApplication, QStyle, QVBoxLayout
-from PyQt5.QtWidgets import QDialog, QStyle
 from PyQt5 import uic
-from myengine import DEFAULT_ENGINE_PARAMS, StandardEngineParams
-from StandardEngineParamsDialog import StandardEngineParamsDialog
 from Ui_OCTDialog import Ui_OCTDialog
 from ScanConfigWidget import ScanConfigWidget
 from AcqParamsWidget import AcqParamsWidget
@@ -31,23 +28,9 @@ class OCTDialog(QDialog, Ui_OCTDialog):
         super().__init__() # Call the inherited class' __init__ method
         self.setupUi(self)  # Use Ui_OCTDialog.py- WARNING! pyuic5 -o Ui_OCTDialog.py OCTDialog.ui
 
-        # replace placeholder with scan type widget
-        self.scanConfigWidget = ScanConfigWidget(self)
-        self.verticalLayoutSidebar.insertWidget(0, self.scanConfigWidget)
-        self.acqParamsWidget = AcqParamsWidget(self)
-        self.verticalLayoutSidebar.insertWidget(1, self.acqParamsWidget)
-        self.verticalLayoutSidebar.insertStretch(2)
-
-        # icons
+        # icons. Cannot seem to do this easily from QtDesigner!
         self.pbStart.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
         self.pbStop.setIcon(self.style().standardIcon(QStyle.SP_MediaStop))
-
-        self.saveAscans = CbFileSaveWidget('ascans', self)
-        self.saveSpectra = CbFileSaveWidget('spectra', self)
-        layout = QVBoxLayout()
-        layout.addWidget(self.saveAscans)
-        layout.addWidget(self.saveSpectra)
-        self.horizontalLayoutStartStop.addLayout(layout)
 
 
 if __name__ == '__main__':
@@ -56,4 +39,3 @@ if __name__ == '__main__':
     dlg = OCTDialog()
     dlg.show()
     app.exec_()
-    print("exec() done")
