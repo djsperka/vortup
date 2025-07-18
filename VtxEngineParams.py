@@ -2,14 +2,17 @@ from vortex import Range
 from vortex.acquire import alazar
 from vortex.engine import source, Source
 from typing import Tuple
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from dataclasses_json import dataclass_json, config
 from enum import Enum
+from VtupUtilities import getRangeFromTextEntry
 #from vortex.engine import Source
 
 class AcquisitionType(Enum):
     ALAZAR_ACQUISITION = 1
     FILE_ACQUISITION= 2
 
+@dataclass_json
 @dataclass
 class VtxEngineParams:
     # acquisition type
@@ -19,8 +22,10 @@ class VtxEngineParams:
     galvo_delay: float
 
     # other galvo stuff
-    galvo_x_voltage_range: Range
-    galvo_y_voltage_range: Range
+    #galvo_x_voltage_range: field(metadata=config(decoder=getRangeFromTextEntry,encoder=str))
+    #galvo_y_voltage_range: field(metadata=config(decoder=getRangeFromTextEntry, encoder=str))
+    # galvo_x_voltage_range: Range
+    # galvo_y_voltage_range: Range
     galvo_x_units_per_volt: float
     galvo_y_units_per_volt: float
     
