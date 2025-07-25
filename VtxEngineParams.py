@@ -12,7 +12,6 @@ class AcquisitionType(Enum):
     ALAZAR_ACQUISITION = 1
     FILE_ACQUISITION= 2
 
-@dataclass_json
 @dataclass
 class VtxEngineParams:
     # acquisition type
@@ -22,10 +21,10 @@ class VtxEngineParams:
     galvo_delay: float
 
     # other galvo stuff
-    #galvo_x_voltage_range: field(metadata=config(decoder=getRangeFromTextEntry,encoder=str))
-    #galvo_y_voltage_range: field(metadata=config(decoder=getRangeFromTextEntry, encoder=str))
-    # galvo_x_voltage_range: Range
-    # galvo_y_voltage_range: Range
+    galvo_x_voltage_range: Range
+    galvo_y_voltage_range: Range
+    galvo_x_voltage_range: Range
+    galvo_y_voltage_range: Range
     galvo_x_units_per_volt: float
     galvo_y_units_per_volt: float
     
@@ -68,7 +67,8 @@ DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
     preload_count=32,
 
     # hardware configuration
-    swept_source=source.Axsun100k,
+    #swept_source=source.Axsun100k,
+    swept_source=Source(100000, 1376, 0.5, 0.0037),
     internal_clock=False,
     clock_samples_per_second=int(500e6),    # ATS 9350 - applies to internal clock only
     external_clock_level_pct=50,        # only relevant if internal_clock is False

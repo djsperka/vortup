@@ -2,7 +2,6 @@ import sys
 from pathlib import Path
 import logging
 from textwrap import dedent
-from rainbow_logging_handler import RainbowLoggingHandler
 
 import numpy as np
 import cupy as cp
@@ -20,22 +19,22 @@ from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecuto
 
 from vortex_tools.ui.display import RasterEnFaceWidget
 
-from myengine import setup_logging
-from VtxEngineParams import DEFAULT_VTX_ENGINE_PARAMS, VtxEngineParams
-from VtxEngineParamsDialog import VtxEngineParamsDialog
-from VtxBaseEngine import VtxBaseEngine
+# hack to simplify running demos
+#sys.path.append(Path(__file__).parent.parent.as_posix())
+sys.path.append(Path('c:/work/src/vortex/demo').as_posix())
+from _common.engine import setup_logging, StandardEngineParams, DEFAULT_ENGINE_PARAMS, BaseEngine
 
 _log = logging.getLogger(__name__)
 
 class GalvoTunerWindow(QWidget):
     stop_signal = pyqtSignal()
 
-    def __init__(self, params: VtxEngineParams, **kwargs):
+    def __init__(self, params: StandardEngineParams, **kwargs):
         super().__init__(**kwargs)
         params.bscans_per_volume = 100
         self._params = params
 
-        self._system = VtxBaseEngine(params)
+        self._system = BaseEngine(params)
 
         #
         # scan
@@ -61,30 +60,17 @@ class GalvoTunerWindow(QWidget):
         fc.records_per_segment = params.ascans_per_bscan
         fc.adapt_shape = False
 
-        print(fc)
-        # result   
-        # FormatPlannerConfig(shape=[100, 500], segments_per_volume=100, records_per_segments=500, mask=Flags(value=0xffffffffffffffff), flip_reversed=True, strip_inactive=True, adapt_shape=False)     
-        # 100 = bscans per volume (hard-coded as 100 above) (ROWS)
-        # 500 = ascans per bscan (COLUMNS)
-        # Note that the SimpleSlice added to the StackFormatExecutor takes just 688 samples from each Ascan, so the 
-        # size of the volume we fetch below is (100, 500, 688)
-
         self._stack_format = FormatPlanner(get_logger('format', params.log_level))
         self._stack_format.initialize(fc)
 
         # format executors
-        # the sample_slice works on the Ascans. In our system, each Ascan has 1368 samples (K-clock ticks), 
-        # and this line takes the first half of the samples as a slice (and passes just those samples on to the next step)
-
         cfec = StackFormatExecutorConfig()
         cfec.sample_slice = SimpleSlice(self._system._process.config.samples_per_ascan // 2)
         samples_to_save = cfec.sample_slice.count()
-        print("samples to save {0:d}".format(samples_to_save))
 
         cfe = StackFormatExecutor()
         cfe.initialize(cfec)
         self._stack_endpoint = StackDeviceTensorEndpoint(cfe, (self._scan_config.bscans_per_volume, self._scan_config.ascans_per_bscan, samples_to_save), get_logger('stack', params.log_level))
-
 
         self._engine = None
 
@@ -238,15 +224,12 @@ class GalvoTunerWindow(QWidget):
         # plot shifting
         if self._stack_endpoint.tensor.valid:
             with self._stack_endpoint.tensor as volume:
-                s = np.shape(volume)
-                _log.info("shape of volume from _stack_endpoint.tensor: {0:d},{1:d},{2:d}".format(s[0],s[1],s[2]))
                 mip = cp.max(volume, axis=2)
                 a = cp.mean(mip[::2], axis=0).get()
                 b = cp.mean(mip[1::2], axis=0).get()
 
             if self._axes:
-                #self._axes.lines.clear()
-                self._axes.clear()
+                self._axes.lines.clear()
             else:
                 self._axes = self._canvas.figure.subplots()
                 self._axes.set_xlabel('Sample Index')
@@ -258,21 +241,6 @@ class GalvoTunerWindow(QWidget):
             self._axes.plot(b, 'C1')
 
             self._canvas.draw()
-
-
-def setup_logging():
-    # configure the root logger to accept all records
-    root_logger = logging.getLogger()
-    root_logger.setLevel(logging.NOTSET)
-    logging.getLogger("matplotlib").setLevel(logging.WARNING)
-
-    formatter = logging.Formatter('%(asctime)s.%(msecs)03d [%(name)s] %(filename)s:%(lineno)d\t%(levelname)s:\t%(message)s')
-
-    # set up colored logging to console
-    console_handler = RainbowLoggingHandler(sys.stderr)
-    console_handler.setFormatter(formatter)
-    root_logger.addHandler(console_handler)
-
 
 if __name__ == '__main__':
     setup_logging()
@@ -300,10 +268,9 @@ if __name__ == '__main__':
         QTimer.singleShot(msec, lambda: keepalive(msec))
     keepalive(10)
 
-
-    cfg = DEFAULT_VTX_ENGINE_PARAMS
-    window = GalvoTunerWindow(cfg)
+    window = GalvoTunerWindow(DEFAULT_ENGINE_PARAMS)
     window.show()
+
     app.exec_()
 
     window.stop()
