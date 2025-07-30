@@ -2,7 +2,7 @@ from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, Acquisit
 from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
 from ScanParams import ScanParams, DEFAULT_SCAN_PARAMS
 from platformdirs import site_config_dir
-from pathlib import PurePath
+from pathlib import Path
 import json
 from dataclasses import asdict, dataclass
 import copyreg
@@ -16,7 +16,7 @@ from vortex.acquire import alazar
 default_app_name = 'octui'
 default_author_name = 'djsperka'
 default_config_base = 'octui.conf'
-default_config_file = PurePath(site_config_dir(default_app_name, default_author_name), default_config_base)
+default_config_path = Path(site_config_dir(default_app_name, default_author_name), default_config_base)
 
 
 # This stuff is needed for when we call asdict() on a dataclass
@@ -30,7 +30,7 @@ copyreg.pickle(Range, pickle_range)
 copyreg.pickle(Source, pickle_source)
 
 @dataclass
-class __UiParams():
+class UiParams():
     vtx: VtxEngineParams = DEFAULT_VTX_ENGINE_PARAMS
     acq: AcqParams = DEFAULT_ACQ_PARAMS
     scn: ScanParams = DEFAULT_SCAN_PARAMS
@@ -68,34 +68,65 @@ class __encoder(json.JSONEncoder):
         return super().default(o)
 
 class OCTUiParams():
-    vtx: VtxEngineParams = DEFAULT_VTX_ENGINE_PARAMS
-    acq: AcqParams = DEFAULT_ACQ_PARAMS
-    scn: ScanParams = DEFAULT_SCAN_PARAMS    
-    __filename: str = ''
-    
+    def __init__(self, config_file = '', load = True):
 
-    def __init__(self, config_file = default_config_file):
-        __params = self.__load(config_file)        
+        if not load:
+            # Special case - save initial file
+            self.vtx = DEFAULT_VTX_ENGINE_PARAMS
+            self.acq = DEFAULT_ACQ_PARAMS
+            self.scn = DEFAULT_SCAN_PARAMS
+            self.save(str(default_config_path))
 
-    def __load(self, config_file = default_config_file):        
-        with open(config_file, 'r') as f:
+        if len(config_file):
+            maybepath = Path(config_file)
+            if not maybepath.exists():
+                raise FileNotFoundError('Config file {0:s} not found.'.format(config_file))
+            else:
+                self.__cfgpath = maybepath
+        else:
+            self.__cfgpath = default_config_path
+
+        self.load()
+
+    def load(self, config_file=''):
+        if len(config_file):
+            maybepath = Path(config_file)
+            if not maybepath.exists():
+                raise FileNotFoundError('Config file {0:s} not found.'.format(config_file))
+            else:
+                use_this_path = maybepath
+        else:
+            if self.__cfgpath.exists():
+                use_this_path = self.__cfgpath
+            else:
+                raise FileNotFoundError('Config file {0:s} not found.'.format(str(self.__cfgpath)))
+
+        with use_this_path.open(mode='r') as f:
             dct = json.load(f)
-        params = __UiParams(**dct)
+        params = UiParams(**dct)
         self.vtx = params.vtx
         self.acq = params.acq
         self.scn = params.scn
-        __filename = config_file
+        self.__cfgpath = use_this_path
 
-    def load(self, config_file):
-        self.__load(config_file)
+    def path(self):
+        return self.__cfgpath
 
-    def save(self, config_file = None):
-        use_this_filename = self.__filename
-        if config_file is not None:
-            use_this_filename = config_file
-        print("saving to {0:s}".format(use_this_filename))
-        with open(use_this_filename, mode="w", encoding="utf-8") as f:
-            params = __UiParams(self.vtx, self.acq, self.scn)
+    def save(self, config_file = ''):
+
+        # Save to the given filename.
+        # If the filename already exists, overwrite it. 
+        # If the filename doesn't exist, create it.
+        # If the filename is empty, use the private __cfgpath member, 
+        # and apply the same rules to it.
+        if len(config_file):
+            use_this_path = Path(config_file)
+        else:
+            use_this_path = self.__cfgpath
+
+        print("saving to {0:s}".format(str(use_this_path)))
+        with use_this_path.open(mode="w", encoding="utf-8") as f:
+            params = UiParams(self.vtx, self.acq, self.scn)
             json.dump(params, f, indent=2)
 
 
@@ -120,5 +151,18 @@ class OCTUiParams():
 
 
 if __name__ == "__main__":
-    p=OCTUiParams()
-    p.save()
+
+    # First time only! 
+    if not default_config_path.exists():
+        # create directory for default config file
+        default_config_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # calling with load=False will create new file
+        p=OCTUiParams(load=False)
+        print("Saved initial config file in {0:s}".format(str(p.path())))
+
+    # Load config file
+    print("loading config file....")
+    p2 = OCTUiParams()
+    p2.load()
+    print(p2.scn)

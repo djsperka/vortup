@@ -5,6 +5,7 @@ from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
 from vortex import Range
 from vortex.engine import Source
 from vortex.acquire import alazar
+from vortex.scan import RasterScanConfig
 from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, AcquisitionType
 
 
@@ -51,6 +52,11 @@ from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, Acquisit
 
 
 
+
+
+
+
+
 # This stuff is needed for when we call asdict() on a VtxEngineParams object. 
 # It contains things that cannot be "pickled", and these functions tell the pickler 
 # process how to do it. Seems counter-intuitive to need to do this.
@@ -62,24 +68,23 @@ def pickle_source(s: Source):
 copyreg.pickle(Range, pickle_range)
 copyreg.pickle(Source, pickle_source)
 
-# print("call asdict on params")
-# params_dct = asdict(params, dict_factory=factory)
-# print("\n\nafter asdict:\n", params_dct)
-
-
 @dataclass
 class BigConfig:
     vtx: VtxEngineParams = DEFAULT_VTX_ENGINE_PARAMS
     acq: AcqParams = DEFAULT_ACQ_PARAMS
+    scn: ScanParams = DEFAULT_SCAN_PARAMS
 
 
 class MyEncoder(json.JSONEncoder):
     def default(self, o):
         try:
-            # print("default:", o)
+            print("MyEncoder.default:", o)
             if isinstance(o, BigConfig):
                 value = asdict(o)
             elif isinstance(o, VtxEngineParams):
+                value = asdict(o)
+            elif isinstance(o, ScanParams):
+                print("got Scanparams")
                 value = asdict(o)
             elif isinstance(o, AcqParams):
                 value = asdict(o)
@@ -120,6 +125,7 @@ class MyDecoder(json.JSONDecoder):
             d['input_channel'] = alazar.Channel(d['input_channel'])
             d['dispersion'] = tuple(d['dispersion'])
         return d
+
 
 
 
@@ -178,6 +184,9 @@ class MyDecoder(json.JSONDecoder):
 # print("awesome")
 
 
+
+#
+#  THIS WORKS!
 b = BigConfig()
 b_str = json.dumps(b, cls=MyEncoder, indent=2)
 print('\n\nstr encoded from BigConfig\n', b_str)
@@ -187,3 +196,19 @@ print('\n\nDict decoded from the encoded params\n', b_d)
 b2 = BigConfig(**b_d)
 print('original:\n', b)
 print('\nnew\n', b2)
+
+
+
+# scfg = ScanParams()
+# print("call dumps...")
+# scfg_str = json.dumps(scfg, cls=MyEncoder, indent=2)
+# print("DUMP json str for ScanParams: \n", scfg_str)
+# decoder = MyDecoder()
+# scfg_decoded = decoder.decode(scfg_str)
+# # print('\n\nDict decoded from the encoded params\n', b_d)
+# s2 = ScanParams(**scfg_decoded)
+# print('original:\n', scfg)
+# print('\nnew\n', s2)
+
+
+
