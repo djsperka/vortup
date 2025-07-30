@@ -36,19 +36,17 @@ class UiParams():
     scn: ScanParams = DEFAULT_SCAN_PARAMS
 
 
-class __encoder(json.JSONEncoder):
+class _octui_encoder(json.JSONEncoder):
     def default(self, o):
         try:
-            print("__encoder.default:", o)
-            if isinstance(o, OCTUiParams):
+            #print("__encoder.default:", o)
+            if isinstance(o, UiParams):
                 value = asdict(o)
             elif isinstance(o, VtxEngineParams):
                 value = asdict(o)
             elif isinstance(o, ScanParams):
                 value = asdict(o)
             elif isinstance(o, AcqParams):
-                value = asdict(o)
-            elif isinstance(o, OCTUiParams):
                 value = asdict(o)
             elif isinstance(o, AcquisitionType):
                 value = o.value
@@ -75,6 +73,7 @@ class OCTUiParams():
             self.vtx = DEFAULT_VTX_ENGINE_PARAMS
             self.acq = DEFAULT_ACQ_PARAMS
             self.scn = DEFAULT_SCAN_PARAMS
+            print("Saving initial config file {0:s}".format(str(default_config_path)))
             self.save(str(default_config_path))
 
         if len(config_file):
@@ -101,6 +100,7 @@ class OCTUiParams():
             else:
                 raise FileNotFoundError('Config file {0:s} not found.'.format(str(self.__cfgpath)))
 
+        print("loading OCTUi config from {0:s}".format(str(use_this_path)))
         with use_this_path.open(mode='r') as f:
             dct = json.load(f)
         params = UiParams(**dct)
@@ -124,10 +124,10 @@ class OCTUiParams():
         else:
             use_this_path = self.__cfgpath
 
-        print("saving to {0:s}".format(str(use_this_path)))
+        print("saving OCTUi config to {0:s}".format(str(use_this_path)))
         with use_this_path.open(mode="w", encoding="utf-8") as f:
             params = UiParams(self.vtx, self.acq, self.scn)
-            json.dump(params, f, indent=2)
+            json.dump(params, f, indent=2, cls=_octui_encoder)
 
 
 
