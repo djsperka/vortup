@@ -65,14 +65,40 @@ class _octui_encoder(json.JSONEncoder):
         # Let the base class default method raise the TypeError
         return super().default(o)
 
+
+class _octui_decoder(json.JSONDecoder):
+    def __init__(self):
+        json.JSONDecoder.__init__(self, object_hook=_octui_decoder.from_dict)
+
+    @staticmethod
+    def from_dict(d):
+        #print('from_dict: ', d.keys())
+        if d.keys() == {'min', 'max'}:
+            return Range(d['min'], d['max'])
+        elif {'triggers_per_second', 'clock_rising_edges_per_trigger', 'duty_cycle', 'imaging_depth_meters'}.issubset(d.keys()):
+            return Source(int(d['triggers_per_second']), int(d['clock_rising_edges_per_trigger']), float(d['duty_cycle']), float(d['imaging_depth_meters']))
+        elif {'acquisition_type',  'galvo_delay', 'galvo_y_voltage_range', 'save_profiler_data'}.issubset(d.keys()):
+            # This should be the VtxEngineParams object itself. 
+            d['acquisition_type'] = AcquisitionType(d['acquisition_type'])
+            d['clock_channel'] = alazar.Channel(d['clock_channel'])
+            d['input_channel'] = alazar.Channel(d['input_channel'])
+            d['dispersion'] = tuple(d['dispersion'])
+        elif {'vtx', 'acq', 'scn'}.issubset(d.keys()):
+            d['vtx'] = VtxEngineParams(**d['vtx'])
+            d['acq'] = AcqParams(**d['acq'])
+            d['scn'] = ScanParams(**d['scn'])
+        return d
+
+
+
 class OCTUiParams():
     def __init__(self, config_file = '', load = True):
 
         if not load:
             # Special case - save initial file
-            self.vtx = DEFAULT_VTX_ENGINE_PARAMS
-            self.acq = DEFAULT_ACQ_PARAMS
-            self.scn = DEFAULT_SCAN_PARAMS
+            self._vtx = DEFAULT_VTX_ENGINE_PARAMS
+            self._acq = DEFAULT_ACQ_PARAMS
+            self._scn = DEFAULT_SCAN_PARAMS
             print("Saving initial config file {0:s}".format(str(default_config_path)))
             self.save(str(default_config_path))
 
@@ -86,6 +112,30 @@ class OCTUiParams():
             self.__cfgpath = default_config_path
 
         self.load()
+
+    @property
+    def vtx(self):
+        return self._vtx
+    
+    @vtx.setter
+    def vtx(self, value):
+        self._vtx = value
+
+    @property
+    def acq(self):
+        return self._acq
+    
+    @acq.setter
+    def acq(self, value):
+        self._acq = value
+
+    @property
+    def scn(self):
+        return self._scn.getRasterScanConfig()
+    
+    @scn.setter
+    def scn(self, value):
+        self._scn = value
 
     def load(self, config_file=''):
         if len(config_file):
@@ -102,11 +152,12 @@ class OCTUiParams():
 
         print("loading OCTUi config from {0:s}".format(str(use_this_path)))
         with use_this_path.open(mode='r') as f:
-            dct = json.load(f)
+            dct = json.load(f, cls=_octui_decoder)
+        
         params = UiParams(**dct)
-        self.vtx = params.vtx
-        self.acq = params.acq
-        self.scn = params.scn
+        self._vtx = params.vtx
+        self._acq = params.acq
+        self._scn = params.scn
         self.__cfgpath = use_this_path
 
     def path(self):

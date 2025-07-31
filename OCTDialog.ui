@@ -91,7 +91,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="CbAscansFileSaveWidget" name="widget_2" native="true">
+        <widget class="CbAscansFileSaveWidget" name="widgetAscansFileSave" native="true">
          <property name="minimumSize">
           <size>
            <width>800</width>
@@ -101,7 +101,7 @@
         </widget>
        </item>
        <item>
-        <widget class="CbSpectraFileSaveWidget" name="widget" native="true">
+        <widget class="CbSpectraFileSaveWidget" name="widgetSpectraFileSave" native="true">
          <property name="minimumSize">
           <size>
            <width>800</width>

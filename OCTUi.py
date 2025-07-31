@@ -4,6 +4,7 @@ from VtxEngineParams import DEFAULT_VTX_ENGINE_PARAMS, FileSaveConfig
 from VtxEngineParamsDialog import VtxEngineParamsDialog
 from VtxEngine import VtxEngine
 from OCTDialog import OCTDialog
+from OCTUiParams import OCTUiParams
 from PyQt5.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout
 from vortex import get_console_logger as gcl
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
@@ -27,22 +28,16 @@ class OCTUi():
         self._vtxengine = None
         self._cross_widget = None
         self._trace_widget = None
-        self._engineParams = DEFAULT_VTX_ENGINE_PARAMS
-        self._scanConfig = RasterScanConfig()
-        self._acqParams = DEFAULT_ACQ_PARAMS
         self._saveFilenameAscans = ''
         self._typeExtAscans = ''
         self._saveFilenameSpectra = ''
         self._typeExtSpectra = ''
 
-        self._octDialog = OCTDialog()
+        # load config file - default file only!
+        # TODO - make it configurable, or be able to load a diff't config.
+        self._params = OCTUiParams()
 
-        # self._cbSaveAscans = CbFileSaveWidget('ascans', self._octDialog, self._saveFilenameAscans)
-        # self._cbSaveSpectra = CbFileSaveWidget('spectra', self._octDialog, self._saveFilenameSpectra)
-        # layout = QVBoxLayout()
-        # layout.addWidget(self._cbSaveAscans)
-        # layout.addWidget(self._cbSaveSpectra)
-        # self._octDialog.horizontalLayoutStartStop.addLayout(layout)
+        self._octDialog = OCTDialog()
 
         # connections. 
         self._octDialog.pbEtc.clicked.connect(self.etcClicked)
@@ -54,13 +49,13 @@ class OCTUi():
         self._octDialog.show()
 
     def etcClicked(self):
-        self._cfgDialog = VtxEngineParamsDialog(self._engineParams)
+        self._cfgDialog = VtxEngineParamsDialog(self._params.vtx)
         self._cfgDialog.finished.connect(self.etcFinished)
         self._cfgDialog.show()
 
     def etcFinished(self, v):
         if v == 1:
-            self._engineParams = self._cfgDialog.getEngineParameters()
+            self._params.vtx = self._cfgDialog.getEngineParameters()
 
     def addPlotsToDialog(self):
 
@@ -69,6 +64,7 @@ class OCTUi():
             self._raster_widget = RasterEnFaceWidget(self._vtxengine._endpoint_ascan_display)
             self._cross_widget = CrossSectionImageWidget(self._vtxengine._endpoint_ascan_display)
             self._ascan_trace_widget = BScanTraceWidget(self._vtxengine._endpoint_ascan_display, title="ascan")
+
             self._spectra_trace_widget = BScanTraceWidget(self._vtxengine._endpoint_spectra_display, title="raw spectra")
 
             # 
@@ -122,7 +118,7 @@ class OCTUi():
         self._octDialog.pbStop.setEnabled(True)
 
         # check if profiling was requested
-        if self._engineParams.save_profiler_data:
+        if self._params.vtx.save_profiler_data:
             os.environ['VORTEX_PROFILER_LOG'] = 'profiler.log'
         elif os.environ.get('VORTEX_PROFILER_LOG') is not None:
             os.environ['VORTEX_PROFILER_LOG'] = ''
@@ -132,10 +128,10 @@ class OCTUi():
             # fetch current configuration for acq and scan params. The items 
             # in the engineConfig are updated when that dlg is accepted, so no 
             # fetch here.
-            self._acqParams = self._octDialog.acqParamsWidget.getAcqParams()
-            self._scanConfig = self._octDialog.scanConfigWidget.getScanConfig()
-            self._filesaveAscans = self._octDialog.saveAscans.getFileSaveConfig()
-            self._filesaveSpectra = self._octDialog.saveSpectra.getFileSaveConfig()
+            self.acq = self._octDialog.widgetAcqParams.getAcqParams()
+            self.scn = self._octDialog.widgetScanConfig.getScanConfig()
+            self._filesaveAscans = self._octDialog.widgetAscansFileSave.getFileSaveConfig()
+            self._filesaveSpectra = self._octDialog.widgetSpectraFileSave.getFileSaveConfig()
 
             # get oct engine ready
             if self._vtxengine:
@@ -147,11 +143,11 @@ class OCTUi():
 
             # create engine
 
-            self._vtxengine = VtxEngine(self._engineParams, self._acqParams, self._scanConfig, self._filesaveAscans, self._filesaveSpectra)
+            self._vtxengine = VtxEngine(self._params.vtx, self._params.acq, self._params.scn, self._filesaveAscans, self._filesaveSpectra)
 
             # put something into the scan queue
             self._raster_scan = RasterScan()
-            self._raster_scan.initialize(self._scanConfig)
+            self._raster_scan.initialize(self._params.scn)
             self._vtxengine._engine.scan_queue.clear()
             self._vtxengine._engine.scan_queue.append(self._raster_scan)
 
