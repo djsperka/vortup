@@ -1,10 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QDialog, QApplication, QStyle, QVBoxLayout
-from PyQt5 import uic
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QDialog, QApplication, QStyle
 from Ui_OCTDialog import Ui_OCTDialog
-from ScanConfigWidget import ScanConfigWidget
-from AcqParamsWidget import AcqParamsWidget
-from CbFileSaveWidget import CbFileSaveWidget
 
 class OCTDialog(QDialog, Ui_OCTDialog):
     """Wrapper class around designer-generated user interface. 
@@ -23,7 +20,10 @@ class OCTDialog(QDialog, Ui_OCTDialog):
     Args:
         QDialog (_type_): Parent dialog that the UI is placed inside of
     """    
-    
+
+    # signal emitted with dialog is closing
+    dialogClosing = pyqtSignal()
+
     def __init__(self):
         super().__init__() # Call the inherited class' __init__ method
         self.setupUi(self)  # Use Ui_OCTDialog.py- WARNING! pyuic5 -o Ui_OCTDialog.py OCTDialog.ui
@@ -31,6 +31,32 @@ class OCTDialog(QDialog, Ui_OCTDialog):
         # icons. Cannot seem to do this easily from QtDesigner!
         self.pbStart.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
         self.pbStop.setIcon(self.style().standardIcon(QStyle.SP_MediaStop))
+
+
+    def closeEvent(self, event):
+        print("emit dialogClosing() signal")
+        self.dialogClosing.emit()
+        event.accept()
+
+
+# from PyQt5.QtCore import QObject, pyqtSignal
+
+# class Baz(QObject):
+#    trigger = pyqtSignal(int)
+
+#    def emit_trigger(self):
+#       self.trigger.emit(42)
+
+#    def handle_trigger(self, value):
+#       print("Trigger signal received with value:", value)
+
+# baz = Baz()
+# baz.trigger.connect(baz.handle_trigger)
+# baz.emit_trigger()
+
+
+
+
 
 
 if __name__ == '__main__':

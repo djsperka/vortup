@@ -35,6 +35,10 @@ class UiParams():
     acq: AcqParams = DEFAULT_ACQ_PARAMS
     scn: ScanParams = DEFAULT_SCAN_PARAMS
 
+def pickle_uiparams(u: UiParams):
+    return UiParams, (u.vtx, u.acq, u.scn)
+copyreg.pickle(UiParams, pickle_uiparams)
+
 
 class _octui_encoder(json.JSONEncoder):
     def default(self, o):
@@ -177,7 +181,7 @@ class OCTUiParams():
 
         print("saving OCTUi config to {0:s}".format(str(use_this_path)))
         with use_this_path.open(mode="w", encoding="utf-8") as f:
-            params = UiParams(self.vtx, self.acq, self.scn)
+            params = UiParams(self._vtx, self._acq, self._scn)
             json.dump(params, f, indent=2, cls=_octui_encoder)
 
 

@@ -6,6 +6,7 @@ from VtxEngine import VtxEngine
 from OCTDialog import OCTDialog
 from OCTUiParams import OCTUiParams
 from PyQt5.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QMessageBox
 from vortex import get_console_logger as gcl
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
 from vortex.scan import RasterScanConfig, RasterScan
@@ -40,6 +41,7 @@ class OCTUi():
         self._octDialog = OCTDialog()
 
         # connections. 
+        self._octDialog.dialogClosing.connect(self.dialogClosing)
         self._octDialog.pbEtc.clicked.connect(self.etcClicked)
         self._octDialog.pbStart.clicked.connect(self.startClicked)
         self._octDialog.pbStop.clicked.connect(self.stopClicked)
@@ -47,6 +49,17 @@ class OCTUi():
         self._octDialog.pbStop.enabled = False  
         self._octDialog.resize(1000,800)              
         self._octDialog.show()
+
+    def dialogClosing(self):
+        dlg = QMessageBox(self._octDialog)
+        dlg.setWindowTitle("OCTUi is exiting...")
+        dlg.setText("Save engine parameters?")
+        dlg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        dlg.setIcon(QMessageBox.Question)
+        button = dlg.exec()
+        if button == QMessageBox.Yes:
+            self._logger.info("Saving engine parameters...")
+            self._params.save()
 
     def etcClicked(self):
         self._cfgDialog = VtxEngineParamsDialog(self._params.vtx)
@@ -128,8 +141,8 @@ class OCTUi():
             # fetch current configuration for acq and scan params. The items 
             # in the engineConfig are updated when that dlg is accepted, so no 
             # fetch here.
-            self.acq = self._octDialog.widgetAcqParams.getAcqParams()
-            self.scn = self._octDialog.widgetScanConfig.getScanConfig()
+            self._params.acq = self._octDialog.widgetAcqParams.getAcqParams()
+            self._params.scn = self._octDialog.widgetScanConfig.getScanParams()
             self._filesaveAscans = self._octDialog.widgetAscansFileSave.getFileSaveConfig()
             self._filesaveSpectra = self._octDialog.widgetSpectraFileSave.getFileSaveConfig()
 
