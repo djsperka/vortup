@@ -13,11 +13,11 @@
   <property name="windowTitle">
    <string>UCD OCT Dev Tool</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayoutSidebar">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="ScanConfigWidget" name="widgetScanConfig" native="true">
          <property name="minimumSize">
@@ -37,6 +37,9 @@
           </size>
          </property>
         </widget>
+       </item>
+       <item>
+        <widget class="DispersionWidget" name="widgetDispersion" native="true"/>
        </item>
        <item>
         <widget class="QPushButton" name="pbEtc">
@@ -139,6 +142,12 @@
    <class>CbSpectraFileSaveWidget</class>
    <extends>QWidget</extends>
    <header>CbFileSaveWidget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DispersionWidget</class>
+   <extends>QWidget</extends>
+   <header>DispersionWidget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

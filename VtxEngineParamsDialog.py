@@ -30,12 +30,6 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.lineEditGalvoDelay.setValidator(v)
 
         # plain double validators
-        v = QDoubleValidator()
-        v.setNotation(QDoubleValidator.Notation.ScientificNotation)
-        self.lineEditDispersion0.setValidator(v)
-        v = QDoubleValidator()
-        v.setNotation(QDoubleValidator.Notation.ScientificNotation)
-        self.lineEditDispersion1.setValidator(v)
         v = QDoubleValidator(-10,10,3)
         self.lineEditGalvoXmin.setValidator(v)
         v = QDoubleValidator(-10,10,3)

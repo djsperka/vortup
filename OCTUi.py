@@ -40,6 +40,9 @@ class OCTUi():
 
         self._octDialog = OCTDialog()
 
+        # initializations
+        self._octDialog.widgetDispersion.setDispersion(self._params.dsp)
+
         # connections. 
         self._octDialog.dialogClosing.connect(self.dialogClosing)
         self._octDialog.pbEtc.clicked.connect(self.etcClicked)
@@ -143,6 +146,7 @@ class OCTUi():
             # fetch here.
             self._params.acq = self._octDialog.widgetAcqParams.getAcqParams()
             self._params.scn = self._octDialog.widgetScanConfig.getScanParams()
+            self._params.dsp = self._octDialog.widgetDispersion.getDispersion()
             self._filesaveAscans = self._octDialog.widgetAscansFileSave.getFileSaveConfig()
             self._filesaveSpectra = self._octDialog.widgetSpectraFileSave.getFileSaveConfig()
 
@@ -156,7 +160,7 @@ class OCTUi():
 
             # create engine
 
-            self._vtxengine = VtxEngine(self._params.vtx, self._params.acq, self._params.scn, self._filesaveAscans, self._filesaveSpectra)
+            self._vtxengine = VtxEngine(self._params, self._filesaveAscans, self._filesaveSpectra)
 
             # put something into the scan queue
             self._raster_scan = RasterScan()

@@ -6,9 +6,10 @@ from vortex.io import DAQmxIO, DAQmxConfig, daqmx
 from VtxEngineParams import VtxEngineParams, AcquisitionType
 from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
 import numpy as np
+from typing import Tuple
 
 class VtxBaseEngine():
-    def __init__(self, cfg: VtxEngineParams, acq: AcqParams=DEFAULT_ACQ_PARAMS):
+    def __init__(self, cfg: VtxEngineParams, acq: AcqParams=DEFAULT_ACQ_PARAMS, dsp: Tuple[float, float]=(0,0)):
 
         #
         # acquisition
@@ -86,7 +87,7 @@ class VtxBaseEngine():
 
         # spectral filter with dispersion correction
         window = np.hanning(pc.samples_per_ascan)
-        phasor = dispersion_phasor(len(window), cfg.dispersion)
+        phasor = dispersion_phasor(len(window), dsp)
         pc.spectral_filter = window * phasor
 
         # DC subtraction per block

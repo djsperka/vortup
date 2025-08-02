@@ -9,7 +9,7 @@ import copyreg
 from vortex import Range
 from vortex.engine import Source
 from vortex.acquire import alazar
-
+from typing import Tuple
 
 # default location and name for config file
 # on Windows this will go into 'C:\ProgramData\djsperka\octui'
@@ -34,6 +34,7 @@ class UiParams():
     vtx: VtxEngineParams = DEFAULT_VTX_ENGINE_PARAMS
     acq: AcqParams = DEFAULT_ACQ_PARAMS
     scn: ScanParams = DEFAULT_SCAN_PARAMS
+    dsp: Tuple = (-1.8e-05, 0)
 
 def pickle_uiparams(u: UiParams):
     return UiParams, (u.vtx, u.acq, u.scn)
@@ -86,11 +87,11 @@ class _octui_decoder(json.JSONDecoder):
             d['acquisition_type'] = AcquisitionType(d['acquisition_type'])
             d['clock_channel'] = alazar.Channel(d['clock_channel'])
             d['input_channel'] = alazar.Channel(d['input_channel'])
-            d['dispersion'] = tuple(d['dispersion'])
-        elif {'vtx', 'acq', 'scn'}.issubset(d.keys()):
+        elif {'vtx', 'acq', 'scn', 'dsp'}.issubset(d.keys()):
             d['vtx'] = VtxEngineParams(**d['vtx'])
             d['acq'] = AcqParams(**d['acq'])
             d['scn'] = ScanParams(**d['scn'])
+            d['dsp'] = tuple(d['dsp'])
         return d
 
 
@@ -99,10 +100,11 @@ class OCTUiParams():
     def __init__(self, config_file = '', load = True):
 
         if not load:
-            # Special case - save initial file
-            self._vtx = DEFAULT_VTX_ENGINE_PARAMS
-            self._acq = DEFAULT_ACQ_PARAMS
-            self._scn = DEFAULT_SCAN_PARAMS
+            params = UiParams()
+            self._vtx = params.vtx
+            self._acq = params.acq
+            self._scn = params.scn
+            self._dsp = params.dsp
             print("Saving initial config file {0:s}".format(str(default_config_path)))
             self.save(str(default_config_path))
 
@@ -141,6 +143,14 @@ class OCTUiParams():
     def scn(self, value):
         self._scn = value
 
+    @property
+    def dsp(self):
+        return self._dsp
+    
+    @dsp.setter
+    def dsp(self, value):
+        self._dsp = value
+
     def load(self, config_file=''):
         if len(config_file):
             maybepath = Path(config_file)
@@ -162,6 +172,7 @@ class OCTUiParams():
         self._vtx = params.vtx
         self._acq = params.acq
         self._scn = params.scn
+        self._dsp = params.dsp
         self.__cfgpath = use_this_path
 
     def path(self):
@@ -181,7 +192,7 @@ class OCTUiParams():
 
         print("saving OCTUi config to {0:s}".format(str(use_this_path)))
         with use_this_path.open(mode="w", encoding="utf-8") as f:
-            params = UiParams(self._vtx, self._acq, self._scn)
+            params = UiParams(self._vtx, self._acq, self._scn, self._dsp)
             json.dump(params, f, indent=2, cls=_octui_encoder)
 
 

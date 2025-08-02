@@ -2,9 +2,6 @@ from VtxBaseEngine import VtxBaseEngine
 from vortex import Range, get_console_logger as get_logger
 from vortex.marker import Flags
 from vortex.engine import Engine, EngineConfig, Block, dispersion_phasor, StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, AscanStackEndpoint, SpectraStackEndpoint, VolumeStrobe, SegmentStrobe
-# from vortex.acquire import AlazarConfig, AlazarAcquisition, alazar, FileAcquisitionConfig, FileAcquisition
-# from vortex.process import CUDAProcessor, CUDAProcessorConfig
-# from vortex.io import DAQmxIO, DAQmxConfig, daqmx
 from VtxEngineParams import VtxEngineParams, FileSaveConfig
 from vortex.scan import RasterScanConfig
 from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, SimpleSlice
@@ -12,14 +9,19 @@ from vortex.storage import HDF5StackUInt16, HDF5StackInt8, HDF5StackConfig, HDF5
 import numpy as np
 import logging
 from typing import Tuple, Union, Any
-from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
+#from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
+from OCTUiParams import OCTUiParams
 
 class VtxEngine(VtxBaseEngine):
-    def __init__(self, cfg: VtxEngineParams, acq: AcqParams=DEFAULT_ACQ_PARAMS, scfg: RasterScanConfig=RasterScanConfig(), fcfg_ascans: FileSaveConfig=FileSaveConfig('ascans'), fcfg_spectra: FileSaveConfig=FileSaveConfig('spectra')):
+    def __init__(self, params: OCTUiParams, fcfg_ascans: FileSaveConfig=FileSaveConfig('ascans'), fcfg_spectra: FileSaveConfig=FileSaveConfig('spectra')):
+
+        cfg = params.vtx
+        acq = params.acq 
+        scfg = params.scn
 
         # base class 
-        super().__init__(cfg)
-        self._cfg = cfg
+        super().__init__(params.vtx, params.acq)
+        self._cfg = params.vtx
         self._fcfg_ascans = fcfg_ascans
         self._fcfg_spectra = fcfg_spectra
         self._logger = logging.getLogger(__name__)

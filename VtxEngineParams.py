@@ -45,7 +45,6 @@ class VtxEngineParams:
 
     # processing control
     process_slots: int
-    dispersion: Tuple[float, float]
 
     # logging
     log_level: int
@@ -80,7 +79,6 @@ DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
 
     # engine memory parameters
     process_slots=2,                    # I think this is for in-stream processing?
-    dispersion=(2.8e-5, 0),             # no idea
 
     # logging
     log_level=1,                        # 1 is normal, 0 is debug-level

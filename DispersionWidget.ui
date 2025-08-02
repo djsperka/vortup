@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DispersionWidget</class>
+ <widget class="QWidget" name="DispersionWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>279</width>
+    <height>76</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label_26">
+       <property name="text">
+        <string>dispersion[0] (s/Hz/m)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="ScienDSpinBox" name="dsbDispersion0"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_27">
+       <property name="text">
+        <string>dispersion[1] (s/Hz**2/m)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="ScienDSpinBox" name="dsbDispersion1"/>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ScienDSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header location="global">scientific_spinbox</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
