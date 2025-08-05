@@ -77,8 +77,8 @@ class OCTUi():
 
         # We need access to both the engine (the endpoints) and the gui (display widgets). 
         if not self._cross_widget:
-            self._raster_widget = RasterEnFaceWidget(self._vtxengine._endpoint_ascan_display)
-            self._cross_widget = CrossSectionImageWidget(self._vtxengine._endpoint_ascan_display)
+            self._raster_widget = RasterEnFaceWidget(self._vtxengine._endpoint_ascan_display, cmap=mpl.colormaps['gray'])
+            self._cross_widget = CrossSectionImageWidget(self._vtxengine._endpoint_ascan_display, cmap=mpl.colormaps['gray'])
             self._ascan_trace_widget = BScanTraceWidget(self._vtxengine._endpoint_ascan_display, title="ascan")
 
             self._spectra_trace_widget = BScanTraceWidget(self._vtxengine._endpoint_spectra_display, title="raw spectra")
