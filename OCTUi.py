@@ -180,10 +180,11 @@ class OCTUi():
             sys.exit(-1)
 
     def stopClicked(self):
-        self._octDialog.pbEtc.setEnabled(True)
-        self._octDialog.pbStart.setEnabled(True)
-        self._octDialog.pbStop.setEnabled(False)
-        self._vtxengine.stop()
+        if self._vtxengine is not None:
+            self._octDialog.pbEtc.setEnabled(True)
+            self._octDialog.pbStart.setEnabled(True)
+            self._octDialog.pbStop.setEnabled(False)
+            self._vtxengine.stop()
 
 
 
