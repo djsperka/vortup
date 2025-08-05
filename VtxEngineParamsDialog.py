@@ -133,8 +133,8 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.lineEditBlocksToAllocate.setText(str(cfg.blocks_to_allocate))
         self.lineEditPreloadCount.setText(str(cfg.preload_count))
         self.lineEditProcessSlots.setText(str(cfg.process_slots))
-        self.lineEditDispersion0.setText(str(cfg.dispersion[0]))
-        self.lineEditDispersion1.setText(str(cfg.dispersion[1]))
+        # self.lineEditDispersion0.setText(str(cfg.dispersion[0]))
+        # self.lineEditDispersion1.setText(str(cfg.dispersion[1]))
         self.lineEditLogLevel.setText(str(cfg.log_level))
         self.cbSaveProfilerData.setChecked(cfg.save_profiler_data)
 
