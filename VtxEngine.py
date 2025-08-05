@@ -89,7 +89,9 @@ class VtxEngine(VtxBaseEngine):
         sfe.initialize(sfec)
 
         # endpoint for display
-        self._endpoint_ascan_display = StackDeviceTensorEndpointInt8(sfe, (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save), get_logger('stack', cfg.log_level))
+        vshape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save)
+        self._logger.info('Create StackDeviceTensorEndpointInt8 with shape {0:s}'.format(str(vshape)))
+        self._endpoint_ascan_display = StackDeviceTensorEndpointInt8(sfe, vshape, get_logger('stack', cfg.log_level))
         endpoints.append(self._endpoint_ascan_display)
 
         if fcfg_ascans.save:
@@ -98,7 +100,7 @@ class VtxEngine(VtxBaseEngine):
             # Shape of data SAVED will be different than the displayed data. Here we save all samples, not half of them.
             # The storage object 'SimpleStackInt8' doesn't save data until you call open().
 
-            shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, acq.samples_per_ascan, 1)
+            shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save, 1)
             self._endpoint_ascan_storage, self._ascan_storage = self.getStorageEndpoint(fcfg_ascans, shape)
             endpoints.append(self._endpoint_ascan_storage)
 
@@ -106,8 +108,9 @@ class VtxEngine(VtxBaseEngine):
         sfec_spectra = StackFormatExecutorConfig()
         sfe_spectra  = StackFormatExecutor()
         sfe_spectra.initialize(sfec_spectra)
-
-        self._endpoint_spectra_display = SpectraStackHostTensorEndpointUInt16(sfe_spectra, (scfg.bscans_per_volume, scfg.ascans_per_bscan, acq.samples_per_ascan), get_logger('stack', cfg.log_level))
+        shape_spectra = (scfg.bscans_per_volume, scfg.ascans_per_bscan, acq.samples_per_ascan)
+        self._logger.info('Create SpectraStackHostTensorEndpointUInt16 with shape {0:s}'.format(str(shape_spectra)))
+        self._endpoint_spectra_display = SpectraStackHostTensorEndpointUInt16(sfe_spectra, shape_spectra, get_logger('stack', cfg.log_level))
         endpoints.append(self._endpoint_spectra_display)
         if fcfg_spectra.save:
 
