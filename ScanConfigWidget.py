@@ -72,7 +72,7 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
             params.bscans_per_volume = int(self.leBperV.text())
             params.bidirectional_segments = self.cbBidirectional.isChecked()
             params.segment_extent = self.getRangeFromTextEntry(self.leXextent.text())
-            params.segment_extent = self.getRangeFromTextEntry(self.leYextent.text())
+            params.volume_extent = self.getRangeFromTextEntry(self.leYextent.text())
         elif self.cbScanTypes.currentIndex() == 1:
             # line scan
             degrees = float(self.leLAngle.text())
