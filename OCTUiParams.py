@@ -4,12 +4,15 @@ from ScanParams import ScanParams, DEFAULT_SCAN_PARAMS
 from platformdirs import site_config_dir
 from pathlib import Path
 import json
+import logging
 from dataclasses import asdict, dataclass
 import copyreg
 from vortex import Range
 from vortex.engine import Source
 from vortex.acquire import alazar
 from typing import Tuple
+
+local_logger = logging.getLogger('OCTUiParams')
 
 # default location and name for config file
 # on Windows this will go into 'C:\ProgramData\djsperka\octui'
@@ -105,7 +108,7 @@ class OCTUiParams():
             self._acq = params.acq
             self._scn = params.scn
             self._dsp = params.dsp
-            print("Saving initial config file {0:s}".format(str(default_config_path)))
+            local_logger.info("Saving initial config file {0:s}".format(str(default_config_path)))
             self.save(str(default_config_path))
 
         if len(config_file):
@@ -164,7 +167,7 @@ class OCTUiParams():
             else:
                 raise FileNotFoundError('Config file {0:s} not found.'.format(str(self.__cfgpath)))
 
-        print("loading OCTUi config from {0:s}".format(str(use_this_path)))
+        local_logger.info("loading OCTUi config from {0:s}".format(str(use_this_path)))
         with use_this_path.open(mode='r') as f:
             dct = json.load(f, cls=_octui_decoder)
         
@@ -190,7 +193,7 @@ class OCTUiParams():
         else:
             use_this_path = self.__cfgpath
 
-        print("saving OCTUi config to {0:s}".format(str(use_this_path)))
+        local_logger.info("saving OCTUi config to {0:s}".format(str(use_this_path)))
         with use_this_path.open(mode="w", encoding="utf-8") as f:
             params = UiParams(self._vtx, self._acq, self._scn, self._dsp)
             json.dump(params, f, indent=2, cls=_octui_encoder)
@@ -225,10 +228,10 @@ if __name__ == "__main__":
 
         # calling with load=False will create new file
         p=OCTUiParams(load=False)
-        print("Saved initial config file in {0:s}".format(str(p.path())))
+        local_logger.info("Saved initial config file in {0:s}".format(str(p.path())))
 
     # Load config file
-    print("loading config file....")
+    local_logger.info("loading config file....")
     p2 = OCTUiParams()
     p2.load()
     print(p2.scn)
