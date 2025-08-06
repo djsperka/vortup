@@ -131,7 +131,7 @@ class VtxEngine(VtxBaseEngine):
         # add galvo output
         ec.add_io(self._io_out, lead_samples=round(cfg.galvo_delay * self._io_out.config.samples_per_second))
         ec.galvo_output_channels = len(self._io_out.config.channels)
-        self._logger.info("there are {0:d} galvo channels".format(ec.galvo_output_channels))
+        #self._logger.info("there are {0:d} galvo channels".format(ec.galvo_output_channels))
 
         # strobe output
         # default is [SampleStrobe(0, 2), SampleStrobe(1, 1000), SampleStrobe(2, 1000, Polarity.Low), SegmentStrobe(3), VolumeStrobe(4)]
@@ -143,7 +143,7 @@ class VtxEngine(VtxBaseEngine):
         ec.records_per_block = acq.ascans_per_block
         ec.blocks_to_allocate = cfg.blocks_to_allocate
         ec.blocks_to_acquire = acq.blocks_to_acquire
-        self._logger.info("blocks to acquire {0:d}".format(ec.blocks_to_acquire))
+        #self._logger.info("blocks to acquire {0:d}".format(ec.blocks_to_acquire))
 
 
         engine = Engine(get_logger('engine', cfg.log_level))
