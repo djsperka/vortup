@@ -1,12 +1,8 @@
 from vortex import Range
 from vortex.acquire import alazar
 from vortex.engine import source, Source
-from typing import Tuple
-from dataclasses import dataclass, field
-from dataclasses_json import dataclass_json, config
+from dataclasses import dataclass
 from enum import Enum
-from VtupUtilities import getRangeFromTextEntry
-#from vortex.engine import Source
 
 class AcquisitionType(Enum):
     ALAZAR_ACQUISITION = 1
