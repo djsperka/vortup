@@ -139,7 +139,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.cbSaveProfilerData.setChecked(cfg.save_profiler_data)
 
     def getEngineParameters(self) -> VtxEngineParams:
-        s = DEFAULT_VTX_ENGINE_PARAMS   # TODO: would be nice to have an empty obj
+        s = self._cfg
         if self.radioButtonAlazarAcquisition.isChecked():
             s.acquisition_type = AcquisitionType.ALAZAR_ACQUISITION
         elif self.radioButtonFileAcquisition.isChecked():
