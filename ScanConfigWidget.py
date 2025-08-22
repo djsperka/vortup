@@ -24,7 +24,13 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
         self.cbScanTypes.currentIndexChanged.connect(self.stackScanTypes.setCurrentIndex)
 
         # validators
-        self._regexForExtents = QRegExp("((-?\d+)[\s,]+(-?\d+))|(-?\d+)")
+
+        # This regular expression matches a comma-separated range with or without floating-point numbers.
+        # It also matches a single number (float or not). 
+        # The capture [1] is for the former, and capture[6] is for the single number.
+        sFloat = "([+-]?([0-9]*[.])?[0-9]+)"
+        self._regexForExtents = QRegExp("({0:s}[\s,]{1:s})|{2:s}".format(sFloat, sFloat, sFloat))
+        #self._regexForExtents = QRegExp("((-?\d+)[\s,]+(-?\d+))|(-?\d+)")
         self.leAperB.setValidator(QIntValidator(1,5000))
         self.leBperV.setValidator(QIntValidator(1,5000))
         self.leXextent.setValidator(QRegExpValidator(self._regexForExtents))
@@ -51,15 +57,15 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
     def getRangeFromTextEntry(self, txt) -> Range:
         # match regex. Validator should ensure that there is ALWAYS a match, but throw exception if not.
         if self._regexForExtents.exactMatch(txt):
-            if self._regexForExtents.cap(4) == '':
-                iLow = int(self._regexForExtents.cap(2))
-                iHigh = int(self._regexForExtents.cap(3))
+            if self._regexForExtents.cap(6) == '':
+                iLow = float(self._regexForExtents.cap(2))
+                iHigh = float(self._regexForExtents.cap(4))
                 r = Range(iLow, iHigh)
             else:
-                iVal = int(self._regexForExtents.cap(4))
+                iVal = float(self._regexForExtents.cap(6))
                 r = Range(-iVal, iVal)
         else:
-            raise RuntimeError("Cannot parse X extents: ", )
+            raise RuntimeError("Cannot parse extents: {0:s}".format(txt))
         print("got range from entry ", txt, "(", r.min, ",", r.max,")")
         return r
 
@@ -104,30 +110,6 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
             raise RuntimeError("Scan type not handled by getScanConfig()")
         return params
 
-
-    # def getScanConfig(self) -> RasterScanConfig:
-    #     cfg = RasterScanConfig()
-
-    #     # which type of scan is preferred?
-    #     if self.cbScanTypes.currentIndex() == 0:
-    #         # raster scan
-    #         cfg.ascans_per_bscan = int(self.leAperB.text())
-    #         cfg.bscans_per_volume = int(self.leBperV.text())
-    #         cfg.bidirectional_segments = self.cbBidirectional.isChecked()
-    #         cfg.segment_extent = self.getRangeFromTextEntry(self.leXextent.text())
-    #         cfg.volume_extent = self.getRangeFromTextEntry(self.leYextent.text())
-    #     elif self.cbScanTypes.currentIndex() == 1:
-    #         # line scan
-    #         degrees = float(self.leLAngle.text())
-    #         cfg.angle = degrees * math.pi / 180.0
-    #         cfg.ascans_per_bscan = int(self.leLAperB.text())
-    #         cfg.bscans_per_volume = 1
-    #         cfg.bidirectional_segments = self.cbLBidirectional.isChecked()
-    #         cfg.segment_extent = self.getRangeFromTextEntry(self.leLextent.text())
-    #         cfg.volume_extent = Range(0, 0)
-    #     else:
-    #         raise RuntimeError("Scan type not handled by getScanConfig()")
-    #     return cfg
 
 if __name__ == "__main__":
     import sys
