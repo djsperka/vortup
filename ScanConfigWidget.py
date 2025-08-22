@@ -12,11 +12,10 @@ from matplotlib import pyplot
 import traceback
 
 class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
-    def __init__(self, parent: QWidget=None, cfg: RasterScanConfig=RasterScanConfig()):
+    def __init__(self, parent: QWidget=None):
         """Instantiate class
 
         Args:
-            cfg (RasterScanConfig, optional): _description_. Defaults to RasterScanConfig().
         """
         super().__init__(parent)
         self.setupUi(self)
@@ -85,6 +84,26 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
         else:
             raise RuntimeError("Scan type not handled by getScanConfig()")
         return params
+
+    def setScanParams(self, params: ScanParams):
+        self.cbScanTypes.setCurrentIndex(params.current_index)
+        if params.current_index == 0:
+            self.leAperB.setText("{0:d}".format(params.ascans_per_bscan))
+            self.leBperV.setText("{0:d}".format(params.bscans_per_volume))
+            self.cbBidirectional.setChecked(params.bidirectional_segments)
+            self.leXextent.setText("{0:.2f},{1:.2f}".format(params.segment_extent.min, params.segment_extent.max))
+            self.leYextent.setText("{0:.2f},{1:.2f}".format(params.volume_extent.min, params.volume_extent.max))
+        elif params.current_index == 1:
+            # line scan
+            degrees = params.angle * 180.0 / math.pi
+            self.leLAngle.setText("{0:f}".format(degrees))
+            self.leLAperB.setText("{0:d}".format(params.ascans_per_bscan))
+            self.cbLBidirectional.setChecked(params.bidirectional_segments)
+            self.leLextent.setText("{0:.2f},{1:.2f}".format(params.segment_extent.min, params.segment_extent.max))
+        else:
+            raise RuntimeError("Scan type not handled by getScanConfig()")
+        return params
+
 
     # def getScanConfig(self) -> RasterScanConfig:
     #     cfg = RasterScanConfig()

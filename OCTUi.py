@@ -42,6 +42,7 @@ class OCTUi():
 
         # initializations
         self._octDialog.widgetDispersion.setDispersion(self._params.dsp)
+        self._octDialog.widgetScanConfig.setScanParams(self._params.scn)
 
         # connections. 
         self._octDialog.dialogClosing.connect(self.dialogClosing)
@@ -62,6 +63,7 @@ class OCTUi():
         button = dlg.exec()
         if button == QMessageBox.Yes:
             self._logger.info("Saving engine parameters...")
+            self._getAllParams()
             self._params.save()
 
     def etcClicked(self):
@@ -128,6 +130,16 @@ class OCTUi():
         print("volume cb: sample_idx=",sample_idx, "scan_idx=", scan_idx, "volume_idx=", volume_idx)
         self._trace_widget.update_trace()
 
+    def _getAllParams(self):
+        # fetch current configuration for acq and scan params. The items 
+        # in the engineConfig are updated when that dlg is accepted, so no 
+        # fetch here.
+        self._params.acq = self._octDialog.widgetAcqParams.getAcqParams()
+        self._params.scn = self._octDialog.widgetScanConfig.getScanParams()
+        self._params.dsp = self._octDialog.widgetDispersion.getDispersion()
+        self._filesaveAscans = self._octDialog.widgetAscansFileSave.getFileSaveConfig()
+        self._filesaveSpectra = self._octDialog.widgetSpectraFileSave.getFileSaveConfig()
+
 
     def startClicked(self):
         self._octDialog.pbEtc.setEnabled(False)
@@ -142,14 +154,8 @@ class OCTUi():
 
         # now build engine
         try:
-            # fetch current configuration for acq and scan params. The items 
-            # in the engineConfig are updated when that dlg is accepted, so no 
-            # fetch here.
-            self._params.acq = self._octDialog.widgetAcqParams.getAcqParams()
-            self._params.scn = self._octDialog.widgetScanConfig.getScanParams()
-            self._params.dsp = self._octDialog.widgetDispersion.getDispersion()
-            self._filesaveAscans = self._octDialog.widgetAscansFileSave.getFileSaveConfig()
-            self._filesaveSpectra = self._octDialog.widgetSpectraFileSave.getFileSaveConfig()
+            # update params with ui 
+            self._getAllParams()
 
             # get oct engine ready
             if self._vtxengine:
@@ -165,7 +171,7 @@ class OCTUi():
 
             # put something into the scan queue
             self._raster_scan = RasterScan()
-            self._raster_scan.initialize(self._params.scn)
+            self._raster_scan.initialize(self._params.rsc)
             self._vtxengine._engine.scan_queue.clear()
             self._vtxengine._engine.scan_queue.append(self._raster_scan)
 
