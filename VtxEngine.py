@@ -64,7 +64,7 @@ class VtxEngine(VtxBaseEngine):
         fc.segments_per_volume = scfg.bscans_per_volume
         fc.records_per_segment = scfg.ascans_per_bscan
         fc.adapt_shape = False
-        fc.mask = scfg.flags
+        #fc.mask = scfg.flags
 
 
         stack_format_ascans = FormatPlanner(get_logger('raster format', cfg.log_level))
