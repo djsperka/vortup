@@ -1,6 +1,7 @@
 import sys
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QApplication
+from DAQConst import ATS9350InputRange
 from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, AcquisitionType
 from Ui_VtxEngineParamsDialog import Ui_VtxEngineParamsDialog
 from vortex.engine import source, Source
@@ -58,7 +59,6 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.lineEditTriggerRange.setValidator(v)
         v = QDoubleValidator()
         self.lineEditTriggerLevelFraction.setValidator(v)
-
 
         # assign id to each radio button. then assign buttonClicked signal to a slot here. 
         # That signal is called once when a radio button is clicked. Use checkedId() in slot.
@@ -138,6 +138,12 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.lineEditLogLevel.setText(str(cfg.log_level))
         self.cbSaveProfilerData.setChecked(cfg.save_profiler_data)
 
+        # enum-using combo boxes....
+        self.comboBoxInputRange.initialize(ATS9350InputRange, cfg.input_channel_range_millivolts)
+
+
+
+
     def getEngineParameters(self) -> VtxEngineParams:
         s = self._cfg
         if self.radioButtonAlazarAcquisition.isChecked():
@@ -157,6 +163,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         s.external_clock_level_pct = int(self.lineEditExternalClockLevelPct.text())
         s.trigger_range_millivolts = int(self.lineEditTriggerRange.text())
         s.trigger_level_fraction = float(self.lineEditTriggerLevelFraction.text())
+        s.input_channel_range_millivolts = self.comboBoxInputRange.itemData(self.comboBoxInputRange.currentIndex())
         s.blocks_to_allocate = int(self.lineEditBlocksToAllocate.text())
         s.preload_count = int(self.lineEditPreloadCount.text())
         s.process_slots = int(self.lineEditProcessSlots.text())
