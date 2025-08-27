@@ -53,14 +53,9 @@ class Ui_OCTDialog(object):
         self.horizontalLayout.addWidget(self.pbStop)
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
-        self.widgetAscansFileSave = CbAscansFileSaveWidget(OCTDialog)
-        self.widgetAscansFileSave.setMinimumSize(QtCore.QSize(800, 0))
-        self.widgetAscansFileSave.setObjectName("widgetAscansFileSave")
-        self.verticalLayout.addWidget(self.widgetAscansFileSave)
-        self.widgetSpectraFileSave = CbSpectraFileSaveWidget(OCTDialog)
-        self.widgetSpectraFileSave.setMinimumSize(QtCore.QSize(800, 0))
-        self.widgetSpectraFileSave.setObjectName("widgetSpectraFileSave")
-        self.verticalLayout.addWidget(self.widgetSpectraFileSave)
+        self.groupBox = SaveVolumeGroupBox(OCTDialog)
+        self.groupBox.setObjectName("groupBox")
+        self.verticalLayout.addWidget(self.groupBox)
         self.horizontalLayout.addLayout(self.verticalLayout)
         self.verticalLayout_3.addLayout(self.horizontalLayout)
 
@@ -73,9 +68,10 @@ class Ui_OCTDialog(object):
         self.pbEtc.setText(_translate("OCTDialog", "Etc"))
         self.pbStart.setText(_translate("OCTDialog", "Start"))
         self.pbStop.setText(_translate("OCTDialog", "Stop"))
+        self.groupBox.setTitle(_translate("OCTDialog", "Saving Volume Data"))
 from AcqParamsWidget import AcqParamsWidget
-from CbFileSaveWidget import CbAscansFileSaveWidget, CbSpectraFileSaveWidget
 from DispersionWidget import DispersionWidget
+from SaveVolumeGroupBox import SaveVolumeGroupBox
 from ScanConfigWidget import ScanConfigWidget
 
 

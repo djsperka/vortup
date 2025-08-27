@@ -94,22 +94,9 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="CbAscansFileSaveWidget" name="widgetAscansFileSave" native="true">
-         <property name="minimumSize">
-          <size>
-           <width>800</width>
-           <height>0</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="CbSpectraFileSaveWidget" name="widgetSpectraFileSave" native="true">
-         <property name="minimumSize">
-          <size>
-           <width>800</width>
-           <height>0</height>
-          </size>
+        <widget class="SaveVolumeGroupBox" name="groupBox">
+         <property name="title">
+          <string>Saving Volume Data</string>
          </property>
         </widget>
        </item>
@@ -133,21 +120,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>CbAscansFileSaveWidget</class>
-   <extends>QWidget</extends>
-   <header>CbFileSaveWidget</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>CbSpectraFileSaveWidget</class>
-   <extends>QWidget</extends>
-   <header>CbFileSaveWidget</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>DispersionWidget</class>
    <extends>QWidget</extends>
    <header>DispersionWidget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SaveVolumeGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>SaveVolumeGroupBox</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
