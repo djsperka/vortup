@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1089</width>
-    <height>851</height>
+    <width>986</width>
+    <height>958</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,6 +49,24 @@
         </widget>
        </item>
        <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QPushButton" name="pbStart">
+           <property name="text">
+            <string>Start</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pbStop">
+           <property name="text">
+            <string>Stop</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -76,31 +94,13 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QPushButton" name="pbStart">
-       <property name="text">
-        <string>Start</string>
+      <widget class="SaveVolumeGroupBox" name="gbSaveVolumes">
+       <property name="title">
+        <string>Saving Volume Data</string>
        </property>
       </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbStop">
-       <property name="text">
-        <string>Stop</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="SaveVolumeGroupBox" name="groupBox">
-         <property name="title">
-          <string>Saving Volume Data</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </item>
     </layout>
    </item>

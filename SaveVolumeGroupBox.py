@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QGroupBox
+from PyQt5.QtCore import pyqtSignal
 from Ui_SaveVolumeGroupBox import Ui_SaveVolumeGroupBox
 from platformdirs import user_data_dir
 from pathlib import Path
@@ -6,6 +7,11 @@ from datetime import datetime
 import warnings
 
 class SaveVolumeGroupBox(QGroupBox, Ui_SaveVolumeGroupBox):
+
+    # signal emitted with dialog is closing
+    saveContVolumes = pyqtSignal()
+    saveNVolumes = pyqtSignal(int)
+
     def __init__(self, parent: QWidget=None, root_folder: str=None):
         """Instantiate class
 
@@ -24,6 +30,11 @@ class SaveVolumeGroupBox(QGroupBox, Ui_SaveVolumeGroupBox):
             else:
                 self.pathDataRoot = p
         self.__updateLabels()
+        self.pbSaveContinuous.clicked.connect(self.saveContVolumes)
+        self.pbSaveFixedN.clicked.connect(self.__saveFixedN)
+
+    def __saveFixedN(self):
+        self.saveNVolumes.emit(self.sbN.value())
 
 
     # def getFileSaveConfig(self):
@@ -76,7 +87,7 @@ class SaveVolumeGroupBox(QGroupBox, Ui_SaveVolumeGroupBox):
 if __name__ == "__main__":
     import sys
     app = QApplication(sys.argv)
-    w = SaveVolumeGroupBox()
+    w = SaveVolumeGroupBox(None)
     w.show()
     app.exec()
     sys.exit()

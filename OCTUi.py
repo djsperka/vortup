@@ -1,6 +1,5 @@
 import sys
 import os
-from VtxEngineParams import DEFAULT_VTX_ENGINE_PARAMS, FileSaveConfig
 from VtxEngineParamsDialog import VtxEngineParamsDialog
 from VtxEngine import VtxEngine
 from OCTDialog import OCTDialog
@@ -9,17 +8,16 @@ from PyQt5.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout
 from PyQt5.QtWidgets import QMessageBox
 from vortex import get_console_logger as gcl
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
-from vortex.scan import RasterScanConfig, RasterScan
-from vortex.storage import HDF5StackUInt16, HDF5StackInt8, HDF5StackConfig, HDF5StackHeader, SimpleStackUInt16, SimpleStackInt8, SimpleStackConfig, SimpleStackHeader
-#from TraceWidget import TraceWidget
+from vortex.scan import RasterScan
+from vortex.storage import SimpleStackConfig, SimpleStackHeader
+from vortex.engine import Engine
 from BScanTraceWidget import BScanTraceWidget
-from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
 import logging
+from typing import Tuple
 from rainbow_logging_handler import RainbowLoggingHandler
-import cupy
-import numpy
 import traceback
 import matplotlib as mpl
+from datetime import datetime
 
 class OCTUi():
     
@@ -29,10 +27,6 @@ class OCTUi():
         self._vtxengine = None
         self._cross_widget = None
         self._trace_widget = None
-        self._saveFilenameAscans = ''
-        self._typeExtAscans = ''
-        self._saveFilenameSpectra = ''
-        self._typeExtSpectra = ''
 
         # load config file - default file only!
         # TODO - make it configurable, or be able to load a diff't config.
@@ -45,6 +39,10 @@ class OCTUi():
         self._octDialog.widgetScanConfig.setScanParams(self._params.scn)
 
         # connections. 
+        print(type(self._octDialog.gbSaveVolumes))
+        self._octDialog.gbSaveVolumes.saveNVolumes.connect(self.saveNVolumes)
+        self._octDialog.gbSaveVolumes.saveContVolumes.connect(self.saveContVolumes)
+        self._octDialog.gbSaveVolumes.enableSaving(False)
         self._octDialog.dialogClosing.connect(self.dialogClosing)
         self._octDialog.pbEtc.clicked.connect(self.etcClicked)
         self._octDialog.pbStart.clicked.connect(self.startClicked)
@@ -53,6 +51,56 @@ class OCTUi():
         self._octDialog.pbStop.enabled = False  
         self._octDialog.resize(1000,800)              
         self._octDialog.show()
+
+    def checkFileSaveStuff(self) -> Tuple[bool, str]:
+        """This function will verify that the file save root folder is accessible. If so, 
+        a new folder with the name yyyy-MM-dd is created (if it doesn't already exist). A new 
+        filename is generated and returned. 
+        """
+
+        # Try to create new folder
+        now = datetime.now()
+        sFolder = now.strftime('%Y-%m-%d')
+        sFile = now.strftime('%Y-%m-%d-%H%M.npy')
+        p = self._octDialog.gbSaveVolumes.pathDataRoot / sFolder
+        p.mkdir(parents=True, exist_ok=True)
+        return (True, str(p / sFile))
+
+    def saveVolumeCallback(self, sample_idx, scan_idx, volume_idx):
+        if self._savingVolumesNow:
+            self._savingVolumesThisManySaved = self._savingVolumesThisManySaved+1
+            if self._savingVolumesThisMany and self._savingVolumesThisManySaved >= self._savingVolumesThisMany:
+                # close file, dump this callback
+                self._savingVolumesNow = False
+                self._vtxengine._spectra_storage.close()
+                self._vtxengine._endpoint_spectra_storage.volume_callback = None
+
+    def saveNVolumes(self, n: int):
+        (bOK, filename) = self.checkFileSaveStuff()
+        if bOK:
+            # Create SimpleEngineConfig
+            npsc = SimpleStackConfig()
+            npsc.shape = (self._params.scn.bscans_per_volume, self._params.scn.ascans_per_bscan, self._params.acq.samples_per_ascan, 1)
+            npsc.header = SimpleStackHeader.NumPy
+            npsc.path = filename
+            self._vtxengine._endpoint_spectra_storage.volume_callback = self.saveVolumeCallback
+            self._vtxengine._spectra_storage.open(npsc)
+            self._savingVolumesNow = True
+            self._savingVolumesThisMany = n
+            self._savingVolumesThisManySaved = 0
+
+    def saveContVolumes(self):
+        (bOK, filename) = self.checkFileSaveStuff()
+        if bOK:
+            # Create SimpleEngineConfig
+            npsc = SimpleStackConfig()
+            npsc.shape = (self._params.scn.bscans_per_volume, self._params.scn.ascans_per_bscan, self._params.acq.samples_per_ascan)
+            npsc.header = SimpleStackHeader.NumPy
+            npsc.path = filename
+            self._vtxengine._spectra_storage.open(npsc)
+            self._savingVolumesNow = True
+            self._savingVolumesThisMany = 0
+            self._savingVolumesThisManySaved = 0
 
     def dialogClosing(self):
         dlg = QMessageBox(self._octDialog)
@@ -115,9 +163,6 @@ class OCTUi():
             self._spectra_trace_widget.update_trace(v)
         self._vtxengine._endpoint_spectra_display.aggregate_segment_callback = cb_spectra
 
-
-        #self._vtxengine._endpoint_ascan_display.volume_callback = self.cb_volume
-
     def cb_segments(self, v):
         # argument (v) here is a number - index pointing to a segment in allocated segments.
         #print("agg segment cb: v=", v)
@@ -126,10 +171,6 @@ class OCTUi():
         self._ascan_trace_widget.update_trace(v)
         self._spectra_trace_widget.update_trace(v)
 
-    def cb_volume(self, sample_idx, scan_idx, volume_idx):
-        print("volume cb: sample_idx=",sample_idx, "scan_idx=", scan_idx, "volume_idx=", volume_idx)
-        self._trace_widget.update_trace()
-
     def _getAllParams(self):
         # fetch current configuration for acq and scan params. The items 
         # in the engineConfig are updated when that dlg is accepted, so no 
@@ -137,8 +178,6 @@ class OCTUi():
         self._params.acq = self._octDialog.widgetAcqParams.getAcqParams()
         self._params.scn = self._octDialog.widgetScanConfig.getScanParams()
         self._params.dsp = self._octDialog.widgetDispersion.getDispersion()
-        self._filesaveAscans = self._octDialog.widgetAscansFileSave.getFileSaveConfig()
-        self._filesaveSpectra = self._octDialog.widgetSpectraFileSave.getFileSaveConfig()
 
 
     def startClicked(self):
@@ -167,7 +206,8 @@ class OCTUi():
 
             # create engine
 
-            self._vtxengine = VtxEngine(self._params, self._filesaveAscans, self._filesaveSpectra)
+            self._vtxengine = VtxEngine(self._params)
+            self._vtxengine._engine.event_callback = self.engineEventCallback
 
             # put something into the scan queue
             self._raster_scan = RasterScan()
@@ -185,6 +225,12 @@ class OCTUi():
             print("RuntimeError:")
             traceback.print_exception(e)
             sys.exit(-1)
+
+    def engineEventCallback(self, event, thingy):
+        if event == Engine.Event.Start:
+            self._octDialog.gbSaveVolumes.enableSaving(True)
+        elif event == Engine.Event.Shutdown:
+            self._octDialog.gbSaveVolumes.enableSaving(False)
 
     def stopClicked(self):
         if self._vtxengine is not None:
