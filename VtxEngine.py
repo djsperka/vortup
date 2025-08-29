@@ -189,6 +189,12 @@ class VtxEngine(VtxBaseEngine):
                 sfe = StackFormatExecutor()
                 sfe.initialize(sfec)
                 endpoint_storage = SpectraStackEndpoint(sfe, storage, log=get_logger('npy-spectra', self._cfg.log_level))
+
+                def local_cb(sample_idx, scan_idx, volume_idx):
+                    print("volume_callback ", volume_idx)
+                    print("storage: ", endpoint_storage)
+                    storage.close()
+                endpoint_storage.volume_callback = local_cb
             else:
                 self._logger.warning('extension {0:s} not supported yet sorry, use npy'.format(fcfg.extension))
                 raise NotImplementedError('extension {0:s} not supported yet sorry, use npy'.format(fcfg.extension))
