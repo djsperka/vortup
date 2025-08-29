@@ -34,30 +34,8 @@ class OCTDialog(QDialog, Ui_OCTDialog):
 
 
     def closeEvent(self, event):
-        print("emit dialogClosing() signal")
         self.dialogClosing.emit()
         event.accept()
-
-
-# from PyQt5.QtCore import QObject, pyqtSignal
-
-# class Baz(QObject):
-#    trigger = pyqtSignal(int)
-
-#    def emit_trigger(self):
-#       self.trigger.emit(42)
-
-#    def handle_trigger(self, value):
-#       print("Trigger signal received with value:", value)
-
-# baz = Baz()
-# baz.trigger.connect(baz.handle_trigger)
-# baz.emit_trigger()
-
-
-
-
-
 
 if __name__ == '__main__':
 
