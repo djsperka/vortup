@@ -27,6 +27,9 @@ class OCTUi():
         self._vtxengine = None
         self._cross_widget = None
         self._trace_widget = None
+        self._savingVolumesNow = False
+        self._savingVolumesThisMany = 0
+        self._savingVolumesThisManySaved = 0
 
         # load config file - default file only!
         # TODO - make it configurable, or be able to load a diff't config.
@@ -61,7 +64,7 @@ class OCTUi():
         # Try to create new folder
         now = datetime.now()
         sFolder = now.strftime('%Y-%m-%d')
-        sFile = now.strftime('%Y-%m-%d-%H%M.npy')
+        sFile = now.strftime('%Y-%m-%d-%H%M%S.npy')
         p = self._octDialog.gbSaveVolumes.pathDataRoot / sFolder
         p.mkdir(parents=True, exist_ok=True)
         return (True, str(p / sFile))
@@ -74,6 +77,7 @@ class OCTUi():
                 self._savingVolumesNow = False
                 self._vtxengine._spectra_storage.close()
                 self._vtxengine._endpoint_spectra_storage.volume_callback = None
+                self._octDialog.gbSaveVolumes.enableSaving(True)
 
     def saveNVolumes(self, n: int):
         (bOK, filename) = self.checkFileSaveStuff()
@@ -88,19 +92,32 @@ class OCTUi():
             self._savingVolumesNow = True
             self._savingVolumesThisMany = n
             self._savingVolumesThisManySaved = 0
+            self._octDialog.gbSaveVolumes.enableSaving(False)
 
     def saveContVolumes(self):
-        (bOK, filename) = self.checkFileSaveStuff()
-        if bOK:
-            # Create SimpleEngineConfig
-            npsc = SimpleStackConfig()
-            npsc.shape = (self._params.scn.bscans_per_volume, self._params.scn.ascans_per_bscan, self._params.acq.samples_per_ascan)
-            npsc.header = SimpleStackHeader.NumPy
-            npsc.path = filename
-            self._vtxengine._spectra_storage.open(npsc)
-            self._savingVolumesNow = True
-            self._savingVolumesThisMany = 0
-            self._savingVolumesThisManySaved = 0
+        """This slot is called when the "Save Continuous" button is pushed. If not currently saving, then 
+        proceed to open the file and start saving. If already saving, though, this button is a toggle and 
+        should stop saving.
+        """
+
+        if not self._savingVolumesNow:
+            (bOK, filename) = self.checkFileSaveStuff()
+            if bOK:
+                # Create SimpleEngineConfig
+                npsc = SimpleStackConfig()
+                npsc.shape = (self._params.scn.bscans_per_volume, self._params.scn.ascans_per_bscan, self._params.acq.samples_per_ascan, 1)
+                npsc.header = SimpleStackHeader.NumPy
+                npsc.path = filename
+                self._vtxengine._spectra_storage.open(npsc)
+                self._savingVolumesNow = True
+                self._savingVolumesThisMany = 0
+                self._savingVolumesThisManySaved = 0
+                self._octDialog.gbSaveVolumes.enableSaving(False, True)
+        else:
+                self._savingVolumesNow = False
+                self._vtxengine._spectra_storage.close()
+                self._vtxengine._endpoint_spectra_storage.volume_callback = None
+                self._octDialog.gbSaveVolumes.enableSaving(True)
 
     def dialogClosing(self):
         dlg = QMessageBox(self._octDialog)

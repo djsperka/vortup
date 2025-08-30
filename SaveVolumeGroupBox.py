@@ -11,7 +11,8 @@ class SaveVolumeGroupBox(QGroupBox, Ui_SaveVolumeGroupBox):
     # signal emitted with dialog is closing
     saveContVolumes = pyqtSignal()
     saveNVolumes = pyqtSignal(int)
-
+    saveContText = "Save Continuous"
+    stopContText = "STOP Save Continuous"
     def __init__(self, parent: QWidget=None, root_folder: str=None):
         """Instantiate class
 
@@ -79,10 +80,15 @@ class SaveVolumeGroupBox(QGroupBox, Ui_SaveVolumeGroupBox):
         self.pathDataActual = self.pathDataRoot / datetime.today().strftime('%Y-%m-%d')
         self.labelStatus.setText("Data will be saved to folder {0:s}".format(str(self.pathDataActual)))
 
-    def enableSaving(self, bEnable: bool=True):
+    def enableSaving(self, bEnable: bool=True, bEnableStop = False):
         self.sbN.setEnabled(bEnable)
         self.pbSaveFixedN.setEnabled(bEnable)
         self.pbSaveContinuous.setEnabled(bEnable)
+        if bEnable:
+            self.pbSaveContinuous.setText(self.saveContText)
+        elif bEnableStop:
+            self.pbSaveContinuous.setEnabled(bEnableStop)
+            self.pbSaveContinuous.setText(self.stopContText)
 
 if __name__ == "__main__":
     import sys
