@@ -1,6 +1,6 @@
 from VtxBaseEngine import VtxBaseEngine
 from vortex import get_console_logger as get_logger
-from vortex.engine import Engine, EngineConfig, StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, SpectraStackEndpoint
+from vortex.engine import Engine, EngineConfig, StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, SpectraStackEndpoint, NullEndpoint
 from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, SimpleSlice
 from vortex.storage import SimpleStackUInt16
 import logging
@@ -73,6 +73,12 @@ class VtxEngine(VtxBaseEngine):
         # They are added to the engine all at once.
         endpoints = []
 
+        # For saving volumes, this NullEndpoint is used. The volume_callback for this 
+        # endpoint will be called before that of the other endpoints. If needed, we open/close
+        # the storage at this point if needed. 
+        self._null_endpoint = NullEndpoint(get_logger('Traffic cop', cfg.log_level))
+        endpoints.append(self._null_endpoint)
+
         # For DISPLAYING ascans (oct-processed data), slice away half the data. 
         # This stack format executor isn't used with the other endpoints.
         sfec = StackFormatExecutorConfig()
@@ -100,6 +106,13 @@ class VtxEngine(VtxBaseEngine):
         shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, acq.samples_per_ascan, 1)
         self._endpoint_spectra_storage, self._spectra_storage = self.getSpectraStorageEndpoint(shape)
         endpoints.append(self._endpoint_spectra_storage)
+
+        # For saving volumes, this NullEndpoint is used. The volume_callback for this 
+        # endpoint will be called before that of the other endpoints. If needed, we open/close
+        # the storage at this point if needed. 
+        self._null_endpoint_2 = NullEndpoint(get_logger('Traffic cop', cfg.log_level))
+        endpoints.append(self._null_endpoint_2)
+
 
         #
         # engine setup
