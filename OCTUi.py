@@ -28,8 +28,10 @@ class OCTUi():
         self._cross_widget = None
         self._trace_widget = None
         self._savingVolumesNow = False
+        self._savingVolumesStopNow = False
         self._savingVolumesThisMany = 0
         self._savingVolumesThisManySaved = 0
+        self._savingVolumesRequested = False
 
         # load config file - default file only!
         # TODO - make it configurable, or be able to load a diff't config.
@@ -54,70 +56,6 @@ class OCTUi():
         self._octDialog.pbStop.enabled = False  
         self._octDialog.resize(1000,800)              
         self._octDialog.show()
-
-    def checkFileSaveStuff(self) -> Tuple[bool, str]:
-        """This function will verify that the file save root folder is accessible. If so, 
-        a new folder with the name yyyy-MM-dd is created (if it doesn't already exist). A new 
-        filename is generated and returned. 
-        """
-
-        # Try to create new folder
-        now = datetime.now()
-        sFolder = now.strftime('%Y-%m-%d')
-        sFile = now.strftime('%Y-%m-%d-%H%M%S.npy')
-        p = self._octDialog.gbSaveVolumes.pathDataRoot / sFolder
-        p.mkdir(parents=True, exist_ok=True)
-        return (True, str(p / sFile))
-
-    def saveVolumeCallback(self, sample_idx, scan_idx, volume_idx):
-        if self._savingVolumesNow:
-            self._savingVolumesThisManySaved = self._savingVolumesThisManySaved+1
-            if self._savingVolumesThisMany and self._savingVolumesThisManySaved >= self._savingVolumesThisMany:
-                # close file, dump this callback
-                self._savingVolumesNow = False
-                self._vtxengine._spectra_storage.close()
-                self._vtxengine._endpoint_spectra_storage.volume_callback = None
-                self._octDialog.gbSaveVolumes.enableSaving(True)
-
-    def saveNVolumes(self, n: int):
-        (bOK, filename) = self.checkFileSaveStuff()
-        if bOK:
-            # Create SimpleEngineConfig
-            npsc = SimpleStackConfig()
-            npsc.shape = (self._params.scn.bscans_per_volume, self._params.scn.ascans_per_bscan, self._params.acq.samples_per_ascan, 1)
-            npsc.header = SimpleStackHeader.NumPy
-            npsc.path = filename
-            self._vtxengine._endpoint_spectra_storage.volume_callback = self.saveVolumeCallback
-            self._vtxengine._spectra_storage.open(npsc)
-            self._savingVolumesNow = True
-            self._savingVolumesThisMany = n
-            self._savingVolumesThisManySaved = 0
-            self._octDialog.gbSaveVolumes.enableSaving(False)
-
-    def saveContVolumes(self):
-        """This slot is called when the "Save Continuous" button is pushed. If not currently saving, then 
-        proceed to open the file and start saving. If already saving, though, this button is a toggle and 
-        should stop saving.
-        """
-
-        if not self._savingVolumesNow:
-            (bOK, filename) = self.checkFileSaveStuff()
-            if bOK:
-                # Create SimpleEngineConfig
-                npsc = SimpleStackConfig()
-                npsc.shape = (self._params.scn.bscans_per_volume, self._params.scn.ascans_per_bscan, self._params.acq.samples_per_ascan, 1)
-                npsc.header = SimpleStackHeader.NumPy
-                npsc.path = filename
-                self._vtxengine._spectra_storage.open(npsc)
-                self._savingVolumesNow = True
-                self._savingVolumesThisMany = 0
-                self._savingVolumesThisManySaved = 0
-                self._octDialog.gbSaveVolumes.enableSaving(False, True)
-        else:
-                self._savingVolumesNow = False
-                self._vtxengine._spectra_storage.close()
-                self._vtxengine._endpoint_spectra_storage.volume_callback = None
-                self._octDialog.gbSaveVolumes.enableSaving(True)
 
     def dialogClosing(self):
         dlg = QMessageBox(self._octDialog)
@@ -222,9 +160,14 @@ class OCTUi():
             self._vtxengine = None
 
             # create engine
-
+            self._logger.info('Setting up OCT engine...')
             self._vtxengine = VtxEngine(self._params)
             self._vtxengine._engine.event_callback = self.engineEventCallback
+            self._vtxengine._null_endpoint.volume_callback = self.volumeCallback
+            self._vtxengine._null_endpoint_2.volume_callback = self.volumeCallback2
+            #self._vtxengine._null_endpoint.segment_callback = self.segmentCallback
+            #self._vtxengine._null_endpoint.aggregate_segment_callback = self.aggregateSegmentCallback
+            #self._vtxengine._null_endpoint.scan_callback = self.scanCallback
 
             # put something into the scan queue
             self._raster_scan = RasterScan()
@@ -256,6 +199,105 @@ class OCTUi():
             self._octDialog.pbStop.setEnabled(False)
             self._vtxengine.stop()
 
+    def scanCallback(self, arg0, arg1):
+        self._logger.info("scanCallback({0:d}, {1:d}, {2:d}, {3:d})".format(arg0, arg1))
+
+    def segmentCallback(self, arg0, arg1, arg2, arg3):
+        self._logger.info("segmentCallback({0:d}, {1:d}, {2:d}, {3:d})".format(arg0, arg1, arg2, arg3))
+
+    def aggregateSegmentCallback(self, v):
+        self._logger.info("aggregateSegmentCallback({0:s})".format(str(v)))
+
+    def volumeCallback(self, arg0, arg1, arg2):
+        """volume callback that is (should be) called prior to other volume callbacks. 
+        Because of that arrangement, this callback will open storage. Same storage is closed 
+        in volumeCallback2
+
+        Args:
+            sample_idx (int): sample index
+            scan_idx (int): scan index
+            volume_idx (int): volume index
+        """
+
+        self._logger.info("volumeCallback({0:d}, {1:d}, {2:d})".format(arg0, arg1, arg2))
+        if self._savingVolumesRequested:
+            (bOK, filename) = self.checkFileSaveStuff()
+            if bOK:
+                # Create SimpleStackConfig to config storage
+                npsc = SimpleStackConfig()
+                npsc.shape = (self._params.scn.bscans_per_volume, self._params.scn.ascans_per_bscan, self._params.acq.samples_per_ascan, 1)
+                npsc.header = SimpleStackHeader.NumPy
+                npsc.path = filename
+                self._logger.info('Open storage.')
+                self._vtxengine._spectra_storage.open(npsc)
+                self._savingVolumesNow = True
+                self._savingVolumesRequested = False
+                #self._savingVolumesThisMany = SHOULD HAVE BEEN SET IN PB CALLBACK WHEN SAVING VOLUMES REQUESTED
+                self._savingVolumesThisManySaved = 0
+                self._octDialog.gbSaveVolumes.enableSaving(False, self._savingVolumesThisMany==0)
+            else:
+                self._logger.warning("Cannot open file {0:s} for saving.".format(filename))
+                self._savingVolumesRequested = False
+
+    def volumeCallback2(self, arg0, arg1, arg2):
+        """This callback will close a file if opened.
+
+        Args:
+            arg0 (_type_): _description_
+            arg1 (_type_): _description_
+            arg2 (_type_): _description_
+        """
+        if self._savingVolumesNow:
+
+            # this is called after the current volume has been written
+            self._savingVolumesThisManySaved = self._savingVolumesThisManySaved + 1
+
+            if self._savingVolumesStopNow or (self._savingVolumesThisMany > 0 and self._savingVolumesThisManySaved == self._savingVolumesThisMany):
+
+                self._logger.info("Saved {0:d} volumes.".format(self._savingVolumesThisManySaved))
+                # close file
+                self._savingVolumesNow = False
+                self._savingVolumesStopNow = False
+                self._savingVolumesThisManySaved = 0
+                self._savingVolumesThisMany = 0
+                self._savingVolumesRequested = False
+                self._vtxengine._spectra_storage.close()
+                self._octDialog.gbSaveVolumes.enableSaving(True)
+
+
+    def checkFileSaveStuff(self) -> Tuple[bool, str]:
+        """This function will verify that the file save root folder is accessible. If so, 
+        a new folder with the name yyyy-MM-dd is created (if it doesn't already exist). A new 
+        filename is generated and returned. 
+        """
+
+        # Try to create new folder
+        now = datetime.now()
+        sFolder = now.strftime('%Y-%m-%d')
+        sFile = now.strftime('%Y-%m-%d-%H%M%S.npy')
+        p = self._octDialog.gbSaveVolumes.pathDataRoot / sFolder
+        p.mkdir(parents=True, exist_ok=True)
+        return (True, str(p / sFile))
+
+    def saveNVolumes(self, n: int):
+        self._savingVolumesRequested = True
+        self._savingVolumesThisMany = n
+        self._octDialog.gbSaveVolumes.enableSaving(False, False)
+
+    def saveContVolumes(self):
+        """This slot is called when the "Save Continuous" button is pushed. If not currently saving, then 
+        proceed to open the file and start saving. If already saving, though, this button is a toggle and 
+        should stop saving.
+        """
+
+        if not self._savingVolumesNow:
+            self._savingVolumesRequested = True
+            self._savingVolumesThisMany = 0
+            self._octDialog.gbSaveVolumes.enableSaving(False, True)
+        else:
+            self._savingVolumesStopNow = True
+
+
 
 
 def setup_logging():
@@ -263,7 +305,7 @@ def setup_logging():
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.NOTSET)
     logging.getLogger("matplotlib").setLevel(logging.WARNING)
-    logging.getLogger("OCTUi").setLevel(logging.WARNING)
+    #logging.getLogger("OCTUi").setLevel(logging.WARNING)
 
     formatter = logging.Formatter('%(asctime)s.%(msecs)03d [%(name)s] %(filename)s:%(lineno)d\t%(levelname)s:\t%(message)s')
 
