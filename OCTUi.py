@@ -44,7 +44,6 @@ class OCTUi():
         self._octDialog.widgetScanConfig.setScanParams(self._params.scn)
 
         # connections. 
-        print(type(self._octDialog.gbSaveVolumes))
         self._octDialog.gbSaveVolumes.saveNVolumes.connect(self.saveNVolumes)
         self._octDialog.gbSaveVolumes.saveContVolumes.connect(self.saveContVolumes)
         self._octDialog.gbSaveVolumes.enableSaving(False)

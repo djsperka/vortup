@@ -70,7 +70,6 @@ class SaveVolumeGroupBox(QGroupBox, Ui_SaveVolumeGroupBox):
 
     def __getFolder(self, folder: str=''):
         selected_folder = QFileDialog.getExistingDirectory(self, "Select folder")
-        print("Selected folder is {0:s}".format(selected_folder))
         if len(selected_folder)>0:
             self.pathDataRoot = Path(selected_folder)
         self.__updateLabels()

@@ -43,7 +43,6 @@ class CbFileSaveWidget(QWidget, Ui_CbFileSaveWidget):
             self._label.setText("not saving data")
 
     def __cbToggled(self, bChecked):
-        print("Checked: ", str(bChecked))
         if bChecked:
             # See if filename selected. If not, open dialog.
             if not self._filename:
