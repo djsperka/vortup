@@ -99,20 +99,28 @@ class VtxBaseEngine():
         #
         # galvo control
         #
+        # Control signals for the galvonometers are sent via the analog output of the IO card. 
+        # We use DAQmxIO objects to control the NI card. This card must be configured with DI drivers, 
+        # and should show up in your NI-MAX application under "Devices and Instruments". Make a note
+        # of the name("Dev1" in our case).
+        #
+        # The config values that refer to the x axis are here configured to be the "fast" axis.
+        # The config values that refer to the y axis are here configured to be the "slow" axis.
 
-        # output
         ioc_out = DAQmxConfig()
         ioc_out.samples_per_block = ac.records_per_block
         ioc_out.samples_per_second = cfg.swept_source.triggers_per_second
         ioc_out.blocks_to_buffer = cfg.preload_count
-        ioc_out.clock.source = "pfi12"
+        #ioc_out.clock.source = "pfi12"
+        ioc_out.clock.source = cfg.galvo_clock_source
         ioc_out.name = 'output'
 
-        stream = Block.StreamIndex.GalvoTarget
-        xAVO = daqmx.AnalogVoltageOutput('Dev1/ao0', cfg.galvo_x_units_per_volt, stream, 0)
+        # xAVO = daqmx.AnalogVoltageOutput('Dev1/ao0', cfg.galvo_x_units_per_volt, Block.StreamIndex.GalvoTarget, 0)
+        xAVO = daqmx.AnalogVoltageOutput(cfg.galvo_x_device_channel, cfg.galvo_x_units_per_volt, Block.StreamIndex.GalvoTarget, 0)
         xAVO.limits = cfg.galvo_x_voltage_range
         ioc_out.channels.append(xAVO)
-        yAVO = daqmx.AnalogVoltageOutput('Dev1/ao1', cfg.galvo_y_units_per_volt, stream, 1)
+        # yAVO = daqmx.AnalogVoltageOutput('Dev1/ao1', cfg.galvo_y_units_per_volt, Block.StreamIndex.GalvoTarget, 1)
+        yAVO = daqmx.AnalogVoltageOutput(cfg.galvo_y_device_channel, cfg.galvo_y_units_per_volt, Block.StreamIndex.GalvoTarget, 1)
         yAVO.limits = cfg.galvo_y_voltage_range
         ioc_out.channels.append(yAVO)
 
@@ -126,9 +134,11 @@ class VtxBaseEngine():
         strobec.samples_per_block = ac.records_per_block
         strobec.samples_per_second = cfg.swept_source.triggers_per_second
         strobec.blocks_to_buffer = cfg.preload_count
-        strobec.clock.source = "pfi12"
+        #strobec.clock.source = "pfi12"
+        strobec.clock.source = cfg.strobe_clock_source
         strobec.name = 'strobe'
-        strobec.channels.append(daqmx.DigitalOutput('Dev1/port0', Block.StreamIndex.Strobes))
+        # strobec.channels.append(daqmx.DigitalOutput('Dev1/port0', Block.StreamIndex.Strobes))
+        strobec.channels.append(daqmx.DigitalOutput(cfg.strobe_device_channel, Block.StreamIndex.Strobes))
         strobe = DAQmxIO(get_logger(strobec.name, cfg.log_level))
         strobe.initialize(strobec)
         self._strobe = strobe

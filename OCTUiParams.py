@@ -16,11 +16,11 @@ local_logger = logging.getLogger('OCTUiParams')
 
 # default location and name for config file
 # on Windows this will go into 'C:\ProgramData\djsperka\octui'
-default_app_name = 'octui'
-default_author_name = 'djsperka'
+#default_app_name = 'octui'
+#default_author_name = 'djsperka'
 default_config_base = 'octui.conf'
-default_config_path = Path(site_config_dir(default_app_name, default_author_name), default_config_base)
-
+#default_config_path = Path(site_config_dir(default_app_name, default_author_name), default_config_base)
+default_config_path = Path.home() / '.octui/' / default_config_base
 
 # This stuff is needed for when we call asdict() on a dataclass
 # It contains things that cannot be "pickled", and these functions tell the pickler 
@@ -102,6 +102,14 @@ class _octui_decoder(json.JSONDecoder):
 class OCTUiParams():
     def __init__(self, config_file = '', load = True):
 
+        if len(config_file):
+            maybepath = Path(config_file)
+            if not maybepath.exists():
+                local_logger.warning('Config file {0:s} not found.'.format(config_file))
+            self.__cfgpath = maybepath
+        else:
+            self.__cfgpath = default_config_path
+
         if not load:
             params = UiParams()
             self._vtx = params.vtx
@@ -109,16 +117,7 @@ class OCTUiParams():
             self._scn = params.scn
             self._dsp = params.dsp
             local_logger.info("Saving initial config file {0:s}".format(str(default_config_path)))
-            self.save(str(default_config_path))
-
-        if len(config_file):
-            maybepath = Path(config_file)
-            if not maybepath.exists():
-                raise FileNotFoundError('Config file {0:s} not found.'.format(config_file))
-            else:
-                self.__cfgpath = maybepath
-        else:
-            self.__cfgpath = default_config_path
+            self.save()
 
         self.load()
 
@@ -198,44 +197,36 @@ class OCTUiParams():
             use_this_path = self.__cfgpath
 
         local_logger.info("saving OCTUi config to {0:s}".format(str(use_this_path)))
+
+        # Check if directory exists.
+        if not use_this_path.exists():
+            local_logger.info("Creating directory {0:s}".format(str(use_this_path.parent)))
+            use_this_path.parent.mkdir(exist_ok=True)
+
         with use_this_path.open(mode="w", encoding="utf-8") as f:
             params = UiParams(self._vtx, self._acq, self._scn, self._dsp)
             json.dump(params, f, indent=2, cls=_octui_encoder)
 
 
-
-
-
-
-    # @staticmethod
-    # def __from_dict(d):
-    #     if d.keys() == {'min', 'max'}:
-    #         return Range(d['min'], d['max'])
-    #     elif {'triggers_per_second', 'clock_rising_edges_per_trigger', 'duty_cycle', 'imaging_depth_meters'}.issubset(d.keys()):
-    #         return Source(int(d['triggers_per_second']), int(d['clock_rising_edges_per_trigger']), float(d['duty_cycle']), float(d['imaging_depth_meters']))
-    #     elif {'acquisition_type',  'galvo_delay', 'galvo_y_voltage_range', 'save_profiler_data'}.issubset(d.keys()):
-    #         # This should be the VtxEngineParams object itself. 
-    #         d['acquisition_type'] = AcquisitionType(d['acquisition_type'])
-    #         d['clock_channel'] = alazar.Channel(d['clock_channel'])
-    #         d['input_channel'] = alazar.Channel(d['input_channel'])
-    #         d['dispersion'] = tuple(d['dispersion'])
-    #     return d
-
-
-
 if __name__ == "__main__":
 
-    # First time only! 
-    if not default_config_path.exists():
-        # create directory for default config file
-        default_config_path.parent.mkdir(parents=True, exist_ok=True)
+    logging.basicConfig(level=logging.DEBUG)
 
-        # calling with load=False will create new file
-        p=OCTUiParams(load=False)
-        local_logger.info("Saved initial config file in {0:s}".format(str(p.path())))
+    from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+    parser = ArgumentParser(description='Initialize/update OCTUi config file.', formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--create', action='store_true', help='create new config file')
+    parser.add_argument('--update', action='store_true', help='create new config file')
+    parser.add_argument('--config', default='', help='path to config file [default = {0:s}]'.format(str(default_config_path)))
+    args = parser.parse_args()
 
-    # Load config file
-    local_logger.info("loading config file....")
-    p2 = OCTUiParams()
-    p2.load()
-    print(p2.scn)
+    if args.create:
+        local_logger.info("creating new config file")
+        p=OCTUiParams(config_file=args.config, load=False)
+    elif args.update:
+        local_logger.info("Load existing config file...")
+        p=OCTUiParams(config_file=args.config, load=True)
+        p.save()
+        local_logger.info("Done.")
+    else:
+        local_logger.error("Must specify --create or --update")
+

@@ -17,12 +17,19 @@ class VtxEngineParams:
     galvo_delay: float
 
     # other galvo stuff
+    galvo_clock_source: str
     galvo_x_voltage_range: Range
     galvo_y_voltage_range: Range
     galvo_x_voltage_range: Range
     galvo_y_voltage_range: Range
     galvo_x_units_per_volt: float
     galvo_y_units_per_volt: float
+    galvo_x_device_channel: str
+    galvo_y_device_channel: str
+
+    # strobe stuff
+    strobe_clock_source: str
+    strobe_device_channel: str
     
     # hardware configuration
     swept_source: Source
@@ -52,10 +59,15 @@ DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
 
     acquisition_type=AcquisitionType.ALAZAR_ACQUISITION,
     galvo_delay=0.0,
+    galvo_clock_source='pfi12',
     galvo_x_voltage_range=Range(-3,3),
     galvo_y_voltage_range=Range(-3,3),
     galvo_x_units_per_volt=1.5,
     galvo_y_units_per_volt=1.5,
+    galvo_x_device_channel='Dev1/ao0',
+    galvo_y_device_channel='Dev1/ao1',
+    strobe_clock_source='pfi12',
+    strobe_device_channel='Dev1/port0',
 
     # These are probably rig-specific? Hasn't been an issue to use these. 
     blocks_to_allocate=128,
