@@ -163,7 +163,7 @@ class OCTUi():
             self._vtxengine = VtxEngine(self._params)
             self._vtxengine._engine.event_callback = self.engineEventCallback
             self._vtxengine._null_endpoint.volume_callback = self.volumeCallback
-            self._vtxengine._null_endpoint_2.volume_callback = self.volumeCallback2
+            self._vtxengine._endpoint_spectra_storage.volume_callback = self.volumeCallback2
             #self._vtxengine._null_endpoint.segment_callback = self.segmentCallback
             #self._vtxengine._null_endpoint.aggregate_segment_callback = self.aggregateSegmentCallback
             #self._vtxengine._null_endpoint.scan_callback = self.scanCallback

@@ -74,8 +74,10 @@ class VtxEngine(VtxBaseEngine):
         endpoints = []
 
         # For saving volumes, this NullEndpoint is used. The volume_callback for this 
-        # endpoint will be called before that of the other endpoints. If needed, we open/close
-        # the storage at this point if needed. 
+        # endpoint will be called before that of the other endpoints. If needed, we open
+        # the storage in the volume_callback for this endpoint when needed. The storage 
+        # is closed in the volume_callback for the SpectraStackEndpoint, which does the 
+        # saving/writing of volumes.
         self._null_endpoint = NullEndpoint(get_logger('Traffic cop', cfg.log_level))
         endpoints.append(self._null_endpoint)
 
@@ -106,13 +108,6 @@ class VtxEngine(VtxBaseEngine):
         shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, acq.samples_per_ascan, 1)
         self._endpoint_spectra_storage, self._spectra_storage = self.getSpectraStorageEndpoint(shape)
         endpoints.append(self._endpoint_spectra_storage)
-
-        # For saving volumes, this NullEndpoint is used. The volume_callback for this 
-        # endpoint will be called before that of the other endpoints. If needed, we open/close
-        # the storage at this point if needed. 
-        self._null_endpoint_2 = NullEndpoint(get_logger('Traffic cop', cfg.log_level))
-        endpoints.append(self._null_endpoint_2)
-
 
         #
         # engine setup
