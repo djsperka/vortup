@@ -36,8 +36,6 @@ class VtxBaseEngine():
             # only input channel A
             input = alazar.Input(alazar.Channel.A, cfg.input_channel_range_millivolts)
             ac.inputs.append(input)
-            print("VtxBaseEngine: have {0:d} inputs.".format(len(ac.inputs)))
-            print("VtxBaseEngine: ", input)
 
             # pull in acquisition params
             ac.records_per_block = acq.ascans_per_block

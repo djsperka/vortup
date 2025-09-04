@@ -16,5 +16,4 @@ def getRangeFromTextEntry(txt) -> Range:
             r = Range(-iVal, iVal)
     else:
         raise RuntimeError("Cannot parse X extents: ", )
-    print("got range from entry ", txt, "(", r.min, ",", r.max,")")
     return r

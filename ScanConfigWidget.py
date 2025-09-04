@@ -66,7 +66,6 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
                 r = Range(-iVal, iVal)
         else:
             raise RuntimeError("Cannot parse extents: {0:s}".format(txt))
-        print("got range from entry ", txt, "(", r.min, ",", r.max,")")
         return r
 
     def getScanParams(self) -> ScanParams:

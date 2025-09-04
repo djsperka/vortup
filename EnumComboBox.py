@@ -14,10 +14,8 @@ class EnumComboBox(QComboBox):
         for t in list(self._E):
             if v == t.value:
                 setToThisIndex = self.count()
-                print("Found this index: ", setToThisIndex)
             self.addItem(t.name, t.value)
         if setToThisIndex < 0:
-            print("cenum value not found in Enum, set to first value")
             setToThisIndex = 0
         self.setCurrentIndex(setToThisIndex)
 
