@@ -20,3 +20,15 @@ class EnumComboBox(QComboBox):
         self.setCurrentIndex(setToThisIndex)
 
     
+if __name__ == "__main__":
+    import sys
+    from PyQt5.QtWidgets import QApplication
+    from DAQConst import ATS9350InputRange
+    from vortex.acquire import alazar
+    app = QApplication(sys.argv)
+    w = EnumComboBox()
+    w.initialize(ATS9350InputRange, 1)
+    w.show()
+    app.exec()
+    print("w.currentIndex {0:d} text {1:d}".format(w.currentIndex(), w.itemData(w.currentIndex())))
+    sys.exit()
