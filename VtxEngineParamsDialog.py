@@ -127,6 +127,8 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.lineEditInternalClockRate.setText(str(cfg.clock_samples_per_second))
         self.lineEditExternalClockLevelPct.setText(str(cfg.external_clock_level_pct))
         # input channel and clock channel ignored for now - we cannot load vortex.acquire.alazar....
+        self.comboBoxInputChannel.setCurrentText(cfg.input_channel)
+        self.comboBoxClockChannel.setCurrentText(cfg.clock_channel)
         self.lineEditTriggerRange.setText(str(cfg.trigger_range_millivolts))
         self.lineEditTriggerLevelFraction.setText(str(cfg.trigger_level_fraction))
 
@@ -161,6 +163,8 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         s.swept_source = self.getClockSourceValues()
         s.internal_clock = bool(self.checkBoxInternalClock.isChecked())
         s.external_clock_level_pct = int(self.lineEditExternalClockLevelPct.text())
+        s.input_channel = self.comboBoxInputChannel.currentText()
+        s.clock_channel = self.comboBoxClockChannel.currentText()
         s.trigger_range_millivolts = int(self.lineEditTriggerRange.text())
         s.trigger_level_fraction = float(self.lineEditTriggerLevelFraction.text())
         s.input_channel_range_millivolts = self.comboBoxInputRange.itemData(self.comboBoxInputRange.currentIndex())

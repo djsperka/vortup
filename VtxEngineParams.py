@@ -36,8 +36,8 @@ class VtxEngineParams:
     internal_clock: bool
     clock_samples_per_second: int
     external_clock_level_pct: int
-    clock_channel: alazar.Channel
-    input_channel: alazar.Channel
+    clock_channel: str
+    input_channel: str
     input_channel_range_millivolts: int
     trigger_range_millivolts: int
     trigger_level_fraction: float
@@ -79,8 +79,8 @@ DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
     internal_clock=False,
     clock_samples_per_second=int(500e6),    # ATS 9350 - applies to internal clock only
     external_clock_level_pct=50,        # only relevant if internal_clock is False
-    clock_channel=alazar.Channel.B,    # only relevant if internal_clock is True
-    input_channel=alazar.Channel.A,
+    clock_channel='B',
+    input_channel='A',
     input_channel_range_millivolts=1000,
     trigger_range_millivolts=5000,
     trigger_level_fraction=0.10,

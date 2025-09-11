@@ -5,9 +5,12 @@ from vortex.process import CUDAProcessor, CUDAProcessorConfig, NullProcessor, Nu
 from vortex.io import DAQmxIO, DAQmxConfig, daqmx
 from VtxEngineParams import VtxEngineParams, AcquisitionType
 from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
+from DAQConst import getAlazarChannel
 import numpy as np
 from typing import Tuple
+import logging
 
+LOGGER = logging.getLogger(__name__)
 class VtxBaseEngine():
     def __init__(self, cfg: VtxEngineParams, acq: AcqParams=DEFAULT_ACQ_PARAMS, dsp: Tuple[float, float]=(0,0)):
 
@@ -34,7 +37,8 @@ class VtxBaseEngine():
             ac.trigger = alazar.SingleExternalTrigger(range_millivolts=cfg.trigger_range_millivolts, level_ratio=cfg.trigger_level_fraction, delay_samples=0, slope=alazar.TriggerSlope.Positive)
 
             # only input channel A
-            input = alazar.Input(alazar.Channel.A, cfg.input_channel_range_millivolts)
+            LOGGER.info("Using input channel {0:s} for input \"{1:s}\"".format(str(getAlazarChannel(cfg.input_channel)), cfg.input_channel))
+            input = alazar.Input(getAlazarChannel(cfg.input_channel), cfg.input_channel_range_millivolts)
             ac.inputs.append(input)
 
             # pull in acquisition params

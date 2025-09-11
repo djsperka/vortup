@@ -15,11 +15,7 @@ from typing import Tuple
 local_logger = logging.getLogger('OCTUiParams')
 
 # default location and name for config file
-# on Windows this will go into 'C:\ProgramData\djsperka\octui'
-#default_app_name = 'octui'
-#default_author_name = 'djsperka'
 default_config_base = 'octui.conf'
-#default_config_path = Path(site_config_dir(default_app_name, default_author_name), default_config_base)
 default_config_path = Path.home() / '.octui/' / default_config_base
 
 # This stuff is needed for when we call asdict() on a dataclass
@@ -62,8 +58,6 @@ class _octui_encoder(json.JSONEncoder):
                 value = {'min': o.min, 'max': o.max}
             elif isinstance(o, Source):
                 value = {'triggers_per_second': o.triggers_per_second, 'clock_rising_edges_per_trigger': o.clock_rising_edges_per_trigger, 'duty_cycle': o.duty_cycle, 'imaging_depth_meters': o.imaging_depth_meters}
-            elif isinstance(o, alazar.Channel):
-                value = o.value
             else:
                 raise TypeError('Unknown type: {0:s}\n'.format(o))
         except TypeError:
@@ -88,8 +82,6 @@ class _octui_decoder(json.JSONDecoder):
         elif {'acquisition_type',  'galvo_delay', 'galvo_y_voltage_range', 'save_profiler_data'}.issubset(d.keys()):
             # This should be the VtxEngineParams object itself. 
             d['acquisition_type'] = AcquisitionType(d['acquisition_type'])
-            d['clock_channel'] = alazar.Channel(d['clock_channel'])
-            d['input_channel'] = alazar.Channel(d['input_channel'])
         elif {'vtx', 'acq', 'scn', 'dsp'}.issubset(d.keys()):
             d['vtx'] = VtxEngineParams(**d['vtx'])
             d['acq'] = AcqParams(**d['acq'])
