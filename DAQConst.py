@@ -24,6 +24,6 @@ AlazarChannelValueDict = {
 
 def getAlazarChannel(letter: str) -> alazar.Channel:
     if letter in AlazarChannelValueDict:
-        return alazar.Channel(letter)
+        return alazar.Channel(AlazarChannelValueDict[letter])
     else:
         return alazar.Channel.A
