@@ -132,8 +132,6 @@ class VtxEngine(VtxBaseEngine):
         ec.records_per_block = acq.ascans_per_block
         ec.blocks_to_allocate = cfg.blocks_to_allocate
         ec.blocks_to_acquire = acq.blocks_to_acquire
-        #self._logger.info("blocks to acquire {0:d}".format(ec.blocks_to_acquire))
-
 
         engine = Engine(get_logger('engine', cfg.log_level))
         engine.initialize(ec)
