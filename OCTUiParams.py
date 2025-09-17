@@ -5,7 +5,7 @@ from platformdirs import site_config_dir
 from pathlib import Path
 import json
 import logging
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 import copyreg
 from vortex import Range
 from vortex.engine import Source
@@ -30,9 +30,10 @@ copyreg.pickle(Source, pickle_source)
 
 @dataclass
 class UiParams():
-    vtx: VtxEngineParams = DEFAULT_VTX_ENGINE_PARAMS
-    acq: AcqParams = DEFAULT_ACQ_PARAMS
-    scn: ScanParams = DEFAULT_SCAN_PARAMS
+    #vtx: VtxEngineParams = DEFAULT_VTX_ENGINE_PARAMS
+    vtx: VtxEngineParams = field(default_factory=lambda: DEFAULT_VTX_ENGINE_PARAMS)
+    acq: AcqParams = field(default_factory=lambda: DEFAULT_ACQ_PARAMS)
+    scn: ScanParams = field(default_factory=lambda: DEFAULT_SCAN_PARAMS)
     dsp: Tuple = (-1.8e-05, 0)
 
 def pickle_uiparams(u: UiParams):

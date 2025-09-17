@@ -8,8 +8,10 @@ class ScanParams():
     ascans_per_bscan: int = 500
     bscans_per_volume: int = 500
     bidirectional_segments: bool = False
-    segment_extent: Range = Range(-1, 1)
-    volume_extent: Range = Range(-1,1)
+    #segment_extent: Range = Range(-1, 1)
+    #volume_extent: Range = Range(-1,1)
+    segment_extent: Range = field(default_factory=lambda: Range(-1,1))
+    volume_extent: Range = field(default_factory=lambda: Range(-1,1))
     angle: float = 0.0
 
     def getRasterScanConfig(self):
