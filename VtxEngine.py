@@ -119,14 +119,16 @@ class VtxEngine(VtxBaseEngine):
         ec.add_formatter(self._format_planner_ascans, endpoints)
 
         # add galvo output
-        ec.add_io(self._io_out, lead_samples=round(cfg.galvo_delay * self._io_out.config.samples_per_second))
-        ec.galvo_output_channels = len(self._io_out.config.channels)
+        if self._io_out is not None:
+            ec.add_io(self._io_out, lead_samples=round(cfg.galvo_delay * self._io_out.config.samples_per_second))
+            ec.galvo_output_channels = len(self._io_out.config.channels)
 
         # strobe output
         # default is [SampleStrobe(0, 2), SampleStrobe(1, 1000), SampleStrobe(2, 1000, Polarity.Low), SegmentStrobe(3), VolumeStrobe(4)]
         # ec.strobes = [VolumeStrobe(0)]
         # ec.strobes = [SegmentStrobe(0)]
-        ec.add_io(self._strobe)
+        if self._strobe is not None:
+            ec.add_io(self._strobe)
 
         ec.preload_count = cfg.preload_count
         ec.records_per_block = acq.ascans_per_block

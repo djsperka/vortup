@@ -45,6 +45,9 @@ class VtxBaseEngine():
             ac.records_per_block = acq.ascans_per_block
             ac.samples_per_record = acq.samples_per_ascan
 
+            # AuxIO
+            ac.options.append(alazar.AuxIOClockOut())
+
             acquire = AlazarAcquisition(get_logger('acquire', cfg.log_level))
             acquire.initialize(ac)
             self._acquire = acquire
@@ -128,6 +131,7 @@ class VtxBaseEngine():
         io_out = DAQmxIO(get_logger(ioc_out.name, cfg.log_level))
         io_out.initialize(ioc_out)
         self._io_out = io_out
+        # self._io_out = None
 
 
         # examples show this being a copy of ioc_out. Make a new one instead.
@@ -141,3 +145,4 @@ class VtxBaseEngine():
         strobe = DAQmxIO(get_logger(strobec.name, cfg.log_level))
         strobe.initialize(strobec)
         self._strobe = strobe
+        #self._strobe = None
