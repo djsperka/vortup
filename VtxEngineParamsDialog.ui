@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>416</width>
-    <height>468</height>
+    <width>453</width>
+    <height>568</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -71,7 +71,7 @@
         <item row="0" column="1" colspan="3">
          <widget class="QLineEdit" name="lineEditGalvoDelay"/>
         </item>
-        <item row="1" column="0" colspan="2">
+        <item row="1" column="0">
          <widget class="QLabel" name="label_4">
           <property name="text">
            <string>X units/V</string>
@@ -124,6 +124,65 @@
            <string/>
           </property>
          </widget>
+        </item>
+        <item row="5" column="0" colspan="2">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>clock source</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="2" colspan="2">
+         <widget class="QLineEdit" name="lineEditGalvoClockSource"/>
+        </item>
+        <item row="6" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>X device</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="2" colspan="2">
+         <widget class="QLineEdit" name="lineEditGalvoXDevice"/>
+        </item>
+        <item row="7" column="0">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>Y device</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="2" colspan="2">
+         <widget class="QLineEdit" name="lineEditGalvoYDevice"/>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox_7">
+       <property name="title">
+        <string>Strobe</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_19">
+          <property name="text">
+           <string>clock source</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="lineEditStrobeClockSource"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_20">
+          <property name="text">
+           <string>out device</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="lineEditStrobeDevice"/>
         </item>
        </layout>
       </widget>
@@ -180,249 +239,266 @@
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_3">
-     <property name="title">
-      <string>Hardware Configuration</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
-      <item>
-       <widget class="QGroupBox" name="groupBox_6">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="title">
-         <string>Acquisition type</string>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QRadioButton" name="radioButtonAlazarAcquisition">
-           <property name="text">
-            <string>Alazar</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QRadioButton" name="radioButtonFileAcquisition">
-           <property name="text">
-            <string>File</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QGroupBox" name="groupBox_4">
-        <property name="title">
-         <string>Source</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <layout class="QVBoxLayout" name="verticalLayout_4">
+     <item>
+      <widget class="QGroupBox" name="groupBox_3">
+       <property name="title">
+        <string>Hardware Configuration</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QGroupBox" name="groupBox_6">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="title">
+           <string>Acquisition type</string>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
-            <widget class="QRadioButton" name="rbAxsun100k">
+            <widget class="QRadioButton" name="radioButtonAlazarAcquisition">
              <property name="text">
-              <string>Axsun 100k</string>
+              <string>Alazar</string>
              </property>
-             <attribute name="buttonGroup">
-              <string notr="true">buttonGroupSource</string>
-             </attribute>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="rbCustom">
+            <widget class="QRadioButton" name="radioButtonFileAcquisition">
              <property name="text">
-              <string>Custom</string>
+              <string>File</string>
              </property>
-             <attribute name="buttonGroup">
-              <string notr="true">buttonGroupSource</string>
-             </attribute>
             </widget>
            </item>
           </layout>
-         </item>
-         <item>
-          <layout class="QFormLayout" name="formLayout_4">
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_10">
-             <property name="text">
-              <string>triggers/s</string>
-             </property>
-            </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_4">
+          <property name="title">
+           <string>Source</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <item>
+              <widget class="QRadioButton" name="rbAxsun100k">
+               <property name="text">
+                <string>Axsun 100k</string>
+               </property>
+               <attribute name="buttonGroup">
+                <string notr="true">buttonGroupSource</string>
+               </attribute>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="rbCustom">
+               <property name="text">
+                <string>Custom</string>
+               </property>
+               <attribute name="buttonGroup">
+                <string notr="true">buttonGroupSource</string>
+               </attribute>
+              </widget>
+             </item>
+            </layout>
            </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_11">
-             <property name="text">
-              <string>clock rise edge/trig</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_12">
-             <property name="text">
-              <string>duty cycle</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_13">
-             <property name="text">
-              <string>imaging depth(m)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="lineEditTriggersPerSecond"/>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="lineEditClockRisingEdgesPerTrigger"/>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="lineEditDutyCycle"/>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="lineEditImagingDepth"/>
+           <item>
+            <layout class="QFormLayout" name="formLayout_4">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_10">
+               <property name="text">
+                <string>triggers/s</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_11">
+               <property name="text">
+                <string>clock rise edge/trig</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_12">
+               <property name="text">
+                <string>duty cycle</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_13">
+               <property name="text">
+                <string>imaging depth(m)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="lineEditTriggersPerSecond"/>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="lineEditClockRisingEdgesPerTrigger"/>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLineEdit" name="lineEditDutyCycle"/>
+             </item>
+             <item row="3" column="1">
+              <widget class="QLineEdit" name="lineEditImagingDepth"/>
+             </item>
+            </layout>
            </item>
           </layout>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <layout class="QFormLayout" name="formLayout">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_14">
-          <property name="text">
-           <string>internal clock</string>
-          </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QCheckBox" name="checkBoxInternalClock">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_15">
-          <property name="text">
-           <string>int clock rate</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="lineEditInternalClockRate"/>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_16">
-          <property name="text">
-           <string>ext clock level %</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLineEdit" name="lineEditExternalClockLevelPct"/>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_17">
-          <property name="text">
-           <string>clock channel</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QComboBox" name="comboBoxClockChannel">
-          <item>
-           <property name="text">
-            <string>A</string>
-           </property>
+        <item>
+         <layout class="QFormLayout" name="formLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string>internal clock</string>
+            </property>
+           </widget>
           </item>
-          <item>
-           <property name="text">
-            <string>B</string>
-           </property>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="checkBoxInternalClock">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
           </item>
-          <item>
-           <property name="text">
-            <string>C</string>
-           </property>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_15">
+            <property name="text">
+             <string>int clock rate</string>
+            </property>
+           </widget>
           </item>
-          <item>
-           <property name="text">
-            <string>D</string>
-           </property>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="lineEditInternalClockRate"/>
           </item>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label_18">
-          <property name="text">
-           <string>input channel</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QComboBox" name="comboBoxInputChannel">
-          <item>
-           <property name="text">
-            <string>A</string>
-           </property>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>ext clock level %</string>
+            </property>
+           </widget>
           </item>
-          <item>
-           <property name="text">
-            <string>B</string>
-           </property>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="lineEditExternalClockLevelPct"/>
           </item>
-          <item>
-           <property name="text">
-            <string>C</string>
-           </property>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_17">
+            <property name="text">
+             <string>clock channel</string>
+            </property>
+           </widget>
           </item>
-          <item>
-           <property name="text">
-            <string>D</string>
-           </property>
+          <item row="3" column="1">
+           <widget class="QComboBox" name="comboBoxClockChannel">
+            <item>
+             <property name="text">
+              <string>A</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>B</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>C</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>D</string>
+             </property>
+            </item>
+           </widget>
           </item>
-         </widget>
-        </item>
-        <item row="5" column="0">
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>input range (mV)</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="EnumComboBox" name="comboBoxInputRange"/>
-        </item>
-        <item row="6" column="0">
-         <widget class="QLabel" name="label_21">
-          <property name="text">
-           <string>trigger range (mV)</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1">
-         <widget class="QLineEdit" name="lineEditTriggerRange"/>
-        </item>
-        <item row="7" column="0">
-         <widget class="QLabel" name="label_22">
-          <property name="text">
-           <string>trigger level fraction</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="1">
-         <widget class="QLineEdit" name="lineEditTriggerLevelFraction"/>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_18">
+            <property name="text">
+             <string>input channel</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QComboBox" name="comboBoxInputChannel">
+            <item>
+             <property name="text">
+              <string>A</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>B</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>C</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>D</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>input range (mV)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="EnumComboBox" name="comboBoxInputRange"/>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_21">
+            <property name="text">
+             <string>trigger range (mV)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QLineEdit" name="lineEditTriggerRange"/>
+          </item>
+          <item row="7" column="0">
+           <widget class="QLabel" name="label_22">
+            <property name="text">
+             <string>trigger level fraction</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="QLineEdit" name="lineEditTriggerLevelFraction"/>
+          </item>
+         </layout>
         </item>
        </layout>
-      </item>
-     </layout>
-    </widget>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

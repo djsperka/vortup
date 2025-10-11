@@ -126,7 +126,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.checkBoxInternalClock.setChecked(cfg.internal_clock)
         self.lineEditInternalClockRate.setText(str(cfg.clock_samples_per_second))
         self.lineEditExternalClockLevelPct.setText(str(cfg.external_clock_level_pct))
-        # input channel and clock channel ignored for now - we cannot load vortex.acquire.alazar....
+
         self.comboBoxInputChannel.setCurrentText(cfg.input_channel)
         self.comboBoxClockChannel.setCurrentText(cfg.clock_channel)
         self.lineEditTriggerRange.setText(str(cfg.trigger_range_millivolts))
@@ -143,7 +143,12 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         # enum-using combo boxes....
         self.comboBoxInputRange.initialize(ATS9350InputRange, cfg.input_channel_range_millivolts)
 
-
+        # clock and device sources
+        self.lineEditGalvoClockSource.setText(cfg.galvo_clock_source)
+        self.lineEditGalvoXDevice.setText(cfg.galvo_x_device_channel)
+        self.lineEditGalvoYDevice.setText(cfg.galvo_y_device_channel)
+        self.lineEditStrobeClockSource.setText(cfg.strobe_clock_source)
+        self.lineEditStrobeDevice.setText(cfg.strobe_device_channel)
 
 
     def getEngineParameters(self) -> VtxEngineParams:
@@ -174,6 +179,13 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         #s.dispersion = (float(self.lineEditDispersion0.text()), float(self.lineEditDispersion1.text()))
         s.log_level = int(self.lineEditLogLevel.text())
         s.save_profiler_data = self.cbSaveProfilerData.isChecked()
+
+        # clock source stuff added
+        s.galvo_clock_source = self.lineEditGalvoClockSource.text()
+        s.galvo_x_device_channel = self.lineEditGalvoXDevice.text()
+        s.galvo_y_device_channel = self.lineEditGalvoYDevice.text()
+        s.strobe_clock_source = self.lineEditStrobeClockSource.text()
+        s.strobe_device_channel = self.lineEditStrobeDevice.text()
         return s
 
 
