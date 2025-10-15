@@ -180,6 +180,9 @@ class OCTUi():
             # now start the actual engine
             self._vtxengine._engine.start()
 
+            # status timer
+
+
         except RuntimeError as e:
             print("RuntimeError:")
             traceback.print_exception(e)
@@ -190,6 +193,9 @@ class OCTUi():
             self._octDialog.gbSaveVolumes.enableSaving(True)
         elif event == Engine.Event.Shutdown:
             self._octDialog.gbSaveVolumes.enableSaving(False)
+        elif event == Engine.Event.Error:
+            self._logger.error("Error event from engine.")
+            self.stopClicked()
 
     def stopClicked(self):
         if self._vtxengine is not None:
@@ -300,18 +306,22 @@ class OCTUi():
 
 
 def setup_logging():
-    # configure the root logger to accept all records
-    root_logger = logging.getLogger()
-    root_logger.setLevel(logging.NOTSET)
+
+    # format
+    DATE_FORMAT = "%d-%b-%Y %H:%M:%S"
+    #FORMAT = '%(asctime)s.%(msecs)03d [%(name)s] %(filename)s:%(lineno)d\t%(levelname)s:\t%(message)s'
+    FORMAT = '[%(asctime)s.%(msecs)d] %(name)s\t(%(levelname).1s) %(message)s'
+    logging.basicConfig(format=FORMAT, datefmt=DATE_FORMAT, level=logging.DEBUG)
+
+    # This was in  the examples, not sure why.
     logging.getLogger("matplotlib").setLevel(logging.WARNING)
-    #logging.getLogger("OCTUi").setLevel(logging.WARNING)
 
-    formatter = logging.Formatter('%(asctime)s.%(msecs)03d [%(name)s] %(filename)s:%(lineno)d\t%(levelname)s:\t%(message)s')
 
-    # set up colored logging to console
-    console_handler = RainbowLoggingHandler(sys.stderr)
-    console_handler.setFormatter(formatter)
-    root_logger.addHandler(console_handler)
+    # # set up colored logging to console
+    # formatter = logging.Formatter('%(asctime)s.%(msecs)03d [%(name)s] %(filename)s:%(lineno)d\t%(levelname)s:\t%(message)s')
+    # console_handler = RainbowLoggingHandler(sys.stderr)
+    # console_handler.setFormatter(formatter)
+    # root_logger.addHandler(console_handler)
 
 
 def setup_plotting():

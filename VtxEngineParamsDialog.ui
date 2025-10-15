@@ -56,9 +56,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="groupBox">
+      <widget class="QGroupBox" name="groupBoxGalvo">
        <property name="title">
         <string>Galvo</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
        </property>
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
@@ -159,9 +162,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="groupBox_7">
+      <widget class="QGroupBox" name="groupBoxStrobe">
        <property name="title">
         <string>Strobe</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">

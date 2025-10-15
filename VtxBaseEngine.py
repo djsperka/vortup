@@ -46,7 +46,7 @@ class VtxBaseEngine():
             ac.samples_per_record = acq.samples_per_ascan
 
             # AuxIO
-            ac.options.append(alazar.AuxIOClockOut())
+            ac.options.append(alazar.AuxIOTriggerOut())
 
             acquire = AlazarAcquisition(get_logger('acquire', cfg.log_level))
             acquire.initialize(ac)
@@ -114,35 +114,40 @@ class VtxBaseEngine():
         # The config values that refer to the x axis are here configured to be the "fast" axis.
         # The config values that refer to the y axis are here configured to be the "slow" axis.
 
-        ioc_out = DAQmxConfig()
-        ioc_out.samples_per_block = ac.records_per_block
-        ioc_out.samples_per_second = cfg.swept_source.triggers_per_second
-        ioc_out.blocks_to_buffer = cfg.preload_count
-        ioc_out.clock.source = cfg.galvo_clock_source
-        ioc_out.name = 'output'
+        if cfg.galvo_enabled:
+            ioc_out = DAQmxConfig()
+            ioc_out.samples_per_block = ac.records_per_block
+            ioc_out.samples_per_second = cfg.swept_source.triggers_per_second
+            ioc_out.blocks_to_buffer = cfg.preload_count
+            ioc_out.clock.source = cfg.galvo_clock_source
+            ioc_out.name = 'output'
 
-        xAVO = daqmx.AnalogVoltageOutput(cfg.galvo_x_device_channel, cfg.galvo_x_units_per_volt, Block.StreamIndex.GalvoTarget, 0)
-        xAVO.limits = cfg.galvo_x_voltage_range
-        ioc_out.channels.append(xAVO)
-        yAVO = daqmx.AnalogVoltageOutput(cfg.galvo_y_device_channel, cfg.galvo_y_units_per_volt, Block.StreamIndex.GalvoTarget, 1)
-        yAVO.limits = cfg.galvo_y_voltage_range
-        ioc_out.channels.append(yAVO)
+            xAVO = daqmx.AnalogVoltageOutput(cfg.galvo_x_device_channel, cfg.galvo_x_units_per_volt, Block.StreamIndex.GalvoTarget, 0)
+            xAVO.limits = cfg.galvo_x_voltage_range
+            ioc_out.channels.append(xAVO)
+            yAVO = daqmx.AnalogVoltageOutput(cfg.galvo_y_device_channel, cfg.galvo_y_units_per_volt, Block.StreamIndex.GalvoTarget, 1)
+            yAVO.limits = cfg.galvo_y_voltage_range
+            ioc_out.channels.append(yAVO)
 
-        io_out = DAQmxIO(get_logger(ioc_out.name, cfg.log_level))
-        io_out.initialize(ioc_out)
-        self._io_out = io_out
-        # self._io_out = None
+            io_out = DAQmxIO(get_logger(ioc_out.name, cfg.log_level))
+            io_out.initialize(ioc_out)
+            self._io_out = io_out
+        else:
+            self._io_out = None
 
 
         # examples show this being a copy of ioc_out. Make a new one instead.
-        strobec = DAQmxConfig()
-        strobec.samples_per_block = ac.records_per_block
-        strobec.samples_per_second = cfg.swept_source.triggers_per_second
-        strobec.blocks_to_buffer = cfg.preload_count
-        strobec.clock.source = cfg.strobe_clock_source
-        strobec.name = 'strobe'
-        strobec.channels.append(daqmx.DigitalOutput(cfg.strobe_device_channel, Block.StreamIndex.Strobes))
-        strobe = DAQmxIO(get_logger(strobec.name, cfg.log_level))
-        strobe.initialize(strobec)
-        self._strobe = strobe
-        #self._strobe = None
+
+        if cfg.strobe_enabled:
+            strobec = DAQmxConfig()
+            strobec.samples_per_block = ac.records_per_block
+            strobec.samples_per_second = cfg.swept_source.triggers_per_second
+            strobec.blocks_to_buffer = cfg.preload_count
+            strobec.clock.source = cfg.strobe_clock_source
+            strobec.name = 'strobe'
+            strobec.channels.append(daqmx.DigitalOutput(cfg.strobe_device_channel, Block.StreamIndex.Strobes))
+            strobe = DAQmxIO(get_logger(strobec.name, cfg.log_level))
+            strobe.initialize(strobec)
+            self._strobe = strobe
+        else:
+            self._strobe = None

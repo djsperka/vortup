@@ -150,6 +150,10 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.lineEditStrobeClockSource.setText(cfg.strobe_clock_source)
         self.lineEditStrobeDevice.setText(cfg.strobe_device_channel)
 
+        # enable/disable
+        self.groupBoxGalvo.setChecked(cfg.galvo_enabled)
+        self.groupBoxStrobe.setChecked(cfg.strobe_enabled)
+
 
     def getEngineParameters(self) -> VtxEngineParams:
         s = self._cfg
@@ -179,6 +183,10 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         #s.dispersion = (float(self.lineEditDispersion0.text()), float(self.lineEditDispersion1.text()))
         s.log_level = int(self.lineEditLogLevel.text())
         s.save_profiler_data = self.cbSaveProfilerData.isChecked()
+
+        # enable/disable
+        s.galvo_enabled = self.groupBoxGalvo.isChecked()
+        s.strobe_enabled = self.groupBoxStrobe.isChecked()
 
         # clock source stuff added
         s.galvo_clock_source = self.lineEditGalvoClockSource.text()
