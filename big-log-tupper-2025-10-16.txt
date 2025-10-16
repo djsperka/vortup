@@ -1,0 +1,1019 @@
+16-Oct-2025 10:30:34.165583] process    (T) waiting for block 47 (slot 1)
+[16-Oct-2025 10:30:34.165599] process    (T) processed block 47 (slot 1)
+[16-Oct-2025 10:30:34.165609] engine     (T) processed job 47 (block 47)
+[16-Oct-2025 10:30:34.165611] engine     (T) sending job 47 (block 47) for formatting
+[16-Oct-2025 10:30:34.165612] raster format (T) loading 351 records at segment 39, record 149
+[16-Oct-2025 10:30:34.165613] raster format (T) formatted segment 39
+[16-Oct-2025 10:30:34.165614] raster format (T) loading 52 records at segment 40, record 0
+[16-Oct-2025 10:30:34.166307] stack      (T) transferring chunk [39-40) to host
+[16-Oct-2025 10:30:34.166706] engine     (T) formatted job 47 and recycling block 47
+[16-Oct-2025 10:30:34.170363] acquire    (T) acquired block 48 with 500 records
+[16-Oct-2025 10:30:34.170371] acquire    (T) waiting for block 49
+[16-Oct-2025 10:30:34.170375] engine     (T) acquired job 48 (block 48)
+[16-Oct-2025 10:30:34.170381] engine     (T) created job 80 (block 80)
+[16-Oct-2025 10:30:34.170384] engine     (T) sending job 48 (block 48) for processing
+[16-Oct-2025 10:30:34.170427] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.170431] process    (T) dispatching block 48 (slot 0)
+[16-Oct-2025 10:30:34.170442] engine     (T) sending job 80 (block 80) for acquisition
+[16-Oct-2025 10:30:34.170445] acquire    (T) posting block 80
+[16-Oct-2025 10:30:34.170484] output     (T) dispatching block 80
+[16-Oct-2025 10:30:34.170491] process    (T) dispatched block 48 (slot 0)
+[16-Oct-2025 10:30:34.170497] output     (T) processing block 80
+[16-Oct-2025 10:30:34.170506] strobe     (T) dispatching block 80
+[16-Oct-2025 10:30:34.170509] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.170515] strobe     (T) processing block 80
+[16-Oct-2025 10:30:34.170536] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.170545] output     (T) finished block 80 with 500 samples
+[16-Oct-2025 10:30:34.170561] strobe     (T) finished block 80 with 500 samples
+[16-Oct-2025 10:30:34.170565] process    (T) waiting for block 48 (slot 0)
+[16-Oct-2025 10:30:34.170707] process    (T) processed block 48 (slot 0)
+[16-Oct-2025 10:30:34.170716] engine     (T) processed job 48 (block 48)
+[16-Oct-2025 10:30:34.170717] engine     (T) sending job 48 (block 48) for formatting
+[16-Oct-2025 10:30:34.170718] raster format (T) loading 448 records at segment 40, record 52
+[16-Oct-2025 10:30:34.170773] engine     (T) formatted job 48 and recycling block 48
+[16-Oct-2025 10:30:34.175364] acquire    (T) acquired block 49 with 500 records
+[16-Oct-2025 10:30:34.175373] acquire    (T) waiting for block 50
+[16-Oct-2025 10:30:34.175388] engine     (T) acquired job 49 (block 49)
+[16-Oct-2025 10:30:34.175408] engine     (T) created job 81 (block 81)
+[16-Oct-2025 10:30:34.175433] engine     (T) sending job 49 (block 49) for processing
+[16-Oct-2025 10:30:34.175488] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.175492] process    (T) dispatching block 49 (slot 1)
+[16-Oct-2025 10:30:34.175513] engine     (T) sending job 81 (block 81) for acquisition
+[16-Oct-2025 10:30:34.175516] acquire    (T) posting block 81
+[16-Oct-2025 10:30:34.175552] output     (T) dispatching block 81
+[16-Oct-2025 10:30:34.175555] process    (T) dispatched block 49 (slot 1)
+[16-Oct-2025 10:30:34.175557] strobe     (T) dispatching block 81
+[16-Oct-2025 10:30:34.175566] output     (T) processing block 81
+[16-Oct-2025 10:30:34.175567] strobe     (T) processing block 81
+[16-Oct-2025 10:30:34.175578] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.175582] process    (T) waiting for block 49 (slot 1)
+[16-Oct-2025 10:30:34.175587] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.175618] output     (T) finished block 81 with 500 samples
+[16-Oct-2025 10:30:34.175620] strobe     (T) finished block 81 with 500 samples
+[16-Oct-2025 10:30:34.175730] process    (T) processed block 49 (slot 1)
+[16-Oct-2025 10:30:34.175741] engine     (T) processed job 49 (block 49)
+[16-Oct-2025 10:30:34.175742] engine     (T) sending job 49 (block 49) for formatting
+[16-Oct-2025 10:30:34.175743] raster format (T) formatted segment 40
+[16-Oct-2025 10:30:34.175744] raster format (T) loading 455 records at segment 41, record 0
+[16-Oct-2025 10:30:34.179869] stack      (T) transferring chunk [40-41) to host
+[16-Oct-2025 10:30:34.180281] acquire    (T) acquired block 50 with 500 records
+[16-Oct-2025 10:30:34.180288] acquire    (T) waiting for block 51
+[16-Oct-2025 10:30:34.180333] engine     (T) acquired job 50 (block 50)
+[16-Oct-2025 10:30:34.180361] engine     (T) created job 82 (block 82)
+[16-Oct-2025 10:30:34.180390] engine     (T) sending job 50 (block 50) for processing
+[16-Oct-2025 10:30:34.180438] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.180442] process    (T) dispatching block 50 (slot 0)
+[16-Oct-2025 10:30:34.180458] engine     (T) sending job 82 (block 82) for acquisition
+[16-Oct-2025 10:30:34.180461] acquire    (T) posting block 82
+[16-Oct-2025 10:30:34.180497] output     (T) dispatching block 82
+[16-Oct-2025 10:30:34.180505] strobe     (T) dispatching block 82
+[16-Oct-2025 10:30:34.180513] strobe     (T) processing block 82
+[16-Oct-2025 10:30:34.180519] output     (T) processing block 82
+[16-Oct-2025 10:30:34.180525] process    (T) dispatched block 50 (slot 0)
+[16-Oct-2025 10:30:34.180530] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.180533] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.180542] process    (T) waiting for block 50 (slot 0)
+[16-Oct-2025 10:30:34.180567] output     (T) finished block 82 with 500 samples
+[16-Oct-2025 10:30:34.180569] strobe     (T) finished block 82 with 500 samples
+[16-Oct-2025 10:30:34.180665] process    (T) processed block 50 (slot 0)
+[16-Oct-2025 10:30:34.182067] engine     (T) processed job 50 (block 50)
+[16-Oct-2025 10:30:34.182069] engine     (T) sending job 50 (block 50) for formatting
+[16-Oct-2025 10:30:34.182070] raster format (T) loading 45 records at segment 41, record 455
+[16-Oct-2025 10:30:34.182070] engine     (T) formatted job 49 and recycling block 49
+[16-Oct-2025 10:30:34.182071] raster format (T) formatted segment 41
+[16-Oct-2025 10:30:34.182072] raster format (T) loading 358 records at segment 42, record 0
+[16-Oct-2025 10:30:34.185296] acquire    (T) acquired block 51 with 500 records
+[16-Oct-2025 10:30:34.185305] acquire    (T) waiting for block 52
+[16-Oct-2025 10:30:34.185313] engine     (T) acquired job 51 (block 51)
+[16-Oct-2025 10:30:34.185322] engine     (T) created job 83 (block 83)
+[16-Oct-2025 10:30:34.185323] engine     (T) sending job 51 (block 51) for processing
+[16-Oct-2025 10:30:34.185368] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.185372] process    (T) dispatching block 51 (slot 1)
+[16-Oct-2025 10:30:34.185417] engine     (T) sending job 83 (block 83) for acquisition
+[16-Oct-2025 10:30:34.185420] acquire    (T) posting block 83
+[16-Oct-2025 10:30:34.185436] process    (T) dispatched block 51 (slot 1)
+[16-Oct-2025 10:30:34.185453] output     (T) dispatching block 83
+[16-Oct-2025 10:30:34.185458] strobe     (T) dispatching block 83
+[16-Oct-2025 10:30:34.185474] process    (T) waiting for block 51 (slot 1)
+[16-Oct-2025 10:30:34.185476] strobe     (T) processing block 83
+[16-Oct-2025 10:30:34.185501] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.185525] output     (T) processing block 83
+[16-Oct-2025 10:30:34.185536] strobe     (T) finished block 83 with 500 samples
+[16-Oct-2025 10:30:34.185537] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.185574] output     (T) finished block 83 with 500 samples
+[16-Oct-2025 10:30:34.185578] process    (T) processed block 51 (slot 1)
+[16-Oct-2025 10:30:34.186910] stack      (T) transferring chunk [41-42) to host
+[16-Oct-2025 10:30:34.187723] engine     (T) processed job 51 (block 51)
+[16-Oct-2025 10:30:34.187726] engine     (T) sending job 51 (block 51) for formatting
+[16-Oct-2025 10:30:34.187727] raster format (T) loading 142 records at segment 42, record 358
+[16-Oct-2025 10:30:34.187727] raster format (T) formatted segment 42
+[16-Oct-2025 10:30:34.187728] raster format (T) loading 261 records at segment 43, record 0
+[16-Oct-2025 10:30:34.187728] engine     (T) formatted job 50 and recycling block 50
+[16-Oct-2025 10:30:34.190293] acquire    (T) acquired block 52 with 500 records
+[16-Oct-2025 10:30:34.190301] acquire    (T) waiting for block 53
+[16-Oct-2025 10:30:34.190334] engine     (T) acquired job 52 (block 52)
+[16-Oct-2025 10:30:34.190356] engine     (T) created job 84 (block 84)
+[16-Oct-2025 10:30:34.190382] engine     (T) sending job 52 (block 52) for processing
+[16-Oct-2025 10:30:34.190429] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.190433] process    (T) dispatching block 52 (slot 0)
+[16-Oct-2025 10:30:34.190457] engine     (T) sending job 84 (block 84) for acquisition
+[16-Oct-2025 10:30:34.190460] acquire    (T) posting block 84
+[16-Oct-2025 10:30:34.190495] process    (T) dispatched block 52 (slot 0)
+[16-Oct-2025 10:30:34.190497] output     (T) dispatching block 84
+[16-Oct-2025 10:30:34.190505] strobe     (T) dispatching block 84
+[16-Oct-2025 10:30:34.190514] strobe     (T) processing block 84
+[16-Oct-2025 10:30:34.190514] output     (T) processing block 84
+[16-Oct-2025 10:30:34.190527] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.190539] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.190568] output     (T) finished block 84 with 500 samples
+[16-Oct-2025 10:30:34.190569] strobe     (T) finished block 84 with 500 samples
+[16-Oct-2025 10:30:34.190588] process    (T) waiting for block 52 (slot 0)
+[16-Oct-2025 10:30:34.190659] process    (T) processed block 52 (slot 0)
+[16-Oct-2025 10:30:34.191130] stack      (T) transferring chunk [42-43) to host
+[16-Oct-2025 10:30:34.192031] engine     (T) processed job 52 (block 52)
+[16-Oct-2025 10:30:34.192033] engine     (T) sending job 52 (block 52) for formatting
+[16-Oct-2025 10:30:34.192034] raster format (T) loading 239 records at segment 43, record 261
+[16-Oct-2025 10:30:34.192034] raster format (T) formatted segment 43
+[16-Oct-2025 10:30:34.192035] raster format (T) loading 164 records at segment 44, record 0
+[16-Oct-2025 10:30:34.192035] engine     (T) formatted job 51 and recycling block 51
+[16-Oct-2025 10:30:34.193328] stack      (T) transferring chunk [43-44) to host
+[16-Oct-2025 10:30:34.194312] engine     (T) formatted job 52 and recycling block 52
+[16-Oct-2025 10:30:34.195301] acquire    (T) acquired block 53 with 500 records
+[16-Oct-2025 10:30:34.195328] acquire    (T) waiting for block 54
+[16-Oct-2025 10:30:34.195332] engine     (T) acquired job 53 (block 53)
+[16-Oct-2025 10:30:34.195339] engine     (T) sending job 53 (block 53) for processing
+[16-Oct-2025 10:30:34.195339] engine     (T) created job 85 (block 85)
+[16-Oct-2025 10:30:34.195365] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.195368] process    (T) dispatching block 53 (slot 1)
+[16-Oct-2025 10:30:34.195415] process    (T) dispatched block 53 (slot 1)
+[16-Oct-2025 10:30:34.195432] engine     (T) sending job 85 (block 85) for acquisition
+[16-Oct-2025 10:30:34.195435] acquire    (T) posting block 85
+[16-Oct-2025 10:30:34.195449] process    (T) waiting for block 53 (slot 1)
+[16-Oct-2025 10:30:34.195466] output     (T) dispatching block 85
+[16-Oct-2025 10:30:34.195471] strobe     (T) dispatching block 85
+[16-Oct-2025 10:30:34.195479] strobe     (T) processing block 85
+[16-Oct-2025 10:30:34.195504] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.195537] strobe     (T) finished block 85 with 500 samples
+[16-Oct-2025 10:30:34.195571] process    (T) processed block 53 (slot 1)
+[16-Oct-2025 10:30:34.195580] engine     (T) processed job 53 (block 53)
+[16-Oct-2025 10:30:34.195582] engine     (T) sending job 53 (block 53) for formatting
+[16-Oct-2025 10:30:34.195583] raster format (T) loading 336 records at segment 44, record 164
+[16-Oct-2025 10:30:34.195584] raster format (T) formatted segment 44
+[16-Oct-2025 10:30:34.195585] raster format (T) loading 67 records at segment 45, record 0
+[16-Oct-2025 10:30:34.195589] output     (T) processing block 85
+[16-Oct-2025 10:30:34.195601] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.195630] output     (T) finished block 85 with 500 samples
+[16-Oct-2025 10:30:34.196552] stack      (T) transferring chunk [44-45) to host
+[16-Oct-2025 10:30:34.197468] engine     (T) formatted job 53 and recycling block 53
+[16-Oct-2025 10:30:34.200271] acquire    (T) acquired block 54 with 500 records
+[16-Oct-2025 10:30:34.200279] acquire    (T) waiting for block 55
+[16-Oct-2025 10:30:34.200284] engine     (T) acquired job 54 (block 54)
+[16-Oct-2025 10:30:34.200293] engine     (T) sending job 54 (block 54) for processing
+[16-Oct-2025 10:30:34.200294] engine     (T) created job 86 (block 86)
+[16-Oct-2025 10:30:34.200340] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.200366] engine     (T) sending job 86 (block 86) for acquisition
+[16-Oct-2025 10:30:34.200365] process    (T) dispatching block 54 (slot 0)
+[16-Oct-2025 10:30:34.200369] acquire    (T) posting block 86
+[16-Oct-2025 10:30:34.200408] output     (T) dispatching block 86
+[16-Oct-2025 10:30:34.200414] strobe     (T) dispatching block 86
+[16-Oct-2025 10:30:34.200423] output     (T) processing block 86
+[16-Oct-2025 10:30:34.200423] strobe     (T) processing block 86
+[16-Oct-2025 10:30:34.200436] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.200445] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.200456] process    (T) dispatched block 54 (slot 0)
+[16-Oct-2025 10:30:34.200477] output     (T) finished block 86 with 500 samples
+[16-Oct-2025 10:30:34.200479] strobe     (T) finished block 86 with 500 samples
+[16-Oct-2025 10:30:34.200492] process    (T) waiting for block 54 (slot 0)
+[16-Oct-2025 10:30:34.200575] process    (T) processed block 54 (slot 0)
+[16-Oct-2025 10:30:34.200583] engine     (T) processed job 54 (block 54)
+[16-Oct-2025 10:30:34.200584] engine     (T) sending job 54 (block 54) for formatting
+[16-Oct-2025 10:30:34.200584] raster format (T) loading 433 records at segment 45, record 67
+[16-Oct-2025 10:30:34.200640] engine     (T) formatted job 54 and recycling block 54
+[16-Oct-2025 10:30:34.205308] acquire    (T) acquired block 55 with 500 records
+[16-Oct-2025 10:30:34.205315] acquire    (T) waiting for block 56
+[16-Oct-2025 10:30:34.205363] engine     (T) acquired job 55 (block 55)
+[16-Oct-2025 10:30:34.205386] engine     (T) created job 87 (block 87)
+[16-Oct-2025 10:30:34.205393] engine     (T) sending job 55 (block 55) for processing
+[16-Oct-2025 10:30:34.205432] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.205435] process    (T) dispatching block 55 (slot 1)
+[16-Oct-2025 10:30:34.205487] engine     (T) sending job 87 (block 87) for acquisition
+[16-Oct-2025 10:30:34.205488] process    (T) dispatched block 55 (slot 1)
+[16-Oct-2025 10:30:34.205490] acquire    (T) posting block 87
+[16-Oct-2025 10:30:34.205522] output     (T) dispatching block 87
+[16-Oct-2025 10:30:34.205584] strobe     (T) dispatching block 87
+[16-Oct-2025 10:30:34.205597] output     (T) processing block 87
+[16-Oct-2025 10:30:34.205600] strobe     (T) processing block 87
+[16-Oct-2025 10:30:34.205608] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.205616] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.205645] output     (T) finished block 87 with 500 samples
+[16-Oct-2025 10:30:34.205647] strobe     (T) finished block 87 with 500 samples
+[16-Oct-2025 10:30:34.205690] process    (T) waiting for block 55 (slot 1)
+[16-Oct-2025 10:30:34.205732] process    (T) processed block 55 (slot 1)
+[16-Oct-2025 10:30:34.205740] engine     (T) processed job 55 (block 55)
+[16-Oct-2025 10:30:34.205742] engine     (T) sending job 55 (block 55) for formatting
+[16-Oct-2025 10:30:34.205743] raster format (T) formatted segment 45
+[16-Oct-2025 10:30:34.205744] raster format (T) loading 470 records at segment 46, record 0
+[16-Oct-2025 10:30:34.208453] stack      (T) transferring chunk [45-46) to host
+[16-Oct-2025 10:30:34.208851] engine     (T) formatted job 55 and recycling block 55
+[16-Oct-2025 10:30:34.210234] acquire    (T) acquired block 56 with 500 records
+[16-Oct-2025 10:30:34.210240] acquire    (T) waiting for block 57
+[16-Oct-2025 10:30:34.210244] engine     (T) acquired job 56 (block 56)
+[16-Oct-2025 10:30:34.210252] engine     (T) created job 88 (block 88)
+[16-Oct-2025 10:30:34.210252] engine     (T) sending job 56 (block 56) for processing
+[16-Oct-2025 10:30:34.210286] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.210289] process    (T) dispatching block 56 (slot 0)
+[16-Oct-2025 10:30:34.210334] engine     (T) sending job 88 (block 88) for acquisition
+[16-Oct-2025 10:30:34.210336] acquire    (T) posting block 88
+[16-Oct-2025 10:30:34.210341] process    (T) dispatched block 56 (slot 0)
+[16-Oct-2025 10:30:34.210385] output     (T) dispatching block 88
+[16-Oct-2025 10:30:34.210389] strobe     (T) dispatching block 88
+[16-Oct-2025 10:30:34.210399] strobe     (T) processing block 88
+[16-Oct-2025 10:30:34.210400] output     (T) processing block 88
+[16-Oct-2025 10:30:34.210410] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.210416] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.210441] output     (T) finished block 88 with 500 samples
+[16-Oct-2025 10:30:34.210443] strobe     (T) finished block 88 with 500 samples
+[16-Oct-2025 10:30:34.210483] process    (T) waiting for block 56 (slot 0)
+[16-Oct-2025 10:30:34.210493] process    (T) processed block 56 (slot 0)
+[16-Oct-2025 10:30:34.210505] engine     (T) processed job 56 (block 56)
+[16-Oct-2025 10:30:34.210506] engine     (T) sending job 56 (block 56) for formatting
+[16-Oct-2025 10:30:34.210507] raster format (T) loading 30 records at segment 46, record 470
+[16-Oct-2025 10:30:34.210508] raster format (T) formatted segment 46
+[16-Oct-2025 10:30:34.210508] raster format (T) loading 373 records at segment 47, record 0
+[16-Oct-2025 10:30:34.212315] stack      (T) transferring chunk [46-47) to host
+[16-Oct-2025 10:30:34.213041] engine     (T) formatted job 56 and recycling block 56
+[16-Oct-2025 10:30:34.215236] acquire    (T) acquired block 57 with 500 records
+[16-Oct-2025 10:30:34.215242] acquire    (T) waiting for block 58
+[16-Oct-2025 10:30:34.215275] engine     (T) acquired job 57 (block 57)
+[16-Oct-2025 10:30:34.215297] engine     (T) created job 89 (block 89)
+[16-Oct-2025 10:30:34.215319] engine     (T) sending job 57 (block 57) for processing
+[16-Oct-2025 10:30:34.215389] engine     (T) sending job 89 (block 89) for acquisition
+[16-Oct-2025 10:30:34.215391] acquire    (T) posting block 89
+[16-Oct-2025 10:30:34.215399] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.215402] process    (T) dispatching block 57 (slot 1)
+[16-Oct-2025 10:30:34.215420] output     (T) dispatching block 89
+[16-Oct-2025 10:30:34.215426] strobe     (T) dispatching block 89
+[16-Oct-2025 10:30:34.215453] strobe     (T) processing block 89
+[16-Oct-2025 10:30:34.215457] process    (T) dispatched block 57 (slot 1)
+[16-Oct-2025 10:30:34.215474] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.215500] strobe     (T) finished block 89 with 500 samples
+[16-Oct-2025 10:30:34.215513] process    (T) waiting for block 57 (slot 1)
+[16-Oct-2025 10:30:34.215560] output     (T) processing block 89
+[16-Oct-2025 10:30:34.215572] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.215599] output     (T) finished block 89 with 500 samples
+[16-Oct-2025 10:30:34.215886] process    (T) processed block 57 (slot 1)
+[16-Oct-2025 10:30:34.215893] engine     (T) processed job 57 (block 57)
+[16-Oct-2025 10:30:34.215894] engine     (T) sending job 57 (block 57) for formatting
+[16-Oct-2025 10:30:34.215895] raster format (T) loading 127 records at segment 47, record 373
+[16-Oct-2025 10:30:34.215895] raster format (T) formatted segment 47
+[16-Oct-2025 10:30:34.215896] raster format (T) loading 276 records at segment 48, record 0
+[16-Oct-2025 10:30:34.220273] acquire    (T) acquired block 58 with 500 records
+[16-Oct-2025 10:30:34.220280] acquire    (T) waiting for block 59
+[16-Oct-2025 10:30:34.220313] engine     (T) acquired job 58 (block 58)
+[16-Oct-2025 10:30:34.220329] engine     (T) created job 90 (block 90)
+[16-Oct-2025 10:30:34.220347] engine     (T) sending job 58 (block 58) for processing
+[16-Oct-2025 10:30:34.220377] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.220380] process    (T) dispatching block 58 (slot 0)
+[16-Oct-2025 10:30:34.220418] engine     (T) sending job 90 (block 90) for acquisition
+[16-Oct-2025 10:30:34.220420] acquire    (T) posting block 90
+[16-Oct-2025 10:30:34.220431] process    (T) dispatched block 58 (slot 0)
+[16-Oct-2025 10:30:34.220448] output     (T) dispatching block 90
+[16-Oct-2025 10:30:34.220466] output     (T) processing block 90
+[16-Oct-2025 10:30:34.220478] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.220506] output     (T) finished block 90 with 500 samples
+[16-Oct-2025 10:30:34.220518] strobe     (T) dispatching block 90
+[16-Oct-2025 10:30:34.220531] strobe     (T) processing block 90
+[16-Oct-2025 10:30:34.220549] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.220577] strobe     (T) finished block 90 with 500 samples
+[16-Oct-2025 10:30:34.220577] process    (T) waiting for block 58 (slot 0)
+[16-Oct-2025 10:30:34.220582] process    (T) processed block 58 (slot 0)
+[16-Oct-2025 10:30:34.220827] stack      (T) transferring chunk [47-48) to host
+[16-Oct-2025 10:30:34.221604] engine     (T) processed job 58 (block 58)
+[16-Oct-2025 10:30:34.221605] engine     (T) sending job 58 (block 58) for formatting
+[16-Oct-2025 10:30:34.221606] raster format (T) loading 224 records at segment 48, record 276
+[16-Oct-2025 10:30:34.221606] raster format (T) formatted segment 48
+[16-Oct-2025 10:30:34.221607] raster format (T) loading 179 records at segment 49, record 0
+[16-Oct-2025 10:30:34.221607] engine     (T) formatted job 57 and recycling block 57
+[16-Oct-2025 10:30:34.222755] stack      (T) transferring chunk [48-49) to host
+[16-Oct-2025 10:30:34.225288] acquire    (T) acquired block 59 with 500 records
+[16-Oct-2025 10:30:34.225295] acquire    (T) waiting for block 60
+[16-Oct-2025 10:30:34.225328] engine     (T) acquired job 59 (block 59)
+[16-Oct-2025 10:30:34.225344] engine     (T) created job 91 (block 91)
+[16-Oct-2025 10:30:34.225365] engine     (T) sending job 59 (block 59) for processing
+[16-Oct-2025 10:30:34.225395] engine     (T) formatted job 58 and recycling block 58
+[16-Oct-2025 10:30:34.225396] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.225399] process    (T) dispatching block 59 (slot 1)
+[16-Oct-2025 10:30:34.225426] engine     (T) sending job 91 (block 91) for acquisition
+[16-Oct-2025 10:30:34.225428] acquire    (T) posting block 91
+[16-Oct-2025 10:30:34.225446] process    (T) dispatched block 59 (slot 1)
+[16-Oct-2025 10:30:34.225457] output     (T) dispatching block 91
+[16-Oct-2025 10:30:34.225485] strobe     (T) dispatching block 91
+[16-Oct-2025 10:30:34.225495] strobe     (T) processing block 91
+[16-Oct-2025 10:30:34.225514] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.225539] strobe     (T) finished block 91 with 500 samples
+[16-Oct-2025 10:30:34.225540] output     (T) processing block 91
+[16-Oct-2025 10:30:34.225551] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.225575] process    (T) waiting for block 59 (slot 1)
+[16-Oct-2025 10:30:34.225577] output     (T) finished block 91 with 500 samples
+[16-Oct-2025 10:30:34.225602] process    (T) processed block 59 (slot 1)
+[16-Oct-2025 10:30:34.225612] engine     (T) processed job 59 (block 59)
+[16-Oct-2025 10:30:34.225613] engine     (T) sending job 59 (block 59) for formatting
+[16-Oct-2025 10:30:34.225614] raster format (T) loading 321 records at segment 49, record 179
+[16-Oct-2025 10:30:34.225615] raster format (T) formatted segment 49
+[16-Oct-2025 10:30:34.225616] raster format (T) loading 82 records at segment 50, record 0
+[16-Oct-2025 10:30:34.226720] stack      (T) transferring chunk [49-50) to host
+[16-Oct-2025 10:30:34.227551] engine     (T) formatted job 59 and recycling block 59
+[16-Oct-2025 10:30:34.230279] acquire    (T) acquired block 60 with 500 records
+[16-Oct-2025 10:30:34.230300] acquire    (T) waiting for block 61
+[16-Oct-2025 10:30:34.230326] engine     (T) acquired job 60 (block 60)
+[16-Oct-2025 10:30:34.230342] engine     (T) created job 92 (block 92)
+[16-Oct-2025 10:30:34.230365] engine     (T) sending job 60 (block 60) for processing
+[16-Oct-2025 10:30:34.230390] engine     (T) sending job 92 (block 92) for acquisition
+[16-Oct-2025 10:30:34.230392] acquire    (T) posting block 92
+[16-Oct-2025 10:30:34.230396] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.230398] process    (T) dispatching block 60 (slot 0)
+[16-Oct-2025 10:30:34.230419] output     (T) dispatching block 92
+[16-Oct-2025 10:30:34.230424] strobe     (T) dispatching block 92
+[16-Oct-2025 10:30:34.230429] strobe     (T) processing block 92
+[16-Oct-2025 10:30:34.230448] process    (T) dispatched block 60 (slot 0)
+[16-Oct-2025 10:30:34.230448] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.230471] strobe     (T) finished block 92 with 500 samples
+[16-Oct-2025 10:30:34.230492] process    (T) waiting for block 60 (slot 0)
+[16-Oct-2025 10:30:34.230602] output     (T) processing block 92
+[16-Oct-2025 10:30:34.230608] process    (T) processed block 60 (slot 0)
+[16-Oct-2025 10:30:34.230614] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.230616] engine     (T) processed job 60 (block 60)
+[16-Oct-2025 10:30:34.230617] engine     (T) sending job 60 (block 60) for formatting
+[16-Oct-2025 10:30:34.230618] raster format (T) loading 418 records at segment 50, record 82
+[16-Oct-2025 10:30:34.230641] output     (T) finished block 92 with 500 samples
+[16-Oct-2025 10:30:34.230695] engine     (T) formatted job 60 and recycling block 60
+[16-Oct-2025 10:30:34.235221] acquire    (T) acquired block 61 with 500 records
+[16-Oct-2025 10:30:34.235229] acquire    (T) waiting for block 62
+[16-Oct-2025 10:30:34.235234] engine     (T) acquired job 61 (block 61)
+[16-Oct-2025 10:30:34.235243] engine     (T) created job 93 (block 93)
+[16-Oct-2025 10:30:34.235244] engine     (T) sending job 61 (block 61) for processing
+[16-Oct-2025 10:30:34.235295] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.235299] process    (T) dispatching block 61 (slot 1)
+[16-Oct-2025 10:30:34.235356] engine     (T) sending job 93 (block 93) for acquisition
+[16-Oct-2025 10:30:34.235360] acquire    (T) posting block 93
+[16-Oct-2025 10:30:34.235367] process    (T) dispatched block 61 (slot 1)
+[16-Oct-2025 10:30:34.235405] output     (T) dispatching block 93
+[16-Oct-2025 10:30:34.235412] strobe     (T) dispatching block 93
+[16-Oct-2025 10:30:34.235419] output     (T) processing block 93
+[16-Oct-2025 10:30:34.235420] strobe     (T) processing block 93
+[16-Oct-2025 10:30:34.235432] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.235440] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.235470] output     (T) finished block 93 with 500 samples
+[16-Oct-2025 10:30:34.235470] strobe     (T) finished block 93 with 500 samples
+[16-Oct-2025 10:30:34.235485] process    (T) waiting for block 61 (slot 1)
+[16-Oct-2025 10:30:34.235580] process    (T) processed block 61 (slot 1)
+[16-Oct-2025 10:30:34.235590] engine     (T) processed job 61 (block 61)
+[16-Oct-2025 10:30:34.235590] engine     (T) sending job 61 (block 61) for formatting
+[16-Oct-2025 10:30:34.235591] raster format (T) formatted segment 50
+[16-Oct-2025 10:30:34.235592] raster format (T) loading 485 records at segment 51, record 0
+[16-Oct-2025 10:30:34.240184] acquire    (T) acquired block 62 with 500 records
+[16-Oct-2025 10:30:34.240191] acquire    (T) waiting for block 63
+[16-Oct-2025 10:30:34.240195] engine     (T) acquired job 62 (block 62)
+[16-Oct-2025 10:30:34.240203] engine     (T) created job 94 (block 94)
+[16-Oct-2025 10:30:34.240203] engine     (T) sending job 62 (block 62) for processing
+[16-Oct-2025 10:30:34.240238] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.240241] process    (T) dispatching block 62 (slot 0)
+[16-Oct-2025 10:30:34.240295] process    (T) dispatched block 62 (slot 0)
+[16-Oct-2025 10:30:34.240300] engine     (T) sending job 94 (block 94) for acquisition
+[16-Oct-2025 10:30:34.240303] acquire    (T) posting block 94
+[16-Oct-2025 10:30:34.240305] process    (T) waiting for block 62 (slot 0)
+[16-Oct-2025 10:30:34.240335] output     (T) dispatching block 94
+[16-Oct-2025 10:30:34.240358] strobe     (T) dispatching block 94
+[16-Oct-2025 10:30:34.240395] output     (T) processing block 94
+[16-Oct-2025 10:30:34.240399] strobe     (T) processing block 94
+[16-Oct-2025 10:30:34.240406] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.240415] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.240428] output     (T) finished block 94 with 500 samples
+[16-Oct-2025 10:30:34.240439] strobe     (T) finished block 94 with 500 samples
+[16-Oct-2025 10:30:34.240468] process    (T) processed block 62 (slot 0)
+[16-Oct-2025 10:30:34.240755] stack      (T) transferring chunk [50-51) to host
+[16-Oct-2025 10:30:34.241511] engine     (T) processed job 62 (block 62)
+[16-Oct-2025 10:30:34.241512] engine     (T) sending job 62 (block 62) for formatting
+[16-Oct-2025 10:30:34.241513] raster format (T) loading 15 records at segment 51, record 485
+[16-Oct-2025 10:30:34.241513] raster format (T) formatted segment 51
+[16-Oct-2025 10:30:34.241514] raster format (T) loading 388 records at segment 52, record 0
+[16-Oct-2025 10:30:34.241514] engine     (T) formatted job 61 and recycling block 61
+[16-Oct-2025 10:30:34.245229] acquire    (T) acquired block 63 with 500 records
+[16-Oct-2025 10:30:34.245245] acquire    (T) waiting for block 64
+[16-Oct-2025 10:30:34.245250] engine     (T) acquired job 63 (block 63)
+[16-Oct-2025 10:30:34.245257] engine     (T) created job 95 (block 95)
+[16-Oct-2025 10:30:34.245258] engine     (T) sending job 63 (block 63) for processing
+[16-Oct-2025 10:30:34.245284] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.245286] process    (T) dispatching block 63 (slot 1)
+[16-Oct-2025 10:30:34.245330] process    (T) dispatched block 63 (slot 1)
+[16-Oct-2025 10:30:34.245349] engine     (T) sending job 95 (block 95) for acquisition
+[16-Oct-2025 10:30:34.245351] acquire    (T) posting block 95
+[16-Oct-2025 10:30:34.245352] stack      (T) transferring chunk [51-52) to host
+[16-Oct-2025 10:30:34.245380] output     (T) dispatching block 95
+[16-Oct-2025 10:30:34.245393] strobe     (T) dispatching block 95
+[16-Oct-2025 10:30:34.245404] strobe     (T) processing block 95
+[16-Oct-2025 10:30:34.245419] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.245446] strobe     (T) finished block 95 with 500 samples
+[16-Oct-2025 10:30:34.245463] output     (T) processing block 95
+[16-Oct-2025 10:30:34.245475] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.245502] output     (T) finished block 95 with 500 samples
+[16-Oct-2025 10:30:34.245579] process    (T) waiting for block 63 (slot 1)
+[16-Oct-2025 10:30:34.245585] process    (T) processed block 63 (slot 1)
+[16-Oct-2025 10:30:34.245950] engine     (T) processed job 63 (block 63)
+[16-Oct-2025 10:30:34.245951] engine     (T) sending job 63 (block 63) for formatting
+[16-Oct-2025 10:30:34.245952] raster format (T) loading 112 records at segment 52, record 388
+[16-Oct-2025 10:30:34.245952] raster format (T) formatted segment 52
+[16-Oct-2025 10:30:34.245953] raster format (T) loading 291 records at segment 53, record 0
+[16-Oct-2025 10:30:34.245953] engine     (T) formatted job 62 and recycling block 62
+[16-Oct-2025 10:30:34.247495] stack      (T) transferring chunk [52-53) to host
+[16-Oct-2025 10:30:34.249924] engine     (T) formatted job 63 and recycling block 63
+[16-Oct-2025 10:30:34.250190] acquire    (T) acquired block 64 with 500 records
+[16-Oct-2025 10:30:34.250196] acquire    (T) waiting for block 65
+[16-Oct-2025 10:30:34.250200] engine     (T) acquired job 64 (block 64)
+[16-Oct-2025 10:30:34.250209] engine     (T) created job 96 (block 96)
+[16-Oct-2025 10:30:34.250210] engine     (T) sending job 64 (block 64) for processing
+[16-Oct-2025 10:30:34.250243] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.250247] process    (T) dispatching block 64 (slot 0)
+[16-Oct-2025 10:30:34.250299] engine     (T) sending job 96 (block 96) for acquisition
+[16-Oct-2025 10:30:34.250301] acquire    (T) posting block 96
+[16-Oct-2025 10:30:34.250309] process    (T) dispatched block 64 (slot 0)
+[16-Oct-2025 10:30:34.250329] output     (T) dispatching block 96
+[16-Oct-2025 10:30:34.250330] process    (T) waiting for block 64 (slot 0)
+[16-Oct-2025 10:30:34.250335] strobe     (T) dispatching block 96
+[16-Oct-2025 10:30:34.250355] strobe     (T) processing block 96
+[16-Oct-2025 10:30:34.250380] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.250409] strobe     (T) finished block 96 with 500 samples
+[16-Oct-2025 10:30:34.250424] output     (T) processing block 96
+[16-Oct-2025 10:30:34.250436] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.250464] output     (T) finished block 96 with 500 samples
+[16-Oct-2025 10:30:34.250586] process    (T) processed block 64 (slot 0)
+[16-Oct-2025 10:30:34.250596] engine     (T) processed job 64 (block 64)
+[16-Oct-2025 10:30:34.250596] engine     (T) sending job 64 (block 64) for formatting
+[16-Oct-2025 10:30:34.250597] raster format (T) loading 209 records at segment 53, record 291
+[16-Oct-2025 10:30:34.250598] raster format (T) formatted segment 53
+[16-Oct-2025 10:30:34.250598] raster format (T) loading 194 records at segment 54, record 0
+[16-Oct-2025 10:30:34.250812] engine     (I) stopping engine
+[16-Oct-2025 10:30:34.250813] engine     (W) shutdown requested
+[16-Oct-2025 10:30:34.251292] stack      (T) transferring chunk [53-54) to host
+[16-Oct-2025 10:30:34.251710] engine     (T) formatted job 64 and recycling block 64
+[16-Oct-2025 10:30:34.255236] acquire    (T) acquired block 65 with 500 records
+[16-Oct-2025 10:30:34.255242] acquire    (T) waiting for block 66
+[16-Oct-2025 10:30:34.255275] engine     (T) acquired job 65 (block 65)
+[16-Oct-2025 10:30:34.255292] engine     (T) created job 97 (block 97)
+[16-Oct-2025 10:30:34.255296] engine     (T) sending job 65 (block 65) for processing
+[16-Oct-2025 10:30:34.255317] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.255319] process    (T) dispatching block 65 (slot 1)
+[16-Oct-2025 10:30:34.255357] process    (T) dispatched block 65 (slot 1)
+[16-Oct-2025 10:30:34.255365] process    (T) waiting for block 65 (slot 1)
+[16-Oct-2025 10:30:34.255379] engine     (T) sending job 97 (block 97) for acquisition
+[16-Oct-2025 10:30:34.255381] acquire    (T) posting block 97
+[16-Oct-2025 10:30:34.255412] output     (T) dispatching block 97
+[16-Oct-2025 10:30:34.255449] strobe     (T) dispatching block 97
+[16-Oct-2025 10:30:34.255456] strobe     (T) processing block 97
+[16-Oct-2025 10:30:34.255474] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.255500] strobe     (T) finished block 97 with 500 samples
+[16-Oct-2025 10:30:34.255507] output     (T) processing block 97
+[16-Oct-2025 10:30:34.255518] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.255527] process    (T) processed block 65 (slot 1)
+[16-Oct-2025 10:30:34.255536] engine     (T) processed job 65 (block 65)
+[16-Oct-2025 10:30:34.255537] engine     (T) sending job 65 (block 65) for formatting
+[16-Oct-2025 10:30:34.255538] raster format (T) loading 306 records at segment 54, record 194
+[16-Oct-2025 10:30:34.255539] raster format (T) formatted segment 54
+[16-Oct-2025 10:30:34.255540] raster format (T) loading 97 records at segment 55, record 0
+[16-Oct-2025 10:30:34.255545] output     (T) finished block 97 with 500 samples
+[16-Oct-2025 10:30:34.255971] stack      (T) transferring chunk [54-55) to host
+[16-Oct-2025 10:30:34.256318] engine     (T) formatted job 65 and recycling block 65
+[16-Oct-2025 10:30:34.260165] acquire    (T) acquired block 66 with 500 records
+[16-Oct-2025 10:30:34.260170] acquire    (T) waiting for block 67
+[16-Oct-2025 10:30:34.260174] engine     (T) acquired job 66 (block 66)
+[16-Oct-2025 10:30:34.260181] engine     (T) created job 98 (block 98)
+[16-Oct-2025 10:30:34.260182] engine     (T) sending job 66 (block 66) for processing
+[16-Oct-2025 10:30:34.260215] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.260218] process    (T) dispatching block 66 (slot 0)
+[16-Oct-2025 10:30:34.260228] engine     (T) sending job 98 (block 98) for acquisition
+[16-Oct-2025 10:30:34.260230] acquire    (T) posting block 98
+[16-Oct-2025 10:30:34.260254] output     (T) dispatching block 98
+[16-Oct-2025 10:30:34.260258] strobe     (T) dispatching block 98
+[16-Oct-2025 10:30:34.260260] engine     (I) dispatching of blocks completed
+[16-Oct-2025 10:30:34.260264] strobe     (T) processing block 98
+[16-Oct-2025 10:30:34.260265] output     (T) processing block 98
+[16-Oct-2025 10:30:34.260265] process    (T) dispatched block 66 (slot 0)
+[16-Oct-2025 10:30:34.260275] output     (T) writing 500 samples of analog I/O
+[16-Oct-2025 10:30:34.260276] engine     (D) acquire loop waiting for inflight tasks to finish
+[16-Oct-2025 10:30:34.260277] engine     (D) waiting for pending jobs to finish
+[16-Oct-2025 10:30:34.260288] strobe     (T) writing 500 samples of digital I/O
+[16-Oct-2025 10:30:34.260303] output     (T) finished block 98 with 500 samples
+[16-Oct-2025 10:30:34.260311] strobe     (T) finished block 98 with 500 samples
+[16-Oct-2025 10:30:34.260391] process    (T) waiting for block 66 (slot 0)
+[16-Oct-2025 10:30:34.260421] process    (T) processed block 66 (slot 0)
+[16-Oct-2025 10:30:34.260430] engine     (T) processed job 66 (block 66)
+[16-Oct-2025 10:30:34.260432] engine     (T) sending job 66 (block 66) for formatting
+[16-Oct-2025 10:30:34.260432] raster format (T) loading 403 records at segment 55, record 97
+[16-Oct-2025 10:30:34.260486] engine     (T) formatted job 66 and recycling block 66
+[16-Oct-2025 10:30:34.265242] acquire    (T) acquired block 67 with 500 records
+[16-Oct-2025 10:30:34.265270] acquire    (T) waiting for block 68
+[16-Oct-2025 10:30:34.265297] engine     (T) acquired job 67 (block 67)
+[16-Oct-2025 10:30:34.265329] engine     (T) sending job 67 (block 67) for processing
+[16-Oct-2025 10:30:34.265381] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.265383] process    (T) dispatching block 67 (slot 1)
+[16-Oct-2025 10:30:34.265430] process    (T) dispatched block 67 (slot 1)
+[16-Oct-2025 10:30:34.265435] process    (T) waiting for block 67 (slot 1)
+[16-Oct-2025 10:30:34.265756] process    (T) processed block 67 (slot 1)
+[16-Oct-2025 10:30:34.265763] engine     (T) processed job 67 (block 67)
+[16-Oct-2025 10:30:34.265764] engine     (T) sending job 67 (block 67) for formatting
+[16-Oct-2025 10:30:34.265765] raster format (T) formatted segment 55
+[16-Oct-2025 10:30:34.265766] raster format (T) loading 500 records at segment 56, record 0
+[16-Oct-2025 10:30:34.266243] stack      (T) transferring chunk [55-56) to host
+[16-Oct-2025 10:30:34.266641] engine     (T) formatted job 67 and recycling block 67
+[16-Oct-2025 10:30:34.270220] acquire    (T) acquired block 68 with 500 records
+[16-Oct-2025 10:30:34.270228] acquire    (T) waiting for block 69
+[16-Oct-2025 10:30:34.270260] engine     (T) acquired job 68 (block 68)
+[16-Oct-2025 10:30:34.270292] engine     (T) sending job 68 (block 68) for processing
+[16-Oct-2025 10:30:34.270337] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.270341] process    (T) dispatching block 68 (slot 0)
+[16-Oct-2025 10:30:34.270400] process    (T) dispatched block 68 (slot 0)
+[16-Oct-2025 10:30:34.270408] process    (T) waiting for block 68 (slot 0)
+[16-Oct-2025 10:30:34.270608] process    (T) processed block 68 (slot 0)
+[16-Oct-2025 10:30:34.270615] engine     (T) processed job 68 (block 68)
+[16-Oct-2025 10:30:34.270616] engine     (T) sending job 68 (block 68) for formatting
+[16-Oct-2025 10:30:34.270617] raster format (T) formatted segment 56
+[16-Oct-2025 10:30:34.270618] raster format (T) loading 403 records at segment 57, record 0
+[16-Oct-2025 10:30:34.271113] stack      (T) transferring chunk [56-57) to host
+[16-Oct-2025 10:30:34.271472] engine     (T) formatted job 68 and recycling block 68
+[16-Oct-2025 10:30:34.275228] acquire    (T) acquired block 69 with 500 records
+[16-Oct-2025 10:30:34.275241] acquire    (T) waiting for block 70
+[16-Oct-2025 10:30:34.275271] engine     (T) acquired job 69 (block 69)
+[16-Oct-2025 10:30:34.275300] engine     (T) sending job 69 (block 69) for processing
+[16-Oct-2025 10:30:34.275325] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.275327] process    (T) dispatching block 69 (slot 1)
+[16-Oct-2025 10:30:34.275369] process    (T) dispatched block 69 (slot 1)
+[16-Oct-2025 10:30:34.275376] process    (T) waiting for block 69 (slot 1)
+[16-Oct-2025 10:30:34.275537] process    (T) processed block 69 (slot 1)
+[16-Oct-2025 10:30:34.275544] engine     (T) processed job 69 (block 69)
+[16-Oct-2025 10:30:34.275545] engine     (T) sending job 69 (block 69) for formatting
+[16-Oct-2025 10:30:34.275545] raster format (T) loading 97 records at segment 57, record 403
+[16-Oct-2025 10:30:34.275546] raster format (T) formatted segment 57
+[16-Oct-2025 10:30:34.275547] raster format (T) loading 306 records at segment 58, record 0
+[16-Oct-2025 10:30:34.275961] stack      (T) transferring chunk [57-58) to host
+[16-Oct-2025 10:30:34.276335] engine     (T) formatted job 69 and recycling block 69
+[16-Oct-2025 10:30:34.280251] acquire    (T) acquired block 70 with 500 records
+[16-Oct-2025 10:30:34.280258] acquire    (T) waiting for block 71
+[16-Oct-2025 10:30:34.280292] engine     (T) acquired job 70 (block 70)
+[16-Oct-2025 10:30:34.280317] engine     (T) sending job 70 (block 70) for processing
+[16-Oct-2025 10:30:34.280342] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.280344] process    (T) dispatching block 70 (slot 0)
+[16-Oct-2025 10:30:34.280384] process    (T) dispatched block 70 (slot 0)
+[16-Oct-2025 10:30:34.280392] process    (T) waiting for block 70 (slot 0)
+[16-Oct-2025 10:30:34.280549] process    (T) processed block 70 (slot 0)
+[16-Oct-2025 10:30:34.280556] engine     (T) processed job 70 (block 70)
+[16-Oct-2025 10:30:34.280557] engine     (T) sending job 70 (block 70) for formatting
+[16-Oct-2025 10:30:34.280557] raster format (T) loading 194 records at segment 58, record 306
+[16-Oct-2025 10:30:34.280558] raster format (T) formatted segment 58
+[16-Oct-2025 10:30:34.280558] raster format (T) loading 209 records at segment 59, record 0
+[16-Oct-2025 10:30:34.280948] stack      (T) transferring chunk [58-59) to host
+[16-Oct-2025 10:30:34.281301] engine     (T) formatted job 70 and recycling block 70
+[16-Oct-2025 10:30:34.285191] acquire    (T) acquired block 71 with 500 records
+[16-Oct-2025 10:30:34.285198] acquire    (T) waiting for block 72
+[16-Oct-2025 10:30:34.285225] engine     (T) acquired job 71 (block 71)
+[16-Oct-2025 10:30:34.285251] engine     (T) sending job 71 (block 71) for processing
+[16-Oct-2025 10:30:34.285275] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.285278] process    (T) dispatching block 71 (slot 1)
+[16-Oct-2025 10:30:34.285318] process    (T) dispatched block 71 (slot 1)
+[16-Oct-2025 10:30:34.285325] process    (T) waiting for block 71 (slot 1)
+[16-Oct-2025 10:30:34.285553] process    (T) processed block 71 (slot 1)
+[16-Oct-2025 10:30:34.285560] engine     (T) processed job 71 (block 71)
+[16-Oct-2025 10:30:34.285561] engine     (T) sending job 71 (block 71) for formatting
+[16-Oct-2025 10:30:34.285561] raster format (T) loading 291 records at segment 59, record 209
+[16-Oct-2025 10:30:34.285562] raster format (T) formatted segment 59
+[16-Oct-2025 10:30:34.285562] raster format (T) loading 112 records at segment 60, record 0
+[16-Oct-2025 10:30:34.285915] stack      (T) transferring chunk [59-60) to host
+[16-Oct-2025 10:30:34.286264] engine     (T) formatted job 71 and recycling block 71
+[16-Oct-2025 10:30:34.290206] acquire    (T) acquired block 72 with 500 records
+[16-Oct-2025 10:30:34.290211] acquire    (T) waiting for block 73
+[16-Oct-2025 10:30:34.290240] engine     (T) acquired job 72 (block 72)
+[16-Oct-2025 10:30:34.290266] engine     (T) sending job 72 (block 72) for processing
+[16-Oct-2025 10:30:34.290284] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.290285] process    (T) dispatching block 72 (slot 0)
+[16-Oct-2025 10:30:34.290318] process    (T) dispatched block 72 (slot 0)
+[16-Oct-2025 10:30:34.290324] process    (T) waiting for block 72 (slot 0)
+[16-Oct-2025 10:30:34.290507] process    (T) processed block 72 (slot 0)
+[16-Oct-2025 10:30:34.290513] engine     (T) processed job 72 (block 72)
+[16-Oct-2025 10:30:34.290514] engine     (T) sending job 72 (block 72) for formatting
+[16-Oct-2025 10:30:34.290515] raster format (T) loading 388 records at segment 60, record 112
+[16-Oct-2025 10:30:34.290516] raster format (T) formatted segment 60
+[16-Oct-2025 10:30:34.290516] raster format (T) loading 15 records at segment 61, record 0
+[16-Oct-2025 10:30:34.290971] stack      (T) transferring chunk [60-61) to host
+[16-Oct-2025 10:30:34.291335] engine     (T) formatted job 72 and recycling block 72
+[16-Oct-2025 10:30:34.295172] acquire    (T) acquired block 73 with 500 records
+[16-Oct-2025 10:30:34.295179] acquire    (T) waiting for block 74
+[16-Oct-2025 10:30:34.295207] engine     (T) acquired job 73 (block 73)
+[16-Oct-2025 10:30:34.295236] engine     (T) sending job 73 (block 73) for processing
+[16-Oct-2025 10:30:34.295259] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.295261] process    (T) dispatching block 73 (slot 1)
+[16-Oct-2025 10:30:34.295298] process    (T) dispatched block 73 (slot 1)
+[16-Oct-2025 10:30:34.295304] process    (T) waiting for block 73 (slot 1)
+[16-Oct-2025 10:30:34.295464] process    (T) processed block 73 (slot 1)
+[16-Oct-2025 10:30:34.295471] engine     (T) processed job 73 (block 73)
+[16-Oct-2025 10:30:34.295472] engine     (T) sending job 73 (block 73) for formatting
+[16-Oct-2025 10:30:34.295472] raster format (T) loading 485 records at segment 61, record 15
+[16-Oct-2025 10:30:34.295531] engine     (T) formatted job 73 and recycling block 73
+[16-Oct-2025 10:30:34.300086] acquire    (T) acquired block 74 with 500 records
+[16-Oct-2025 10:30:34.300092] acquire    (T) waiting for block 75
+[16-Oct-2025 10:30:34.300096] engine     (T) acquired job 74 (block 74)
+[16-Oct-2025 10:30:34.300102] engine     (T) sending job 74 (block 74) for processing
+[16-Oct-2025 10:30:34.300133] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.300136] process    (T) dispatching block 74 (slot 0)
+[16-Oct-2025 10:30:34.300183] process    (T) dispatched block 74 (slot 0)
+[16-Oct-2025 10:30:34.300194] process    (T) waiting for block 74 (slot 0)
+[16-Oct-2025 10:30:34.300489] process    (T) processed block 74 (slot 0)
+[16-Oct-2025 10:30:34.300496] engine     (T) processed job 74 (block 74)
+[16-Oct-2025 10:30:34.300497] engine     (T) sending job 74 (block 74) for formatting
+[16-Oct-2025 10:30:34.300497] raster format (T) formatted segment 61
+[16-Oct-2025 10:30:34.300498] raster format (T) loading 418 records at segment 62, record 0
+[16-Oct-2025 10:30:34.300873] stack      (T) transferring chunk [61-62) to host
+[16-Oct-2025 10:30:34.301240] engine     (T) formatted job 74 and recycling block 74
+[16-Oct-2025 10:30:34.305085] acquire    (T) acquired block 75 with 500 records
+[16-Oct-2025 10:30:34.305091] acquire    (T) waiting for block 76
+[16-Oct-2025 10:30:34.305095] engine     (T) acquired job 75 (block 75)
+[16-Oct-2025 10:30:34.305100] engine     (T) sending job 75 (block 75) for processing
+[16-Oct-2025 10:30:34.305138] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.305141] process    (T) dispatching block 75 (slot 1)
+[16-Oct-2025 10:30:34.305188] process    (T) dispatched block 75 (slot 1)
+[16-Oct-2025 10:30:34.305195] process    (T) waiting for block 75 (slot 1)
+[16-Oct-2025 10:30:34.305369] process    (T) processed block 75 (slot 1)
+[16-Oct-2025 10:30:34.305376] engine     (T) processed job 75 (block 75)
+[16-Oct-2025 10:30:34.305376] engine     (T) sending job 75 (block 75) for formatting
+[16-Oct-2025 10:30:34.305377] raster format (T) loading 82 records at segment 62, record 418
+[16-Oct-2025 10:30:34.305377] raster format (T) formatted segment 62
+[16-Oct-2025 10:30:34.305378] raster format (T) loading 321 records at segment 63, record 0
+[16-Oct-2025 10:30:34.305729] stack      (T) transferring chunk [62-63) to host
+[16-Oct-2025 10:30:34.306086] engine     (T) formatted job 75 and recycling block 75
+[16-Oct-2025 10:30:34.310124] acquire    (T) acquired block 76 with 500 records
+[16-Oct-2025 10:30:34.310130] acquire    (T) waiting for block 77
+[16-Oct-2025 10:30:34.310133] engine     (T) acquired job 76 (block 76)
+[16-Oct-2025 10:30:34.310139] engine     (T) sending job 76 (block 76) for processing
+[16-Oct-2025 10:30:34.310170] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.310173] process    (T) dispatching block 76 (slot 0)
+[16-Oct-2025 10:30:34.310217] process    (T) dispatched block 76 (slot 0)
+[16-Oct-2025 10:30:34.310226] process    (T) waiting for block 76 (slot 0)
+[16-Oct-2025 10:30:34.310392] process    (T) processed block 76 (slot 0)
+[16-Oct-2025 10:30:34.310399] engine     (T) processed job 76 (block 76)
+[16-Oct-2025 10:30:34.310399] engine     (T) sending job 76 (block 76) for formatting
+[16-Oct-2025 10:30:34.310400] raster format (T) loading 179 records at segment 63, record 321
+[16-Oct-2025 10:30:34.310401] raster format (T) formatted segment 63
+[16-Oct-2025 10:30:34.310401] raster format (T) loading 224 records at segment 64, record 0
+[16-Oct-2025 10:30:34.310790] stack      (T) transferring chunk [63-64) to host
+[16-Oct-2025 10:30:34.311148] engine     (T) formatted job 76 and recycling block 76
+[16-Oct-2025 10:30:34.315127] acquire    (T) acquired block 77 with 500 records
+[16-Oct-2025 10:30:34.315133] acquire    (T) waiting for block 78
+[16-Oct-2025 10:30:34.315138] engine     (T) acquired job 77 (block 77)
+[16-Oct-2025 10:30:34.315143] engine     (T) sending job 77 (block 77) for processing
+[16-Oct-2025 10:30:34.315173] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.315175] process    (T) dispatching block 77 (slot 1)
+[16-Oct-2025 10:30:34.315216] process    (T) dispatched block 77 (slot 1)
+[16-Oct-2025 10:30:34.315223] process    (T) waiting for block 77 (slot 1)
+[16-Oct-2025 10:30:34.315449] process    (T) processed block 77 (slot 1)
+[16-Oct-2025 10:30:34.315458] engine     (T) processed job 77 (block 77)
+[16-Oct-2025 10:30:34.315460] engine     (T) sending job 77 (block 77) for formatting
+[16-Oct-2025 10:30:34.315461] raster format (T) loading 276 records at segment 64, record 224
+[16-Oct-2025 10:30:34.315462] raster format (T) formatted segment 64
+[16-Oct-2025 10:30:34.315462] raster format (T) loading 127 records at segment 65, record 0
+[16-Oct-2025 10:30:34.315979] stack      (T) transferring chunk [64-65) to host
+[16-Oct-2025 10:30:34.316516] engine     (T) formatted job 77 and recycling block 77
+[16-Oct-2025 10:30:34.320100] acquire    (T) acquired block 78 with 500 records
+[16-Oct-2025 10:30:34.320106] acquire    (T) waiting for block 79
+[16-Oct-2025 10:30:34.320110] engine     (T) acquired job 78 (block 78)
+[16-Oct-2025 10:30:34.320116] engine     (T) sending job 78 (block 78) for processing
+[16-Oct-2025 10:30:34.320151] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.320154] process    (T) dispatching block 78 (slot 0)
+[16-Oct-2025 10:30:34.320205] process    (T) dispatched block 78 (slot 0)
+[16-Oct-2025 10:30:34.320213] process    (T) waiting for block 78 (slot 0)
+[16-Oct-2025 10:30:34.320429] process    (T) processed block 78 (slot 0)
+[16-Oct-2025 10:30:34.320435] engine     (T) processed job 78 (block 78)
+[16-Oct-2025 10:30:34.320436] engine     (T) sending job 78 (block 78) for formatting
+[16-Oct-2025 10:30:34.320437] raster format (T) loading 373 records at segment 65, record 127
+[16-Oct-2025 10:30:34.320438] raster format (T) formatted segment 65
+[16-Oct-2025 10:30:34.320439] raster format (T) loading 30 records at segment 66, record 0
+[16-Oct-2025 10:30:34.320833] stack      (T) transferring chunk [65-66) to host
+[16-Oct-2025 10:30:34.321182] engine     (T) formatted job 78 and recycling block 78
+[16-Oct-2025 10:30:34.325130] acquire    (T) acquired block 79 with 500 records
+[16-Oct-2025 10:30:34.325137] acquire    (T) waiting for block 80
+[16-Oct-2025 10:30:34.325171] engine     (T) acquired job 79 (block 79)
+[16-Oct-2025 10:30:34.325185] engine     (T) sending job 79 (block 79) for processing
+[16-Oct-2025 10:30:34.325213] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.325216] process    (T) dispatching block 79 (slot 1)
+[16-Oct-2025 10:30:34.325260] process    (T) dispatched block 79 (slot 1)
+[16-Oct-2025 10:30:34.325268] process    (T) waiting for block 79 (slot 1)
+[16-Oct-2025 10:30:34.325428] process    (T) processed block 79 (slot 1)
+[16-Oct-2025 10:30:34.325434] engine     (T) processed job 79 (block 79)
+[16-Oct-2025 10:30:34.325435] engine     (T) sending job 79 (block 79) for formatting
+[16-Oct-2025 10:30:34.325436] raster format (T) loading 470 records at segment 66, record 30
+[16-Oct-2025 10:30:34.325491] engine     (T) formatted job 79 and recycling block 79
+[16-Oct-2025 10:30:34.330135] acquire    (T) acquired block 80 with 500 records
+[16-Oct-2025 10:30:34.330141] acquire    (T) waiting for block 81
+[16-Oct-2025 10:30:34.330171] engine     (T) acquired job 80 (block 80)
+[16-Oct-2025 10:30:34.330198] engine     (T) sending job 80 (block 80) for processing
+[16-Oct-2025 10:30:34.330219] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.330220] process    (T) dispatching block 80 (slot 0)
+[16-Oct-2025 10:30:34.330255] process    (T) dispatched block 80 (slot 0)
+[16-Oct-2025 10:30:34.330262] process    (T) waiting for block 80 (slot 0)
+[16-Oct-2025 10:30:34.330429] process    (T) processed block 80 (slot 0)
+[16-Oct-2025 10:30:34.330436] engine     (T) processed job 80 (block 80)
+[16-Oct-2025 10:30:34.330437] engine     (T) sending job 80 (block 80) for formatting
+[16-Oct-2025 10:30:34.330438] raster format (T) formatted segment 66
+[16-Oct-2025 10:30:34.330438] raster format (T) loading 433 records at segment 67, record 0
+[16-Oct-2025 10:30:34.330832] stack      (T) transferring chunk [66-67) to host
+[16-Oct-2025 10:30:34.331187] engine     (T) formatted job 80 and recycling block 80
+[16-Oct-2025 10:30:34.335111] acquire    (T) acquired block 81 with 500 records
+[16-Oct-2025 10:30:34.335117] acquire    (T) waiting for block 82
+[16-Oct-2025 10:30:34.335153] engine     (T) acquired job 81 (block 81)
+[16-Oct-2025 10:30:34.335178] engine     (T) sending job 81 (block 81) for processing
+[16-Oct-2025 10:30:34.335209] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.335211] process    (T) dispatching block 81 (slot 1)
+[16-Oct-2025 10:30:34.335256] process    (T) dispatched block 81 (slot 1)
+[16-Oct-2025 10:30:34.335265] process    (T) waiting for block 81 (slot 1)
+[16-Oct-2025 10:30:34.335480] process    (T) processed block 81 (slot 1)
+[16-Oct-2025 10:30:34.335487] engine     (T) processed job 81 (block 81)
+[16-Oct-2025 10:30:34.335487] engine     (T) sending job 81 (block 81) for formatting
+[16-Oct-2025 10:30:34.335488] raster format (T) loading 67 records at segment 67, record 433
+[16-Oct-2025 10:30:34.335489] raster format (T) formatted segment 67
+[16-Oct-2025 10:30:34.335489] raster format (T) loading 336 records at segment 68, record 0
+[16-Oct-2025 10:30:34.335880] stack      (T) transferring chunk [67-68) to host
+[16-Oct-2025 10:30:34.336241] engine     (T) formatted job 81 and recycling block 81
+[16-Oct-2025 10:30:34.340094] acquire    (T) acquired block 82 with 500 records
+[16-Oct-2025 10:30:34.340100] acquire    (T) waiting for block 83
+[16-Oct-2025 10:30:34.340137] engine     (T) acquired job 82 (block 82)
+[16-Oct-2025 10:30:34.340168] engine     (T) sending job 82 (block 82) for processing
+[16-Oct-2025 10:30:34.340199] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.340202] process    (T) dispatching block 82 (slot 0)
+[16-Oct-2025 10:30:34.340243] process    (T) dispatched block 82 (slot 0)
+[16-Oct-2025 10:30:34.340250] process    (T) waiting for block 82 (slot 0)
+[16-Oct-2025 10:30:34.340407] process    (T) processed block 82 (slot 0)
+[16-Oct-2025 10:30:34.340413] engine     (T) processed job 82 (block 82)
+[16-Oct-2025 10:30:34.340415] engine     (T) sending job 82 (block 82) for formatting
+[16-Oct-2025 10:30:34.340415] raster format (T) loading 164 records at segment 68, record 336
+[16-Oct-2025 10:30:34.340416] raster format (T) formatted segment 68
+[16-Oct-2025 10:30:34.340417] raster format (T) loading 239 records at segment 69, record 0
+[16-Oct-2025 10:30:34.340799] stack      (T) transferring chunk [68-69) to host
+[16-Oct-2025 10:30:34.341152] engine     (T) formatted job 82 and recycling block 82
+[16-Oct-2025 10:30:34.345054] acquire    (T) acquired block 83 with 500 records
+[16-Oct-2025 10:30:34.345060] acquire    (T) waiting for block 84
+[16-Oct-2025 10:30:34.345095] engine     (T) acquired job 83 (block 83)
+[16-Oct-2025 10:30:34.345121] engine     (T) sending job 83 (block 83) for processing
+[16-Oct-2025 10:30:34.345154] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.345157] process    (T) dispatching block 83 (slot 1)
+[16-Oct-2025 10:30:34.345207] process    (T) dispatched block 83 (slot 1)
+[16-Oct-2025 10:30:34.345216] process    (T) waiting for block 83 (slot 1)
+[16-Oct-2025 10:30:34.345365] process    (T) processed block 83 (slot 1)
+[16-Oct-2025 10:30:34.345371] engine     (T) processed job 83 (block 83)
+[16-Oct-2025 10:30:34.345371] engine     (T) sending job 83 (block 83) for formatting
+[16-Oct-2025 10:30:34.345372] raster format (T) loading 261 records at segment 69, record 239
+[16-Oct-2025 10:30:34.345373] raster format (T) formatted segment 69
+[16-Oct-2025 10:30:34.345373] raster format (T) loading 142 records at segment 70, record 0
+[16-Oct-2025 10:30:34.345713] stack      (T) transferring chunk [69-70) to host
+[16-Oct-2025 10:30:34.346053] engine     (T) formatted job 83 and recycling block 83
+[16-Oct-2025 10:30:34.350017] acquire    (T) acquired block 84 with 500 records
+[16-Oct-2025 10:30:34.350023] acquire    (T) waiting for block 85
+[16-Oct-2025 10:30:34.350027] engine     (T) acquired job 84 (block 84)
+[16-Oct-2025 10:30:34.350032] engine     (T) sending job 84 (block 84) for processing
+[16-Oct-2025 10:30:34.350055] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.350057] process    (T) dispatching block 84 (slot 0)
+[16-Oct-2025 10:30:34.350093] process    (T) dispatched block 84 (slot 0)
+[16-Oct-2025 10:30:34.350101] process    (T) waiting for block 84 (slot 0)
+[16-Oct-2025 10:30:34.350465] process    (T) processed block 84 (slot 0)
+[16-Oct-2025 10:30:34.350471] engine     (T) processed job 84 (block 84)
+[16-Oct-2025 10:30:34.350471] engine     (T) sending job 84 (block 84) for formatting
+[16-Oct-2025 10:30:34.350472] raster format (T) loading 358 records at segment 70, record 142
+[16-Oct-2025 10:30:34.350473] raster format (T) formatted segment 70
+[16-Oct-2025 10:30:34.350473] raster format (T) loading 45 records at segment 71, record 0
+[16-Oct-2025 10:30:34.350830] stack      (T) transferring chunk [70-71) to host
+[16-Oct-2025 10:30:34.351188] engine     (T) formatted job 84 and recycling block 84
+[16-Oct-2025 10:30:34.355067] acquire    (T) acquired block 85 with 500 records
+[16-Oct-2025 10:30:34.355074] acquire    (T) waiting for block 86
+[16-Oct-2025 10:30:34.355122] engine     (T) acquired job 85 (block 85)
+[16-Oct-2025 10:30:34.355142] engine     (T) sending job 85 (block 85) for processing
+[16-Oct-2025 10:30:34.355177] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.355179] process    (T) dispatching block 85 (slot 1)
+[16-Oct-2025 10:30:34.355230] process    (T) dispatched block 85 (slot 1)
+[16-Oct-2025 10:30:34.355238] process    (T) waiting for block 85 (slot 1)
+[16-Oct-2025 10:30:34.355388] process    (T) processed block 85 (slot 1)
+[16-Oct-2025 10:30:34.355392] engine     (T) processed job 85 (block 85)
+[16-Oct-2025 10:30:34.355393] engine     (T) sending job 85 (block 85) for formatting
+[16-Oct-2025 10:30:34.355393] raster format (T) loading 455 records at segment 71, record 45
+[16-Oct-2025 10:30:34.355428] engine     (T) formatted job 85 and recycling block 85
+[16-Oct-2025 10:30:34.360023] acquire    (T) acquired block 86 with 500 records
+[16-Oct-2025 10:30:34.360028] acquire    (T) waiting for block 87
+[16-Oct-2025 10:30:34.360063] engine     (T) acquired job 86 (block 86)
+[16-Oct-2025 10:30:34.360085] engine     (T) sending job 86 (block 86) for processing
+[16-Oct-2025 10:30:34.360118] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.360121] process    (T) dispatching block 86 (slot 0)
+[16-Oct-2025 10:30:34.360166] process    (T) dispatched block 86 (slot 0)
+[16-Oct-2025 10:30:34.360175] process    (T) waiting for block 86 (slot 0)
+[16-Oct-2025 10:30:34.360329] process    (T) processed block 86 (slot 0)
+[16-Oct-2025 10:30:34.360336] engine     (T) processed job 86 (block 86)
+[16-Oct-2025 10:30:34.360337] engine     (T) sending job 86 (block 86) for formatting
+[16-Oct-2025 10:30:34.360337] raster format (T) formatted segment 71
+[16-Oct-2025 10:30:34.360339] raster format (T) loading 448 records at segment 72, record 0
+[16-Oct-2025 10:30:34.360768] stack      (T) transferring chunk [71-72) to host
+[16-Oct-2025 10:30:34.361141] engine     (T) formatted job 86 and recycling block 86
+[16-Oct-2025 10:30:34.365001] acquire    (T) acquired block 87 with 500 records
+[16-Oct-2025 10:30:34.365006] acquire    (T) waiting for block 88
+[16-Oct-2025 10:30:34.365010] engine     (T) acquired job 87 (block 87)
+[16-Oct-2025 10:30:34.365015] engine     (T) sending job 87 (block 87) for processing
+[16-Oct-2025 10:30:34.365040] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.365043] process    (T) dispatching block 87 (slot 1)
+[16-Oct-2025 10:30:34.365078] process    (T) dispatched block 87 (slot 1)
+[16-Oct-2025 10:30:34.365085] process    (T) waiting for block 87 (slot 1)
+[16-Oct-2025 10:30:34.365256] process    (T) processed block 87 (slot 1)
+[16-Oct-2025 10:30:34.365262] engine     (T) processed job 87 (block 87)
+[16-Oct-2025 10:30:34.365263] engine     (T) sending job 87 (block 87) for formatting
+[16-Oct-2025 10:30:34.365264] raster format (T) loading 52 records at segment 72, record 448
+[16-Oct-2025 10:30:34.365264] raster format (T) formatted segment 72
+[16-Oct-2025 10:30:34.365265] raster format (T) loading 351 records at segment 73, record 0
+[16-Oct-2025 10:30:34.365644] stack      (T) transferring chunk [72-73) to host
+[16-Oct-2025 10:30:34.366008] engine     (T) formatted job 87 and recycling block 87
+[16-Oct-2025 10:30:34.369994] acquire    (T) acquired block 88 with 500 records
+[16-Oct-2025 10:30:34.370000] acquire    (T) waiting for block 89
+[16-Oct-2025 10:30:34.370004] engine     (T) acquired job 88 (block 88)
+[16-Oct-2025 10:30:34.370011] engine     (T) sending job 88 (block 88) for processing
+[16-Oct-2025 10:30:34.370048] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.370051] process    (T) dispatching block 88 (slot 0)
+[16-Oct-2025 10:30:34.370102] process    (T) dispatched block 88 (slot 0)
+[16-Oct-2025 10:30:34.370110] process    (T) waiting for block 88 (slot 0)
+[16-Oct-2025 10:30:34.370322] process    (T) processed block 88 (slot 0)
+[16-Oct-2025 10:30:34.370328] engine     (T) processed job 88 (block 88)
+[16-Oct-2025 10:30:34.370329] engine     (T) sending job 88 (block 88) for formatting
+[16-Oct-2025 10:30:34.370330] raster format (T) loading 149 records at segment 73, record 351
+[16-Oct-2025 10:30:34.370331] raster format (T) formatted segment 73
+[16-Oct-2025 10:30:34.370331] raster format (T) loading 254 records at segment 74, record 0
+[16-Oct-2025 10:30:34.370724] stack      (T) transferring chunk [73-74) to host
+[16-Oct-2025 10:30:34.371076] engine     (T) formatted job 88 and recycling block 88
+[16-Oct-2025 10:30:34.375035] acquire    (T) acquired block 89 with 500 records
+[16-Oct-2025 10:30:34.375041] acquire    (T) waiting for block 90
+[16-Oct-2025 10:30:34.375076] engine     (T) acquired job 89 (block 89)
+[16-Oct-2025 10:30:34.375097] engine     (T) sending job 89 (block 89) for processing
+[16-Oct-2025 10:30:34.375127] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.375130] process    (T) dispatching block 89 (slot 1)
+[16-Oct-2025 10:30:34.375174] process    (T) dispatched block 89 (slot 1)
+[16-Oct-2025 10:30:34.375214] process    (T) waiting for block 89 (slot 1)
+[16-Oct-2025 10:30:34.375357] process    (T) processed block 89 (slot 1)
+[16-Oct-2025 10:30:34.375365] engine     (T) processed job 89 (block 89)
+[16-Oct-2025 10:30:34.375366] engine     (T) sending job 89 (block 89) for formatting
+[16-Oct-2025 10:30:34.375367] raster format (T) loading 246 records at segment 74, record 254
+[16-Oct-2025 10:30:34.375367] raster format (T) formatted segment 74
+[16-Oct-2025 10:30:34.375368] raster format (T) loading 157 records at segment 75, record 0
+[16-Oct-2025 10:30:34.375768] stack      (T) transferring chunk [74-75) to host
+[16-Oct-2025 10:30:34.376128] engine     (T) formatted job 89 and recycling block 89
+[16-Oct-2025 10:30:34.380086] acquire    (T) acquired block 90 with 500 records
+[16-Oct-2025 10:30:34.380091] acquire    (T) waiting for block 91
+[16-Oct-2025 10:30:34.380124] engine     (T) acquired job 90 (block 90)
+[16-Oct-2025 10:30:34.380149] engine     (T) sending job 90 (block 90) for processing
+[16-Oct-2025 10:30:34.380177] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.380179] process    (T) dispatching block 90 (slot 0)
+[16-Oct-2025 10:30:34.380215] process    (T) dispatched block 90 (slot 0)
+[16-Oct-2025 10:30:34.380223] process    (T) waiting for block 90 (slot 0)
+[16-Oct-2025 10:30:34.380416] process    (T) processed block 90 (slot 0)
+[16-Oct-2025 10:30:34.380421] engine     (T) processed job 90 (block 90)
+[16-Oct-2025 10:30:34.380422] engine     (T) sending job 90 (block 90) for formatting
+[16-Oct-2025 10:30:34.380423] raster format (T) loading 343 records at segment 75, record 157
+[16-Oct-2025 10:30:34.380423] raster format (T) formatted segment 75
+[16-Oct-2025 10:30:34.380424] raster format (T) loading 60 records at segment 76, record 0
+[16-Oct-2025 10:30:34.380828] stack      (T) transferring chunk [75-76) to host
+[16-Oct-2025 10:30:34.381187] engine     (T) formatted job 90 and recycling block 90
+[16-Oct-2025 10:30:34.384975] acquire    (T) acquired block 91 with 500 records
+[16-Oct-2025 10:30:34.384981] acquire    (T) waiting for block 92
+[16-Oct-2025 10:30:34.384986] engine     (T) acquired job 91 (block 91)
+[16-Oct-2025 10:30:34.384992] engine     (T) sending job 91 (block 91) for processing
+[16-Oct-2025 10:30:34.385024] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.385027] process    (T) dispatching block 91 (slot 1)
+[16-Oct-2025 10:30:34.385076] process    (T) dispatched block 91 (slot 1)
+[16-Oct-2025 10:30:34.385083] process    (T) waiting for block 91 (slot 1)
+[16-Oct-2025 10:30:34.385302] process    (T) processed block 91 (slot 1)
+[16-Oct-2025 10:30:34.385308] engine     (T) processed job 91 (block 91)
+[16-Oct-2025 10:30:34.385309] engine     (T) sending job 91 (block 91) for formatting
+[16-Oct-2025 10:30:34.385310] raster format (T) loading 440 records at segment 76, record 60
+[16-Oct-2025 10:30:34.385361] engine     (T) formatted job 91 and recycling block 91
+[16-Oct-2025 10:30:34.390024] acquire    (T) acquired block 92 with 500 records
+[16-Oct-2025 10:30:34.390033] acquire    (T) waiting for block 93
+[16-Oct-2025 10:30:34.390037] engine     (T) acquired job 92 (block 92)
+[16-Oct-2025 10:30:34.390042] engine     (T) sending job 92 (block 92) for processing
+[16-Oct-2025 10:30:34.390070] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.390072] process    (T) dispatching block 92 (slot 0)
+[16-Oct-2025 10:30:34.390117] process    (T) dispatched block 92 (slot 0)
+[16-Oct-2025 10:30:34.390124] process    (T) waiting for block 92 (slot 0)
+[16-Oct-2025 10:30:34.390285] process    (T) processed block 92 (slot 0)
+[16-Oct-2025 10:30:34.390291] engine     (T) processed job 92 (block 92)
+[16-Oct-2025 10:30:34.390292] engine     (T) sending job 92 (block 92) for formatting
+[16-Oct-2025 10:30:34.390292] raster format (T) formatted segment 76
+[16-Oct-2025 10:30:34.390293] raster format (T) loading 463 records at segment 77, record 0
+[16-Oct-2025 10:30:34.390711] stack      (T) transferring chunk [76-77) to host
+[16-Oct-2025 10:30:34.391077] engine     (T) formatted job 92 and recycling block 92
+[16-Oct-2025 10:30:34.395001] acquire    (T) acquired block 93 with 500 records
+[16-Oct-2025 10:30:34.395007] acquire    (T) waiting for block 94
+[16-Oct-2025 10:30:34.395044] engine     (T) acquired job 93 (block 93)
+[16-Oct-2025 10:30:34.395054] engine     (T) sending job 93 (block 93) for processing
+[16-Oct-2025 10:30:34.395087] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.395089] process    (T) dispatching block 93 (slot 1)
+[16-Oct-2025 10:30:34.395134] process    (T) dispatched block 93 (slot 1)
+[16-Oct-2025 10:30:34.395146] process    (T) waiting for block 93 (slot 1)
+[16-Oct-2025 10:30:34.395312] process    (T) processed block 93 (slot 1)
+[16-Oct-2025 10:30:34.395318] engine     (T) processed job 93 (block 93)
+[16-Oct-2025 10:30:34.395319] engine     (T) sending job 93 (block 93) for formatting
+[16-Oct-2025 10:30:34.395320] raster format (T) loading 37 records at segment 77, record 463
+[16-Oct-2025 10:30:34.395320] raster format (T) formatted segment 77
+[16-Oct-2025 10:30:34.395321] raster format (T) loading 366 records at segment 78, record 0
+[16-Oct-2025 10:30:34.395738] stack      (T) transferring chunk [77-78) to host
+[16-Oct-2025 10:30:34.396089] engine     (T) formatted job 93 and recycling block 93
+[16-Oct-2025 10:30:34.399947] acquire    (T) acquired block 94 with 500 records
+[16-Oct-2025 10:30:34.399952] acquire    (T) waiting for block 95
+[16-Oct-2025 10:30:34.399958] engine     (T) acquired job 94 (block 94)
+[16-Oct-2025 10:30:34.399964] engine     (T) sending job 94 (block 94) for processing
+[16-Oct-2025 10:30:34.399996] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.399998] process    (T) dispatching block 94 (slot 0)
+[16-Oct-2025 10:30:34.400134] process    (T) dispatched block 94 (slot 0)
+[16-Oct-2025 10:30:34.400294] process    (T) waiting for block 94 (slot 0)
+[16-Oct-2025 10:30:34.400297] process    (T) processed block 94 (slot 0)
+[16-Oct-2025 10:30:34.400307] engine     (T) processed job 94 (block 94)
+[16-Oct-2025 10:30:34.400308] engine     (T) sending job 94 (block 94) for formatting
+[16-Oct-2025 10:30:34.400308] raster format (T) loading 134 records at segment 78, record 366
+[16-Oct-2025 10:30:34.400309] raster format (T) formatted segment 78
+[16-Oct-2025 10:30:34.400310] raster format (T) loading 269 records at segment 79, record 0
+[16-Oct-2025 10:30:34.400680] stack      (T) transferring chunk [78-79) to host
+[16-Oct-2025 10:30:34.401035] engine     (T) formatted job 94 and recycling block 94
+[16-Oct-2025 10:30:34.404972] acquire    (T) acquired block 95 with 500 records
+[16-Oct-2025 10:30:34.404978] acquire    (T) waiting for block 96
+[16-Oct-2025 10:30:34.405010] engine     (T) acquired job 95 (block 95)
+[16-Oct-2025 10:30:34.405033] engine     (T) sending job 95 (block 95) for processing
+[16-Oct-2025 10:30:34.405055] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.405057] process    (T) dispatching block 95 (slot 1)
+[16-Oct-2025 10:30:34.405096] process    (T) dispatched block 95 (slot 1)
+[16-Oct-2025 10:30:34.405105] process    (T) waiting for block 95 (slot 1)
+[16-Oct-2025 10:30:34.405271] process    (T) processed block 95 (slot 1)
+[16-Oct-2025 10:30:34.405277] engine     (T) processed job 95 (block 95)
+[16-Oct-2025 10:30:34.405278] engine     (T) sending job 95 (block 95) for formatting
+[16-Oct-2025 10:30:34.405279] raster format (T) loading 231 records at segment 79, record 269
+[16-Oct-2025 10:30:34.405280] raster format (T) formatted segment 79
+[16-Oct-2025 10:30:34.405280] raster format (T) loading 172 records at segment 80, record 0
+[16-Oct-2025 10:30:34.405688] stack      (T) transferring chunk [79-80) to host
+[16-Oct-2025 10:30:34.406066] engine     (T) formatted job 95 and recycling block 95
+[16-Oct-2025 10:30:34.410020] acquire    (T) acquired block 96 with 500 records
+[16-Oct-2025 10:30:34.410029] acquire    (T) waiting for block 97
+[16-Oct-2025 10:30:34.410061] engine     (T) acquired job 96 (block 96)
+[16-Oct-2025 10:30:34.410086] engine     (T) sending job 96 (block 96) for processing
+[16-Oct-2025 10:30:34.410119] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.410121] process    (T) dispatching block 96 (slot 0)
+[16-Oct-2025 10:30:34.410167] process    (T) dispatched block 96 (slot 0)
+[16-Oct-2025 10:30:34.410176] process    (T) waiting for block 96 (slot 0)
+[16-Oct-2025 10:30:34.410331] process    (T) processed block 96 (slot 0)
+[16-Oct-2025 10:30:34.410338] engine     (T) processed job 96 (block 96)
+[16-Oct-2025 10:30:34.410338] engine     (T) sending job 96 (block 96) for formatting
+[16-Oct-2025 10:30:34.410339] raster format (T) loading 328 records at segment 80, record 172
+[16-Oct-2025 10:30:34.410340] raster format (T) formatted segment 80
+[16-Oct-2025 10:30:34.410340] raster format (T) loading 75 records at segment 81, record 0
+[16-Oct-2025 10:30:34.410811] stack      (T) transferring chunk [80-81) to host
+[16-Oct-2025 10:30:34.411280] engine     (T) formatted job 96 and recycling block 96
+[16-Oct-2025 10:30:34.414979] acquire    (T) acquired block 97 with 500 records
+[16-Oct-2025 10:30:34.414984] acquire    (T) waiting for block 98
+[16-Oct-2025 10:30:34.415016] engine     (T) acquired job 97 (block 97)
+[16-Oct-2025 10:30:34.415035] engine     (T) sending job 97 (block 97) for processing
+[16-Oct-2025 10:30:34.415057] process    (T) waiting for slot 1
+[16-Oct-2025 10:30:34.415059] process    (T) dispatching block 97 (slot 1)
+[16-Oct-2025 10:30:34.415098] process    (T) dispatched block 97 (slot 1)
+[16-Oct-2025 10:30:34.415104] process    (T) waiting for block 97 (slot 1)
+[16-Oct-2025 10:30:34.415350] process    (T) processed block 97 (slot 1)
+[16-Oct-2025 10:30:34.415360] engine     (T) processed job 97 (block 97)
+[16-Oct-2025 10:30:34.415369] engine     (T) sending job 97 (block 97) for formatting
+[16-Oct-2025 10:30:34.415370] raster format (T) loading 425 records at segment 81, record 75
+[16-Oct-2025 10:30:34.415408] engine     (T) formatted job 97 and recycling block 97
+[16-Oct-2025 10:30:34.419920] acquire    (T) acquired block 98 with 500 records
+[16-Oct-2025 10:30:34.420017] engine     (T) acquired job 98 (block 98)
+[16-Oct-2025 10:30:34.420028] engine     (T) sending job 98 (block 98) for processing
+[16-Oct-2025 10:30:34.420119] process    (T) waiting for slot 0
+[16-Oct-2025 10:30:34.420126] process    (T) dispatching block 98 (slot 0)[16-Oct-2025 10:30:34.420] OCTUi      (I) volumeCallback(49022, 0, 0)
+
+[16-Oct-2025 10:30:34.420229] process    (T) dispatched block 98 (slot 0)
+[16-Oct-2025 10:30:34.420247] engine     (I) acquired all blocks
+[16-Oct-2025 10:30:34.420248] engine     (D) process loop exited
+[16-Oct-2025 10:30:34.420248] process    (T) waiting for block 98 (slot 0)
+[16-Oct-2025 10:30:34.420418] process    (T) processed block 98 (slot 0)
+[16-Oct-2025 10:30:34.420512] engine     (T) processed job 98 (block 98)
+[16-Oct-2025 10:30:34.420514] engine     (T) sending job 98 (block 98) for formatting
+[16-Oct-2025 10:30:34.420515] raster format (T) formatted segment 81
+[16-Oct-2025 10:30:34.420517] raster format (T) loading 478 records at segment 82, record 0
+[16-Oct-2025 10:30:34.420518] raster format (T) formatted segment 82
+[16-Oct-2025 10:30:34.420519] raster format (T) formatted volume 0
+[16-Oct-2025 10:30:34.420519] raster format (T) formatted scan 0
+[16-Oct-2025 10:30:34.421720] stack      (T) transferring chunk [81-83) to host
+[16-Oct-2025 10:30:34.422321] engine     (I) processed all blocks
+[16-Oct-2025 10:30:34.422323] engine     (D) format loop 0 exited
+[16-Oct-2025 10:30:34.422331] engine     (T) formatted job 98 and recycling block 98
+[16-Oct-2025 10:30:34.422343] engine     (D) formatted all blocks
+[16-Oct-2025 10:30:34.422344] engine     (D) recycle loop exited
+[16-Oct-2025 10:30:34.422345] engine     (D) acquire loop exited
+[16-Oct-2025 10:30:34.422351] output     (I) stopping I/O
+[16-Oct-2025 10:30:34.422573] output     (W) exception while stopping: stop task: (-200290) buffer underflow
+[16-Oct-2025 10:30:34.422581] strobe     (I) stopping I/O
+[16-Oct-2025 10:30:34.422638] strobe     (W) exception while stopping: stop task: (-200290) buffer underflow
+[16-Oct-2025 10:30:34.422646] acquire    (I) stopping acquisition
+[16-Oct-2025 10:30:34.446527] engine     (D) shutting down session
+[16-Oct-2025 10:30:34.446538] engine     (D) session exited
