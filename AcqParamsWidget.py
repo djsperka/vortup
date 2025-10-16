@@ -31,3 +31,8 @@ class AcqParamsWidget(QGroupBox, Ui_AcqParamsWidget):
         cfg.trigger_delay_seconds = float(self.leTriggerDelay.text())
         return cfg
     
+    def setAcqParams(self, cfg: AcqParams):
+        self.leAperBlock.setText(str(cfg.ascans_per_block))
+        self.leSperA.setText(str(cfg.samples_per_ascan))
+        self.leNBlocks.setText(str(cfg.blocks_to_acquire))
+        self.leTriggerDelay.setText(str(cfg.trigger_delay_seconds))

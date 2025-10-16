@@ -42,6 +42,7 @@ class OCTUi():
         # initializations
         self._octDialog.widgetDispersion.setDispersion(self._params.dsp)
         self._octDialog.widgetScanConfig.setScanParams(self._params.scn)
+        self._octDialog.widgetAcqParams.setAcqParams(self._params.acq)
 
         # connections. 
         self._octDialog.gbSaveVolumes.saveNVolumes.connect(self.saveNVolumes)
