@@ -1,0 +1,84 @@
+(base) PS C:\work\src\vortup> & C:/Users/Eyepod_SSOCM/.conda/envs/v310b/python.exe c:/work/src/vortup/OCTUi.py
+[16-Oct-2025 10:17:04.470] OCTUiParams  (I) loading OCTUi config from C:\Users\Eyepod_SSOCM\.octui\octui.conf
+[16-Oct-2025 10:17:46.295] OCTUi        (I) Setting up OCT engine...
+[16-Oct-2025 10:17:46.301] VtxBaseEngine        (I) Using input channel Channel.A for input "A"
+[16-Oct-2025 10:17:46.302467] acquire    (D) initializing Alazar board
+[16-Oct-2025 10:17:46.302995] acquire    (D) worker thread entered
+[16-Oct-2025 10:17:46.313934] acquire    (I) using ATS9350 (920511) PCIe x8 @ 2.5 Gbps
+[16-Oct-2025 10:17:46.313942] acquire    (D) configuring external clock on rising edge with level 5000% and AC coupling
+[16-Oct-2025 10:17:46.352622] acquire    (D) configuring single external trigger on positive edge with range 5000 mV (0V is TTL), DC coupling, level 10%, and delay of 0 samples
+[16-Oct-2025 10:17:46.369136] acquire    (D) configuring input A with range 1000 mV, impedance 50 Ohms, and DC coupling
+[16-Oct-2025 10:17:46.407806] acquire    (D) configuring auxiliary I/O to pass trigger
+[16-Oct-2025 10:17:46.409394] process    (D) worker thread entered
+[16-Oct-2025 10:17:46.482388] process    (D) initializing CUDA OCT processor
+[16-Oct-2025 10:17:46.482405] process    (I) using NVIDIA GeForce RTX 4080 SUPER (device 0) with compute capability 8.9 and 17170956288 bytes of memory
+[16-Oct-2025 10:17:46.482411] process    (D) beginning heavyweight recalculation
+[16-Oct-2025 10:17:46.482425] process    (D) allocating average record history buffer with [1000 x 1280] elements
+[16-Oct-2025 10:17:46.482552] process    (D) allocating complex filter with [1280] elements
+[16-Oct-2025 10:17:46.482800] process    (D) slot 0 allocating spectral buffer with [500 x 1280] elements
+[16-Oct-2025 10:17:46.482861] process    (D) slot 0 allocating spectral average buffer with [1280] elements
+[16-Oct-2025 10:17:46.482867] process    (D) slot 0 allocating complex buffer with [500 x 1280] elements
+[16-Oct-2025 10:17:46.482901] process    (D) slot 0 planning FFT of length 1280
+[16-Oct-2025 10:17:46.485411] process    (D) slot 1 allocating spectral buffer with [500 x 1280] elements
+[16-Oct-2025 10:17:46.485475] process    (D) slot 1 allocating spectral average buffer with [1280] elements
+[16-Oct-2025 10:17:46.485481] process    (D) slot 1 allocating complex buffer with [500 x 1280] elements
+[16-Oct-2025 10:17:46.485581] process    (D) slot 1 planning FFT of length 1280
+[16-Oct-2025 10:17:46.485934] process    (D) recalculation complete for block size 500 x 1280 (A-scans x samples)
+[16-Oct-2025 10:17:46.486512] output     (D) worker thread entered
+[16-Oct-2025 10:17:46.523444] output     (D) creating analog output Dev1/ao0 with range [-4 V, 4 V] and scale 1.5 lu/v
+[16-Oct-2025 10:17:46.604178] output     (D) creating analog output Dev1/ao1 with range [-4 V, 4 V] and scale 1.5 lu/v
+[16-Oct-2025 10:17:46.604309] output     (D) configuring sample clock from pfi12 expecting 100000 samples/second with 1x upsampling and 500 samples/block
+[16-Oct-2025 10:17:46.604415] output     (D) disabling regeneration
+[16-Oct-2025 10:17:46.604426] output     (D) setting output buffer of 16000 samples/channel
+[16-Oct-2025 10:17:46.604706] strobe     (D) creating digital output Dev1/port0
+[16-Oct-2025 10:17:46.604821] strobe     (D) worker thread entered
+[16-Oct-2025 10:17:46.608644] strobe     (D) configuring sample clock from pfi12 expecting 100000 samples/second with 1x upsampling and 500 samples/block
+[16-Oct-2025 10:17:46.608667] strobe     (D) disabling regeneration
+[16-Oct-2025 10:17:46.608670] strobe     (D) setting output buffer of 16000 samples/channel
+[16-Oct-2025 10:17:46.608] VtxEngine    (I) Create StackDeviceTensorEndpointInt8 with shape (500, 500, 640)
+[16-Oct-2025 10:17:46.609] VtxEngine    (I) Create SpectraStackHostTensorEndpointUInt16 with shape (500, 500, 1280)
+[16-Oct-2025 10:17:46.609853] engine     (D) requesting [500 x 1280 x 1] buffer on host in block for spectra
+[16-Oct-2025 10:17:46.609866] engine     (D) requesting [500 x 1280 x 1] buffer on device 0 in block for spectra
+[16-Oct-2025 10:17:46.609872] engine     (D) requesting [500 x 1280 x 1] buffer on device 0 in block for A-scans
+[16-Oct-2025 10:17:46.609876] npy-spectra (D) allocating [0 x 0 x 0 x 1] buffer on device 0 for formatting
+[16-Oct-2025 10:17:46.609883] npy-spectra (D) allocating [0 x 0 x 0 x 1] buffer on host for formatting
+[16-Oct-2025 10:17:46.609886] stack      (D) allocating [500 x 500 x 640] buffer on device 0 for endpoint
+[16-Oct-2025 10:17:46.610164] stack      (D) allocating [500 x 500 x 1280] buffer on device 0 for formatting
+[16-Oct-2025 10:17:46.611237] stack      (D) allocating [500 x 500 x 1280] buffer on host for endpoint
+[16-Oct-2025 10:17:46.669649] engine     (D) allocating 128 blocks
+[16-Oct-2025 10:17:46.719978] engine     (D) finished allocating blocks
+[16-Oct-2025 10:17:46.758131] engine     (I) starting engine
+[16-Oct-2025 10:17:46.758165] engine     (D) open profiler log at "profiler.log"
+[16-Oct-2025 10:17:46.758813] engine     (D) profiler worker entered
+[16-Oct-2025 10:17:46.759247] engine     (D) session starting
+[16-Oct-2025 10:17:46.759327] acquire    (D) configuring acquisition on channels A with 1280 samples/record and 500 records/block
+[16-Oct-2025 10:17:46.781874] engine     (D) recycle loop entered
+[16-Oct-2025 10:17:46.782061] engine     (D) format loop 0 entered
+[16-Oct-2025 10:17:46.782243] engine     (D) acquire loop entered
+[16-Oct-2025 10:17:46.782710] engine     (D) process loop entered
+[16-Oct-2025 10:17:46.785951] strobe     (I) starting I/O
+[16-Oct-2025 10:17:46.792623] output     (I) starting I/O
+[16-Oct-2025 10:17:46.794216] acquire    (I) starting acquisition
+[16-Oct-2025 10:17:49.780] OCTUi        (I) volumeCallback(298500, 0, 0)
+[16-Oct-2025 10:17:51.844791] engine     (I) stopping engine
+[16-Oct-2025 10:17:51.844798] engine     (W) shutdown requested
+[16-Oct-2025 10:17:51.852490] engine     (I) dispatching of blocks completed
+[16-Oct-2025 10:17:51.852524] engine     (D) acquire loop waiting for inflight tasks to finish
+[16-Oct-2025 10:17:51.852534] engine     (D) waiting for pending jobs to finish
+[16-Oct-2025 10:17:52.012046] engine     (I) acquired all blocks
+[16-Oct-2025 10:17:52.012050] engine     [16-Oct-2025 10:17:52.11] OCTUi        (I) volumeCallback(522443, 0, 0)
+(D) process loop exited
+[16-Oct-2025 10:17:52.013362] engine     (I) processed all blocks
+[16-Oct-2025 10:17:52.013366] engine     (D) format loop 0 exited
+[16-Oct-2025 10:17:52.013370] engine     (D) formatted all blocks
+[16-Oct-2025 10:17:52.013371] engine     (D) recycle loop exited
+[16-Oct-2025 10:17:52.013374] strobe     (I) stopping I/O
+[16-Oct-2025 10:17:52.013486] engine     (D) acquire loop exited
+[16-Oct-2025 10:17:52.013538] strobe     (W) exception while stopping: stop task: (-200290) buffer underflow
+[16-Oct-2025 10:17:52.013543] output     (I) stopping I/O
+[16-Oct-2025 10:17:52.013580] output     (W) exception while stopping: stop task: (-200290) buffer underflow
+[16-Oct-2025 10:17:52.013584] acquire    (I) stopping acquisition
+[16-Oct-2025 10:17:52.037961] engine     (D) shutting down session
+[16-Oct-2025 10:17:52.037975] engine     (D) session exited
+[16-Oct-2025 10:17:52.038351] engine     (D) profiler worker exited
+[16-Oct-2025 10:17:52.038543] engine     (D) closing profiler log
