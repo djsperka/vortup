@@ -225,7 +225,7 @@ class OCTUi():
             volume_idx (int): volume index
         """
 
-        self._logger.info("volumeCallback({0:d}, {1:d}, {2:d})".format(arg0, arg1, arg2))
+        #self._logger.info("volumeCallback({0:d}, {1:d}, {2:d})".format(arg0, arg1, arg2))
         if self._savingVolumesRequested:
             (bOK, filename) = self.checkFileSaveStuff()
             if bOK:
