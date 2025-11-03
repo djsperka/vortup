@@ -113,18 +113,17 @@ class OCTUi():
             self._ascan_trace_widget.update_trace(v)
         self._vtxengine._endpoint_ascan_display.aggregate_segment_callback = cb_ascan
 
-        def cb_spectra(v):
-            #self._raster_widget.notify_segments(v)
-            self._spectra_trace_widget.update_trace(v)
-        self._vtxengine._endpoint_spectra_display.aggregate_segment_callback = cb_spectra
+        # def cb_spectra(v):
+        #      self._spectra_trace_widget.update_trace(v)
+        # self._vtxengine._endpoint_spectra_display.aggregate_segment_callback = cb_spectra
 
-    def cb_segments(self, v):
-        # argument (v) here is a number - index pointing to a segment in allocated segments.
-        #print("agg segment cb: v=", v)
-        self._raster_widget.notify_segments(v)
-        self._cross_widget.notify_segments(v)
-        self._ascan_trace_widget.update_trace(v)
-        self._spectra_trace_widget.update_trace(v)
+    # def cb_segments(self, v):
+    #     # argument (v) here is a number - index pointing to a segment in allocated segments.
+    #     #print("agg segment cb: v=", v)
+    #     self._raster_widget.notify_segments(v)
+    #     self._cross_widget.notify_segments(v)
+    #     self._ascan_trace_widget.update_trace(v)
+    #     self._spectra_trace_widget.update_trace(v)
 
     def _getAllParams(self):
         # fetch current configuration for acq and scan params. The items 
