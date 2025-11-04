@@ -113,9 +113,6 @@ class OCTUiParams():
     
     @vtx.setter
     def vtx(self, value):
-        print(self._vtx)
-        print(value)
-        print(self._vtx == value)
         if not self._vtx == value:
             self._isdirty = True
             self._vtx = value
