@@ -31,7 +31,7 @@ class VtxBaseEngine():
                 ac.clock = alazar.ExternalClock(level_ratio=cfg.external_clock_level_pct, coupling=alazar.Coupling.AC, edge=alazar.ClockEdge.Rising, dual=False)
 
             board = alazar.Board(ac.device.system_index, ac.device.board_index)
-            ac.samples_per_record = board.info.smallest_aligned_samples_per_record(cfg.swept_source.clock_rising_edges_per_trigger)
+            ac.samples_per_record = board.info.smallest_aligned_samples_per_record(cfg.ssrc_clock_rising_edges_per_trigger)
 
             # trigger with range - must be 5000 (2500 will err). TTL will work in config also. Discrepancy with docs
             ac.trigger = alazar.SingleExternalTrigger(range_millivolts=cfg.trigger_range_millivolts, level_ratio=cfg.trigger_level_fraction, delay_samples=0, slope=alazar.TriggerSlope.Positive)
@@ -117,7 +117,7 @@ class VtxBaseEngine():
         if cfg.galvo_enabled:
             ioc_out = DAQmxConfig()
             ioc_out.samples_per_block = ac.records_per_block
-            ioc_out.samples_per_second = cfg.swept_source.triggers_per_second
+            ioc_out.samples_per_second = cfg.ssrc_triggers_per_second
             ioc_out.blocks_to_buffer = cfg.preload_count
             ioc_out.clock.source = cfg.galvo_clock_source
             ioc_out.name = 'output'
@@ -141,7 +141,7 @@ class VtxBaseEngine():
         if cfg.strobe_enabled:
             strobec = DAQmxConfig()
             strobec.samples_per_block = ac.records_per_block
-            strobec.samples_per_second = cfg.swept_source.triggers_per_second
+            strobec.samples_per_second = cfg.ssrc_triggers_per_second
             strobec.blocks_to_buffer = cfg.preload_count
             strobec.clock.source = cfg.strobe_clock_source
             strobec.name = 'strobe'

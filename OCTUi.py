@@ -58,16 +58,17 @@ class OCTUi():
         self._octDialog.show()
 
     def dialogClosing(self):
-        dlg = QMessageBox(self._octDialog)
-        dlg.setWindowTitle("OCTUi is exiting...")
-        dlg.setText("Save engine parameters?")
-        dlg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        dlg.setIcon(QMessageBox.Question)
-        button = dlg.exec()
-        if button == QMessageBox.Yes:
-            self._logger.info("Saving engine parameters...")
-            self._getAllParams()
-            self._params.save()
+        self._getAllParams()
+        if self._params.isdirty():
+            dlg = QMessageBox(self._octDialog)
+            dlg.setWindowTitle("OCTUi is exiting...")
+            dlg.setText("Save engine parameters?")
+            dlg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            dlg.setIcon(QMessageBox.Question)
+            button = dlg.exec()
+            if button == QMessageBox.Yes:
+                self._logger.info("Saving engine parameters...")
+                self._params.save()
 
     def etcClicked(self):
         self._cfgDialog = VtxEngineParamsDialog(self._params.vtx)

@@ -60,12 +60,6 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         v = QDoubleValidator()
         self.lineEditTriggerLevelFraction.setValidator(v)
 
-        # assign id to each radio button. then assign buttonClicked signal to a slot here. 
-        # That signal is called once when a radio button is clicked. Use checkedId() in slot.
-        self.buttonGroupSource.setId(self.rbAxsun100k, 1)
-        self.buttonGroupSource.setId(self.rbCustom, 2)
-
-        self.buttonGroupSource.buttonClicked.connect(self.rbClicked)
         self.initializeDialog(cfg)        # takes whatever is in cfg and inits dlg
 
         # slots for accept and cancel
@@ -73,35 +67,8 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.buttonBoxMain.rejected.connect(self.reject)
 
     def accepted(self):
-        self._cfg = self.getEngineParameters()
+        self._cfg = self.getEngineParameters()        
         self.accept()
-
-    def rbClicked(self):
-        # if checked is one of the preset sources, assign those values. 
-        match self.buttonGroupSource.checkedId():
-            case 1:
-                self.setClockSourceWidgetValues(source.Axsun100k)
-            case 2:
-                # When changing to "Custom", do not change values in widgets. 
-                pass
-
-    def setClockSourceRadioButton(self, sscfg: Source):
-        if sscfg == source.Axsun100k:
-            self.rbAxsun100k.setChecked(True)
-        else:
-            self.rbCustom.setChecked(True)
-        
-    def setClockSourceWidgetValues(self, sscfg: Source):
-        self.lineEditTriggersPerSecond.setText(str(sscfg.triggers_per_second))
-        self.lineEditClockRisingEdgesPerTrigger.setText(str(sscfg.clock_rising_edges_per_trigger))
-        self.lineEditDutyCycle.setText(str(sscfg.duty_cycle))
-        self.lineEditImagingDepth.setText(str(sscfg.imaging_depth_meters))
-
-    def getClockSourceValues(self) -> Source:
-        if self.rbAxsun100k.isChecked():
-            return source.Axsun100k
-        else:
-            return Source(int(self.lineEditTriggersPerSecond.text()), int(self.lineEditClockRisingEdgesPerTrigger.text()), float(self.lineEditDutyCycle.text()), float(self.lineEditImagingDepth.text()))
         
     def initializeDialog(self, cfg: VtxEngineParams):
         self._cfg = cfg
@@ -119,9 +86,8 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.lineEditXUnitsPerVolt.setText(str(cfg.galvo_x_units_per_volt))
         self.lineEditYUnitsPerVolt.setText(str(cfg.galvo_y_units_per_volt))
 
-        # Handle swept_source separately because of source types
-        self.setClockSourceRadioButton(cfg.swept_source)
-        self.setClockSourceWidgetValues(cfg.swept_source)
+        self.lineEditTriggersPerSecond.setText(str(cfg.ssrc_triggers_per_second))
+        self.lineEditClockRisingEdgesPerTrigger.setText(str(cfg.ssrc_clock_rising_edges_per_trigger))
 
         self.checkBoxInternalClock.setChecked(cfg.internal_clock)
         self.lineEditInternalClockRate.setText(str(cfg.clock_samples_per_second))
@@ -135,8 +101,6 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.lineEditBlocksToAllocate.setText(str(cfg.blocks_to_allocate))
         self.lineEditPreloadCount.setText(str(cfg.preload_count))
         self.lineEditProcessSlots.setText(str(cfg.process_slots))
-        # self.lineEditDispersion0.setText(str(cfg.dispersion[0]))
-        # self.lineEditDispersion1.setText(str(cfg.dispersion[1]))
         self.lineEditLogLevel.setText(str(cfg.log_level))
         self.cbSaveProfilerData.setChecked(cfg.save_profiler_data)
 
@@ -156,7 +120,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
 
 
     def getEngineParameters(self) -> VtxEngineParams:
-        s = self._cfg
+        s = VtxEngineParams()
         if self.radioButtonAlazarAcquisition.isChecked():
             s.acquisition_type = AcquisitionType.ALAZAR_ACQUISITION
         elif self.radioButtonFileAcquisition.isChecked():
@@ -169,7 +133,9 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         s.galvo_y_units_per_volt = float(self.lineEditYUnitsPerVolt.text())
 
         s.clock_samples_per_second = int(self.lineEditInternalClockRate.text())
-        s.swept_source = self.getClockSourceValues()
+        s.ssrc_triggers_per_second = int(self.lineEditTriggersPerSecond.text())
+        s.ssrc_clock_rising_edges_per_trigger = int(self.lineEditClockRisingEdgesPerTrigger.text())
+
         s.internal_clock = bool(self.checkBoxInternalClock.isChecked())
         s.external_clock_level_pct = int(self.lineEditExternalClockLevelPct.text())
         s.input_channel = self.comboBoxInputChannel.currentText()
