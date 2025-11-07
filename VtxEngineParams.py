@@ -19,10 +19,8 @@ class VtxEngineParams:
     # other galvo stuff
     galvo_enabled: bool = True
     galvo_clock_source: str = "pfi12"
-    galvo_x_voltage_range: Range = field(default_factory=Range)
-    galvo_y_voltage_range: Range = field(default_factory=Range)
-    galvo_x_voltage_range: Range = field(default_factory=Range)
-    galvo_y_voltage_range: Range = field(default_factory=Range)
+    galvo_x_voltage_range: Range = field(default_factory=lambda: Range(-1,1))
+    galvo_y_voltage_range: Range = field(default_factory=lambda: Range(-1,1))
     galvo_x_units_per_volt: float = 1.5
     galvo_y_units_per_volt: float = 1.5
     galvo_x_device_channel: str = "Dev1/ao0"

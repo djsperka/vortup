@@ -27,7 +27,7 @@ copyreg.pickle(Range, pickle_range)
 @dataclass
 class UiParams():
     #vtx: VtxEngineParams = DEFAULT_VTX_ENGINE_PARAMS
-    vtx: VtxEngineParams = field(default_factory=lambda: VtxEngineParams)
+    vtx: VtxEngineParams = field(default_factory=VtxEngineParams)
     acq: AcqParams = field(default_factory=lambda: DEFAULT_ACQ_PARAMS)
     scn: ScanParams = field(default_factory=lambda: DEFAULT_SCAN_PARAMS)
     dsp: Tuple = (-1.8e-05, 0)
@@ -40,7 +40,6 @@ copyreg.pickle(UiParams, pickle_uiparams)
 class _octui_encoder(json.JSONEncoder):
     def default(self, o):
         try:
-            #print("__encoder.default:", o)
             if isinstance(o, UiParams):
                 value = asdict(o)
             elif isinstance(o, VtxEngineParams):
@@ -54,7 +53,7 @@ class _octui_encoder(json.JSONEncoder):
             elif isinstance(o, Range):
                 value = {'min': o.min, 'max': o.max}
             else:
-                raise TypeError('Unknown type: {0:s}\n'.format(o))
+                raise TypeError('Unknown type: {0:s}\n'.format(type(o)))
         except TypeError:
             pass
         else:
