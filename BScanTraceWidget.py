@@ -31,6 +31,17 @@ class BScanTraceWidget(FigureCanvasQTAgg):
         if not self._invalidated:
             return
         
+        with self._endpoint.tensor as volume:
+            if isinstance(volume, cupy.ndarray):
+                # asynchronous on GPU
+                with self._endpoint.stream:
+                    self._ydata = volume[self._bidx].mean(axis=0).get()
+            else:
+                self._ydata = volume[self._bidx].mean(axis=0)
+
+        if self._xdata is None:
+            self._xdata = list(range(1,len(self._ydata)+1))
+
         self._invalidated = False
         if self._line2d is None:
             line2ds = self._axes.plot(self._xdata, self._ydata)
@@ -48,18 +59,6 @@ class BScanTraceWidget(FigureCanvasQTAgg):
         # to the gui thread, not the daq thread.
 
         self._bidx = bscan_idxs[0]
-
-        with self._endpoint.tensor as volume:
-            if isinstance(volume, cupy.ndarray):
-                # asynchronous on GPU
-                with self._endpoint.stream:
-                    self._ydata = volume[self._bidx].mean(axis=0).get()
-            else:
-                self._ydata = volume[self._bidx].mean(axis=0)
-
-        if self._xdata is None:
-            self._xdata = list(range(1,len(self._ydata)+1))
-
         self._invalidated = True
         self.update()
 
