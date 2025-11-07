@@ -41,6 +41,7 @@ class OCTUi():
 
         # initializations
         self._octDialog.widgetDispersion.setDispersion(self._params.dsp)
+        self._octDialog.widgetDispersion.valueChanged.connect(self.dispersionChanged)
         self._octDialog.widgetScanConfig.setScanParams(self._params.scn)
         self._octDialog.widgetAcqParams.setAcqParams(self._params.acq)
 
@@ -56,6 +57,10 @@ class OCTUi():
         self._octDialog.pbStop.enabled = False  
         self._octDialog.resize(1000,800)              
         self._octDialog.show()
+
+    def dispersionChanged(self, dispersion: Tuple[float, float]):
+        self._vtxengine.update_dispersion(dispersion)
+        print("Updated dispersion ", dispersion)
 
     def dialogClosing(self):
         self._getAllParams()

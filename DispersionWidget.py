@@ -1,10 +1,13 @@
 import sys
 from typing import Tuple
 from PyQt5.QtWidgets import QApplication, QWidget
-from PyQt5.QtGui import QDoubleValidator
+from PyQt5 import QtCore
 from Ui_DispersionWidget import Ui_DispersionWidget
 
 class DispersionWidget(QWidget, Ui_DispersionWidget):
+
+    valueChanged = QtCore.pyqtSignal(object)
+
     def __init__(self, parent: QWidget=None, dsp: Tuple[float, float] = (0,0)):
         super().__init__(parent)
         self.setupUi(self)
@@ -13,10 +16,15 @@ class DispersionWidget(QWidget, Ui_DispersionWidget):
         # initialize values
         self.dsbDispersion0.setMinimum(-10e-5)
         self.dsbDispersion0.setMaximum(10e-5)
-        self.dsbDispersion1.setMinimum(-10e-5)
-        self.dsbDispersion1.setMaximum(10e-5)
+        self.dsbDispersion1.setMinimum(-10e-2)
+        self.dsbDispersion1.setMaximum(10e-2)
         self.dsbDispersion0.setValue(dsp[0])
         self.dsbDispersion1.setValue(dsp[1])
+        self.dsbDispersion0.valueChanged.connect(self.dispersionChanged)
+        self.dsbDispersion1.valueChanged.connect(self.dispersionChanged)
+
+    def dispersionChanged(self, value):
+        self.valueChanged.emit(self.getDispersion())
 
     def getDispersion(self) -> Tuple[float, float]:
         return (self.dsbDispersion0.value(), self.dsbDispersion1.value())

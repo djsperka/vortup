@@ -81,27 +81,28 @@ class VtxBaseEngine():
         # OCT processing setup
         #
 
-        pc = CUDAProcessorConfig()
+        self._octprocess_config = CUDAProcessorConfig()
 
         # match acquisition settings
-        pc.samples_per_record = acq.samples_per_ascan
-        pc.ascans_per_block = acq.ascans_per_block
+        self._octprocess_config.samples_per_record = acq.samples_per_ascan
+        self._octprocess_config.ascans_per_block = acq.ascans_per_block
 
-        pc.slots = cfg.process_slots
+        self._octprocess_config.slots = cfg.process_slots
 
         # reasmpling
-        pc.resampling_samples = resampling
+        self._octprocess_config.resampling_samples = resampling
 
         # spectral filter with dispersion correction
-        window = np.hanning(pc.samples_per_ascan)
+        window = np.hanning(self._octprocess_config.samples_per_ascan)
         phasor = dispersion_phasor(len(window), dsp)
-        pc.spectral_filter = window * phasor
+        self._octprocess_config.spectral_filter = window * phasor
+        self._octprocess_config.spectral_filter = self.get_spectral_filter(dsp)
 
         # DC subtraction per block
-        pc.average_window = 2 * pc.ascans_per_block
+        self._octprocess_config.average_window = 2 * self._octprocess_config.ascans_per_block
 
         self._octprocess = CUDAProcessor(get_logger('process', cfg.log_level))
-        self._octprocess.initialize(pc)
+        self._octprocess.initialize(self._octprocess_config)
 
         #
         # galvo control
@@ -151,3 +152,13 @@ class VtxBaseEngine():
             self._strobe = strobe
         else:
             self._strobe = None
+
+    def get_spectral_filter(self, dispersion: Tuple[float, float]) -> np.ndarray:
+        window = np.hanning(self._octprocess_config.samples_per_ascan)
+        phasor = dispersion_phasor(len(window), dispersion)
+        filter = window * phasor
+        return filter
+
+    def update_dispersion(self, dispersion: Tuple[float, float]):
+        self._octprocess_config.spectral_filter = self.get_spectral_filter(dispersion)
+        self._octprocess.change(self._octprocess_config)
