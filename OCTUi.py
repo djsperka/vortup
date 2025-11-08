@@ -59,8 +59,9 @@ class OCTUi():
         self._octDialog.show()
 
     def dispersionChanged(self, dispersion: Tuple[float, float]):
-        self._vtxengine.update_dispersion(dispersion)
-        print("Updated dispersion ", dispersion)
+        if self._vtxengine is not None:
+            self._vtxengine.update_dispersion(dispersion)   
+            print("Updated dispersion ", dispersion)
 
     def dialogClosing(self):
         self._getAllParams()
