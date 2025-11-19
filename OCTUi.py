@@ -119,7 +119,9 @@ class OCTUi():
             # clear plots
             self._cross_widget.notify_segments([0])
             self._raster_widget.notify_segments([0])
-
+            self._ascan_trace_widget.flush()
+            self._spectra_trace_widget.flush()
+            
         def cb_ascan(v):
             self._cross_widget.notify_segments(v)
             self._raster_widget.notify_segments(v)
