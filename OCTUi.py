@@ -11,7 +11,8 @@ from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
 from vortex.scan import RasterScan
 from vortex.storage import SimpleStackConfig, SimpleStackHeader
 from vortex.engine import Engine
-from BScanTraceWidget import BScanTraceWidget
+#from BScanTraceWidget import BScanTraceWidget
+from TraceWidget import TraceWidget
 import logging
 from typing import Tuple
 from rainbow_logging_handler import RainbowLoggingHandler
@@ -91,9 +92,10 @@ class OCTUi():
         if not self._cross_widget:
             self._raster_widget = RasterEnFaceWidget(self._vtxengine._endpoint_ascan_display, cmap=mpl.colormaps['gray'])
             self._cross_widget = CrossSectionImageWidget(self._vtxengine._endpoint_ascan_display, cmap=mpl.colormaps['gray'])
-            self._ascan_trace_widget = BScanTraceWidget(self._vtxengine._endpoint_ascan_display, title="ascan")
-
-            self._spectra_trace_widget = BScanTraceWidget(self._vtxengine._endpoint_spectra_display, title="raw spectra")
+            #self._ascan_trace_widget = BScanTraceWidget(self._vtxengine._endpoint_ascan_display, title="ascan")
+            #self._spectra_trace_widget = BScanTraceWidget(self._vtxengine._endpoint_spectra_display, title="raw spectra")
+            self._ascan_trace_widget = TraceWidget(self._vtxengine._endpoint_ascan_display, title="ascan")
+            self._spectra_trace_widget = TraceWidget(self._vtxengine._endpoint_spectra_display, title="raw spectra")
 
             # 
             vbox = QVBoxLayout()
@@ -114,6 +116,12 @@ class OCTUi():
             self._ascan_trace_widget._endpoint = self._vtxengine._endpoint_ascan_display
             self._spectra_trace_widget._endpoint = self._vtxengine._endpoint_spectra_display
 
+            # clear plots
+            self._cross_widget.notify_segments([0])
+            self._raster_widget.notify_segments([0])
+            self._ascan_trace_widget.flush()
+            self._spectra_trace_widget.flush()
+            
         def cb_ascan(v):
             self._cross_widget.notify_segments(v)
             self._raster_widget.notify_segments(v)
