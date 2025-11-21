@@ -34,7 +34,7 @@ class VtxBaseEngine():
             ac.samples_per_record = board.info.smallest_aligned_samples_per_record(cfg.ssrc_clock_rising_edges_per_trigger)
 
             # trigger with range - must be 5000 (2500 will err). TTL will work in config also. Discrepancy with docs
-            ac.trigger = alazar.SingleExternalTrigger(range_millivolts=cfg.trigger_range_millivolts, level_ratio=cfg.trigger_level_fraction, delay_samples=0, slope=alazar.TriggerSlope.Positive)
+            ac.trigger = alazar.SingleExternalTrigger(range_millivolts=cfg.trigger_range_millivolts, level_ratio=cfg.trigger_level_fraction, delay_samples=acq.trigger_delay_samples, slope=alazar.TriggerSlope.Positive)
 
             # only input channel A
             LOGGER.info("Using input channel {0:s} for input \"{1:s}\"".format(str(getAlazarChannel(cfg.input_channel)), cfg.input_channel))

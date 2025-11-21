@@ -13,26 +13,24 @@ class AcqParamsWidget(QGroupBox, Ui_AcqParamsWidget):
         self.leAperBlock.setValidator(QIntValidator(1,5000))
         self.leSperA.setValidator(QIntValidator(1,5000))
         self.leNBlocks.setValidator(QIntValidator(0, 10000))
-        v = QDoubleValidator(0.0, 1.0, 3)
-        v.setNotation(QDoubleValidator.Notation.ScientificNotation)
-        self.leTriggerDelay.setValidator(v)
+        self.leTriggerDelay.setValidator(QIntValidator(0, 10000))
 
         # initialize values
         self.leAperBlock.setText(str(cfg.ascans_per_block))
         self.leSperA.setText(str(cfg.samples_per_ascan))
         self.leNBlocks.setText(str(cfg.blocks_to_acquire))
-        self.leTriggerDelay.setText(str(cfg.trigger_delay_seconds))
+        self.leTriggerDelay.setText(str(cfg.trigger_delay_samples))
 
     def getAcqParams(self) -> AcqParams: 
         cfg = AcqParams()
         cfg.ascans_per_block = int(self.leAperBlock.text())
         cfg.samples_per_ascan = int(self.leSperA.text())
         cfg.blocks_to_acquire = int(self.leNBlocks.text())
-        cfg.trigger_delay_seconds = float(self.leTriggerDelay.text())
+        cfg.trigger_delay_samples = int(self.leTriggerDelay.text())
         return cfg
     
     def setAcqParams(self, cfg: AcqParams):
         self.leAperBlock.setText(str(cfg.ascans_per_block))
         self.leSperA.setText(str(cfg.samples_per_ascan))
         self.leNBlocks.setText(str(cfg.blocks_to_acquire))
-        self.leTriggerDelay.setText(str(cfg.trigger_delay_seconds))
+        self.leTriggerDelay.setText(str(cfg.trigger_delay_samples))
