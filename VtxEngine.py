@@ -143,7 +143,11 @@ class VtxEngine(VtxBaseEngine):
     def stop(self):
         # only if we are running
         if self._engine and not self._engine.done:
+            self._logger.info('stop...')
             self._engine.stop()
+            self._logger.info('wait...')
+            self._engine.wait()
+            self._logger.info('stopped.')
         else:
             self._logger.warning('engine is not running')
             

@@ -10,7 +10,7 @@ from vortex import get_console_logger as gcl
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
 from vortex.scan import RasterScan
 from vortex.storage import SimpleStackConfig, SimpleStackHeader
-from vortex.engine import Engine
+from vortex.engine import Engine, EngineStatus
 #from BScanTraceWidget import BScanTraceWidget
 from TraceWidget import TraceWidget
 import logging
@@ -210,14 +210,22 @@ class OCTUi():
             self._octDialog.gbSaveVolumes.enableSaving(False)
         elif event == Engine.Event.Error:
             self._logger.error("Error event from engine.")
-            self.stopClicked()
+            #self.stopClicked()
+
+    def printStatus(self, s):
+        if self._vtxengine is not None:
+            status = self._vtxengine._engine.status()
+            self._logger.info(s + "\nactive? {0:d}\nblock_utilization {1:f}\ndispatch_completion {2:f}\ndispatched_blocks {3:d}\ninflight_blocks {4:d}\n".format(status.active, status.block_utilization, status.dispatch_completion, status.dispatched_blocks, status.inflight_blocks))
 
     def stopClicked(self):
         if self._vtxengine is not None:
             self._octDialog.pbEtc.setEnabled(True)
             self._octDialog.pbStart.setEnabled(True)
             self._octDialog.pbStop.setEnabled(False)
+            status = self._vtxengine._engine.status()
+            self.printStatus("about to stop")
             self._vtxengine.stop()
+            self.printStatus("stopped")
 
     def scanCallback(self, arg0, arg1):
         self._logger.info("scanCallback({0:d}, {1:d}, {2:d}, {3:d})".format(arg0, arg1))
@@ -316,8 +324,6 @@ class OCTUi():
             self._octDialog.gbSaveVolumes.enableSaving(False, True)
         else:
             self._savingVolumesStopNow = True
-
-
 
 
 def setup_logging():
