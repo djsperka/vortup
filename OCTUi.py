@@ -2,10 +2,12 @@ import sys
 import os
 from VtxEngineParamsDialog import VtxEngineParamsDialog
 from VtxEngine import VtxEngine
-from OCTDialog import OCTDialog
+#from OCTDialog import OCTDialog
+from OCTUiMainWindow import OCTUiMainWindow
 from OCTUiParams import OCTUiParams
 from PyQt5.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout
 from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtCore import QTimer,QDateTime
 from vortex import get_console_logger as gcl
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
 from vortex.scan import RasterScan
@@ -33,12 +35,14 @@ class OCTUi():
         self._savingVolumesThisMany = 0
         self._savingVolumesThisManySaved = 0
         self._savingVolumesRequested = False
+        self._timer=QTimer()
+        self._timer.timeout.connect(self.showTime)
 
         # load config file - default file only!
         # TODO - make it configurable, or be able to load a diff't config.
         self._params = OCTUiParams()
 
-        self._octDialog = OCTDialog()
+        self._octDialog = OCTUiMainWindow()
 
         # initializations
         self._octDialog.widgetDispersion.setDispersion(self._params.dsp)
@@ -196,12 +200,20 @@ class OCTUi():
             self._vtxengine._engine.start()
 
             # status timer
+            self._timer.start(1000)
 
 
         except RuntimeError as e:
             print("RuntimeError:")
             traceback.print_exception(e)
             sys.exit(-1)
+
+    def showTime(self):
+        current_time=QDateTime.currentDateTime()
+        formatted_time=current_time.toString('yyyy-MM-dd hh:mm:ss dddd')
+        self._logger.info(formatted_time)
+        self._octDialog.statusBar().showMessage(formatted_time)
+
 
     def engineEventCallback(self, event, thingy):
         if event == Engine.Event.Start:
@@ -218,6 +230,7 @@ class OCTUi():
             self._logger.info(s + "\nactive? {0:d}\nblock_utilization {1:f}\ndispatch_completion {2:f}\ndispatched_blocks {3:d}\ninflight_blocks {4:d}\n".format(status.active, status.block_utilization, status.dispatch_completion, status.dispatched_blocks, status.inflight_blocks))
 
     def stopClicked(self):
+        self._timer.stop()
         if self._vtxengine is not None:
             self._octDialog.pbEtc.setEnabled(True)
             self._octDialog.pbStart.setEnabled(True)
