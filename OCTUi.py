@@ -5,8 +5,7 @@ from VtxEngine import VtxEngine
 #from OCTDialog import OCTDialog
 from OCTUiMainWindow import OCTUiMainWindow
 from OCTUiParams import OCTUiParams
-from PyQt5.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QMessageBox, QLabel
 from PyQt5.QtCore import QTimer,QDateTime
 from vortex import get_console_logger as gcl
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
@@ -43,6 +42,11 @@ class OCTUi():
         self._params = OCTUiParams()
 
         self._octDialog = OCTUiMainWindow()
+
+        # add a permanent status widget to the status bar
+        self._labelEngineStatus = QLabel("Not started...")
+        self._octDialog.statusBar().addPermanentWidget(self._labelEngineStatus)
+
 
         # initializations
         self._octDialog.widgetDispersion.setDispersion(self._params.dsp)
@@ -211,8 +215,13 @@ class OCTUi():
     def showTime(self):
         current_time=QDateTime.currentDateTime()
         formatted_time=current_time.toString('yyyy-MM-dd hh:mm:ss dddd')
-        self._logger.info(formatted_time)
+        #self._logger.info(formatted_time)
         self._octDialog.statusBar().showMessage(formatted_time)
+        status = self._vtxengine._engine.status()
+        if status.active:
+            self._labelEngineStatus.setText("Active: blk_util {0:f} disp_blks {2:d}".format(status.block_utilization, status.dispatched_blocks, status.inflight_blocks))
+        else:
+            self._labelEngineStatus.setText("Not running.")
 
 
     def engineEventCallback(self, event, thingy):
@@ -235,10 +244,7 @@ class OCTUi():
             self._octDialog.pbEtc.setEnabled(True)
             self._octDialog.pbStart.setEnabled(True)
             self._octDialog.pbStop.setEnabled(False)
-            status = self._vtxengine._engine.status()
-            self.printStatus("about to stop")
             self._vtxengine.stop()
-            self.printStatus("stopped")
 
     def scanCallback(self, arg0, arg1):
         self._logger.info("scanCallback({0:d}, {1:d}, {2:d}, {3:d})".format(arg0, arg1))
