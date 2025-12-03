@@ -48,7 +48,7 @@
   <customwidget>
    <class>ScienDSpinBox</class>
    <extends>QDoubleSpinBox</extends>
-   <header location="global">scientific_spinbox</header>
+   <header location="global">scientific_spinbox_2</header>
   </customwidget>
  </customwidgets>
  <resources/>
