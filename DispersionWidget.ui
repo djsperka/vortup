@@ -19,12 +19,12 @@
      <item>
       <widget class="QLabel" name="label_26">
        <property name="text">
-        <string>dispersion[0] (s/Hz/m)</string>
+        <string>C2 (s**2/m) x10e-6</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="ScienDSpinBox" name="dsbDispersion0"/>
+      <widget class="ScientificSpinBox" name="dsbDispersion0"/>
      </item>
     </layout>
    </item>
@@ -33,12 +33,12 @@
      <item>
       <widget class="QLabel" name="label_27">
        <property name="text">
-        <string>dispersion[1] (s/Hz**2/m)</string>
+        <string>C3 (s**3/m) x10e-9</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="ScienDSpinBox" name="dsbDispersion1"/>
+      <widget class="ScientificSpinBox" name="dsbDispersion1"/>
      </item>
     </layout>
    </item>
@@ -46,9 +46,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ScienDSpinBox</class>
+   <class>ScientificSpinBox</class>
    <extends>QDoubleSpinBox</extends>
-   <header location="global">scientific_spinbox_2</header>
+   <header location="global">scientific_spinbox.widget</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -22,7 +22,7 @@ class Ui_DispersionWidget(object):
         self.label_26 = QtWidgets.QLabel(DispersionWidget)
         self.label_26.setObjectName("label_26")
         self.horizontalLayout.addWidget(self.label_26)
-        self.dsbDispersion0 = ScienDSpinBox(DispersionWidget)
+        self.dsbDispersion0 = ScientificSpinBox(DispersionWidget)
         self.dsbDispersion0.setObjectName("dsbDispersion0")
         self.horizontalLayout.addWidget(self.dsbDispersion0)
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -31,7 +31,7 @@ class Ui_DispersionWidget(object):
         self.label_27 = QtWidgets.QLabel(DispersionWidget)
         self.label_27.setObjectName("label_27")
         self.horizontalLayout_2.addWidget(self.label_27)
-        self.dsbDispersion1 = ScienDSpinBox(DispersionWidget)
+        self.dsbDispersion1 = ScientificSpinBox(DispersionWidget)
         self.dsbDispersion1.setObjectName("dsbDispersion1")
         self.horizontalLayout_2.addWidget(self.dsbDispersion1)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
@@ -42,9 +42,9 @@ class Ui_DispersionWidget(object):
     def retranslateUi(self, DispersionWidget):
         _translate = QtCore.QCoreApplication.translate
         DispersionWidget.setWindowTitle(_translate("DispersionWidget", "Form"))
-        self.label_26.setText(_translate("DispersionWidget", "dispersion[0] (s/Hz/m)"))
-        self.label_27.setText(_translate("DispersionWidget", "dispersion[1] (s/Hz**2/m)"))
-from scientific_spinbox_2 import ScienDSpinBox
+        self.label_26.setText(_translate("DispersionWidget", "C2 (s**2/m) x10e-6"))
+        self.label_27.setText(_translate("DispersionWidget", "C3 (s**3/m) x10e-9"))
+from scientific_spinbox.widget import ScientificSpinBox
 
 
 if __name__ == "__main__":
