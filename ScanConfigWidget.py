@@ -47,20 +47,39 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
         # callback for radio buttons
         self.cbScanTypes.currentIndexChanged.connect(self.stackScanTypes.setCurrentIndex)
 
-        # validators
+        # # validators
 
-        # This regular expression matches a comma-separated range with or without floating-point numbers.
-        # It also matches a single number (float or not). 
-        # The capture [1] is for the former, and capture[6] is for the single number.
-        sFloat = "([+-]?([0-9]*[.])?[0-9]+)"
-        self._regexForExtents = QRegExp("({0:s}[\s,]{1:s})|{2:s}".format(sFloat, sFloat, sFloat))
-        #self._regexForExtents = QRegExp("((-?\d+)[\s,]+(-?\d+))|(-?\d+)")
-        self.leAperB.setValidator(QIntValidator(1,5000))
-        self.leBperV.setValidator(QIntValidator(1,5000))
-        self.leXextent.setValidator(QRegExpValidator(self._regexForExtents))
-        self.leYextent.setValidator(QRegExpValidator(self._regexForExtents))
-        self.pushButtonShowPattern.clicked.connect(self.showPatternClicked)
+        # # This regular expression matches a comma-separated range with or without floating-point numbers.
+        # # It also matches a single number (float or not). 
+        # # The capture [1] is for the former, and capture[6] is for the single number.
+        # sFloat = "([+-]?([0-9]*[.])?[0-9]+)"
+        # self._regexForExtents = QRegExp("({0:s}[\s,]{1:s})|{2:s}".format(sFloat, sFloat, sFloat))
+        # #self._regexForExtents = QRegExp("((-?\d+)[\s,]+(-?\d+))|(-?\d+)")
+        # self.leAperB.setValidator(QIntValidator(1,5000))
+        # self.leBperV.setValidator(QIntValidator(1,5000))
+        # self.leXextent.setValidator(QRegExpValidator(self._regexForExtents))
+        # self.leYextent.setValidator(QRegExpValidator(self._regexForExtents))
+        # self.pushButtonShowPattern.clicked.connect(self.showPatternClicked)
 
+    def getScanParams(self) -> ScanParams:
+        params = ScanParams()
+        params.current_index = self.cbScanTypes.currentIndex()
+        for i in range(self.cbScanTypes.count()):
+            params.scans[self.cbScanTypes.itemText(i)] = self.cbScanTypes.itemData(i).getParams()
+        return params
+
+    def setScanParams(self, params: ScanParams):
+        print("current index {0:d}".format(params.current_index))
+        for name,cfg in params.scans.items():
+            # create widget
+            w = scanConfigWidgetFactory(cfg)
+
+            # add item to drop-down
+            self.cbScanTypes.addItem(name, w)
+
+            # add page to stacked widget
+            self.stackScanTypes.addWidget(w)
+        
     def showPatternClicked(self):
         try:
             cfg = self.getScanConfig()
@@ -79,7 +98,38 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
             traceback.print_exception(e)
 
 
-class RasterScanConfigWidget(QWidget, Ui_RasterScanConfigWidget):
+def scanConfigWidgetFactory(params: RasterScanParams|AimingScanParams|LineScanParams) -> QWidget:
+    if isinstance(params, RasterScanParams): 
+        w=RasterScanConfigWidget()
+        w.setRasterScanParams(params)
+    elif isinstance(params, AimingScanParams):
+        w=AimingScanConfigWidget()
+        w.setAimingScanParams(params)
+    elif isinstance(params, LineScanParams):
+        w=LineScanConfigWidget()
+        w.setLineScanParams(params)
+    else:
+        raise TypeError('Must pass one of these: RasterScanParams|AimingScanParams|LineScanParams')
+    return w
+
+
+from abc import ABC, ABCMeta,  abstractmethod
+QWidgetMeta = type(QWidget)
+class _ABCQWidgetMeta(QWidgetMeta, ABCMeta): pass
+
+class ScanTypeConfigWidget(ABC):
+
+    @abstractmethod
+    def setParams(self, params):
+        """Initialize widget with the given parameters"""
+        pass
+
+    @abstractmethod
+    def getParams(self):
+        """Return the parameters currently specified in the widget"""
+        pass
+
+class RasterScanConfigWidget(QWidget, Ui_RasterScanConfigWidget, ScanTypeConfigWidget, metaclass=_ABCQWidgetMeta):
     def __init__(self, parent: QWidget=None):
         """Instantiate class
 
@@ -94,6 +144,12 @@ class RasterScanConfigWidget(QWidget, Ui_RasterScanConfigWidget):
         self.leXextent.setValidator(QRegExpValidator(RegexForExtents))
         self.leYextent.setValidator(QRegExpValidator(RegexForExtents))
 
+
+    def getParams(self):
+        return self.getRasterScanParams()
+    
+    def setParams(self, params):
+        self.setRasterScanParams(params)
 
     def getRasterScanParams(self) -> RasterScanParams:
         params = RasterScanParams()
@@ -115,7 +171,7 @@ class RasterScanConfigWidget(QWidget, Ui_RasterScanConfigWidget):
 
 
 
-class AimingScanConfigWidget(QWidget, Ui_AimingScanConfigWidget):
+class AimingScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_AimingScanConfigWidget, metaclass=_ABCQWidgetMeta):
     def __init__(self, parent: QWidget=None):
         """Instantiate class
 
@@ -128,6 +184,11 @@ class AimingScanConfigWidget(QWidget, Ui_AimingScanConfigWidget):
         self.leAperB.setValidator(QIntValidator(1,5000))
         self.leAextent.setValidator(QRegExpValidator(RegexForExtents))
 
+    def getParams(self):
+        return self.getAimingScanParams()
+    
+    def setParams(self, params):
+        self.setAimingScanParams(params)
 
     def getAimingScanParams(self) -> AimingScanParams:
         params = AimingScanParams()
@@ -144,7 +205,7 @@ class AimingScanConfigWidget(QWidget, Ui_AimingScanConfigWidget):
         self.dsbAngle.setValue(params.angle)
 
 
-class LineScanConfigWidget(QWidget, Ui_LineScanConfigWidget):
+class LineScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_LineScanConfigWidget, metaclass=_ABCQWidgetMeta):
     def __init__(self, parent: QWidget=None):
         """Instantiate class
 
@@ -157,6 +218,11 @@ class LineScanConfigWidget(QWidget, Ui_LineScanConfigWidget):
         self.leAperB.setValidator(QIntValidator(1,5000))
         self.leXextent.setValidator(QRegExpValidator(RegexForExtents))
 
+    def getParams(self):
+        return self.getLineScanParams()
+    
+    def setParams(self, params):
+        self.setLineScanParams(params)
 
     def getLineScanParams(self) -> LineScanParams:
         params = LineScanParams()
@@ -193,12 +259,12 @@ if __name__ == "__main__":
             r.bidirectional_segments = False
             r.ascans_per_bscan = 400
             r.bscans_per_volume = 450
-            w.setRasterScanParams(r)
+            w.setParams(r)
 
             w.show()
             app.exec()
 
-            r2 = w.getRasterScanParams()
+            r2 = w.getParams()
             print(r)
             print(r2)
         case 'aim':
