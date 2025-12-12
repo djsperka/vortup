@@ -100,8 +100,6 @@ class OCTUi():
         if not self._cross_widget:
             self._raster_widget = RasterEnFaceWidget(self._vtxengine._endpoint_ascan_display, cmap=mpl.colormaps['gray'])
             self._cross_widget = CrossSectionImageWidget(self._vtxengine._endpoint_ascan_display, cmap=mpl.colormaps['gray'])
-            #self._ascan_trace_widget = BScanTraceWidget(self._vtxengine._endpoint_ascan_display, title="ascan")
-            #self._spectra_trace_widget = BScanTraceWidget(self._vtxengine._endpoint_spectra_display, title="raw spectra")
             self._ascan_trace_widget = TraceWidget(self._vtxengine._endpoint_ascan_display, title="ascan")
             self._spectra_trace_widget = TraceWidget(self._vtxengine._endpoint_spectra_display, title="raw spectra")
 
@@ -187,9 +185,6 @@ class OCTUi():
             self._vtxengine._engine.event_callback = self.engineEventCallback
             self._vtxengine._null_endpoint.volume_callback = self.volumeCallback
             self._vtxengine._endpoint_spectra_storage.volume_callback = self.volumeCallback2
-            #self._vtxengine._null_endpoint.segment_callback = self.segmentCallback
-            #self._vtxengine._null_endpoint.aggregate_segment_callback = self.aggregateSegmentCallback
-            #self._vtxengine._null_endpoint.scan_callback = self.scanCallback
 
             # put something into the scan queue
             self._raster_scan = RasterScan()
