@@ -12,7 +12,8 @@ from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
 from vortex.scan import RasterScan
 from vortex.storage import SimpleStackConfig, SimpleStackHeader
 from vortex.engine import Engine, EngineStatus
-#from BScanTraceWidget import BScanTraceWidget
+from ScanParams import ScanParams
+from ScanGUIHelper import scanGUIHelperFactory, ScanGUIHelper
 from TraceWidget import TraceWidget
 import logging
 from typing import Tuple
@@ -36,6 +37,7 @@ class OCTUi():
         self._savingVolumesRequested = False
         self._timer=QTimer()
         self._timer.timeout.connect(self.showTime)
+        self._guihelpers = {}
 
         # load config file - default file only!
         # TODO - make it configurable, or be able to load a diff't config.
@@ -51,8 +53,8 @@ class OCTUi():
         # initializations
         self._octDialog.widgetDispersion.setDispersion(self._params.dsp)
         self._octDialog.widgetDispersion.valueChanged.connect(self.dispersionChanged)
-        self._octDialog.widgetScanConfig.setScanParams(self._params.scn)
         self._octDialog.widgetAcqParams.setAcqParams(self._params.acq)
+        self.initializeScans(self._params.scn)
 
         # connections. 
         self._octDialog.gbSaveVolumes.saveNVolumes.connect(self.saveNVolumes)
@@ -66,6 +68,14 @@ class OCTUi():
         self._octDialog.pbStop.enabled = False  
         self._octDialog.resize(1000,800)              
         self._octDialog.show()
+
+    def initializeScans(self, scn: ScanParams):
+        number = 1;
+        for name,cfg in scn.scans.items():
+            self._guihelpers[name] = scanGUIHelperFactory(name, number, cfg, self._params.vtx.log_level)
+            self._octDialog.widgetScanConfig.addScanType(name, self._guihelpers[name].edit_widget)
+            number += 1
+        self._octDialog.widgetScanConfig.setCurrentIndex(scn.current_index)
 
     def dispersionChanged(self, dispersion: Tuple[float, float]):
         if self._vtxengine is not None:

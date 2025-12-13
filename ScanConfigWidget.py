@@ -68,18 +68,16 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
             params.scans[self.cbScanTypes.itemText(i)] = self.cbScanTypes.itemData(i).getParams()
         return params
 
-    def setScanParams(self, params: ScanParams):
-        print("current index {0:d}".format(params.current_index))
-        for name,cfg in params.scans.items():
-            # create widget
-            w = scanConfigWidgetFactory(cfg)
+    def addScanType(self, name, w):
+        # add item to drop-down
+        self.cbScanTypes.addItem(name, w)
 
-            # add item to drop-down
-            self.cbScanTypes.addItem(name, w)
+        # add page to stacked widget
+        self.stackScanTypes.addWidget(w)
 
-            # add page to stacked widget
-            self.stackScanTypes.addWidget(w)
-        
+    def setCurrentIndex(self, index):
+        self.cbScanTypes.setCurrentIndex(index)
+       
     def showPatternClicked(self):
         try:
             cfg = self.getScanConfig()
@@ -96,21 +94,6 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
         except RuntimeError as e:
             print("RuntimeError:")
             traceback.print_exception(e)
-
-
-def scanConfigWidgetFactory(params: RasterScanParams|AimingScanParams|LineScanParams) -> QWidget:
-    if isinstance(params, RasterScanParams): 
-        w=RasterScanConfigWidget()
-        w.setRasterScanParams(params)
-    elif isinstance(params, AimingScanParams):
-        w=AimingScanConfigWidget()
-        w.setAimingScanParams(params)
-    elif isinstance(params, LineScanParams):
-        w=LineScanConfigWidget()
-        w.setLineScanParams(params)
-    else:
-        raise TypeError('Must pass one of these: RasterScanParams|AimingScanParams|LineScanParams')
-    return w
 
 
 from abc import ABC, ABCMeta,  abstractmethod
