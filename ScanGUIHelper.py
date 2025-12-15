@@ -1,11 +1,20 @@
 from abc import ABC, abstractmethod
-from VtxEngine import VtxEngine
+from typing import List, Any
 from ScanConfigWidget import RasterScanConfigWidget, AimingScanConfigWidget, LineScanConfigWidget
 from ScanParams import RasterScanParams, AimingScanParams, LineScanParams
+from AcqParams import AcqParams
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
 from TraceWidget import TraceWidget
 import matplotlib as mpl
+
+from vortex.scan import RasterScan, RasterScanConfig
+from vortex.engine import StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, SpectraStackEndpoint, NullEndpoint
+from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, SimpleSlice
+from vortex.storage import SimpleStackUInt16
+from vortex.marker import Flags
+from vortex import get_console_logger as get_logger
+import logging
 
 class ScanGUIHelper(ABC):
     def __init__(self, name, number, params, log_level=1):
@@ -13,8 +22,29 @@ class ScanGUIHelper(ABC):
         self.number = number
         self.params = params
         self.log_level = log_level
-        self.format_planner = None
-        self.endpoints = []
+        self._logger = logging.getLogger('GUIHeper({0:s})'.format(self.name))
+
+    @property 
+    def format_planner(self) -> FormatPlanner:
+        '''
+        Returns format planner for this scan
+        
+        :param self: Should be a FormatPlaner, which can be used in EngineConfig.add_processor. Subclasses should set value.
+
+        '''
+        return self._format_planner
+
+    @property
+    def endpoints(self) -> List[Any]:
+        return self._endpoints
+
+    @property
+    def null_endpoint(self) -> NullEndpoint:
+        return self._null_endpoint
+    
+    @property
+    def storage_endpoint(self) -> NullEndpoint:
+        return self._storage_endpoint
 
     @property
     def plot_widget(self):
@@ -35,20 +65,16 @@ class ScanGUIHelper(ABC):
         return self._edit_widget
 
     @abstractmethod
-    def getParams(self):
-        """Return the parameters currently specified in the edit widget"""
-        pass
+    def getScan(self):
+        '''
+        Returns a configured scan pattern, e.g. RasterScan
+        
+        :param self: Description
+        '''
 
     @abstractmethod
-    def connectToEngine(self, engine: VtxEngine):
-        """Connect any callbacks needed for plots. Do not worry about whatever was connected there before.
-
-        Args:
-            engine (VtxEngine): The engine to connect to. 
-
-        Returns:
-            _type_: None
-        """
+    def getParams(self):
+        """Return the parameters currently specified in the edit widget"""
         pass
 
     @abstractmethod
@@ -59,82 +85,92 @@ class ScanGUIHelper(ABC):
         """
         pass
 
-
-from vortex.engine import StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, NullEndpoint
-from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, SimpleSlice
-from vortex.storage import SimpleStackUInt16
-from vortex.marker import Flags
-from vortex import get_console_logger as get_logger
-
-
 class RasterScanGUIHelper(ScanGUIHelper):
-    def __init__(self, name, number, params, log_level):
+    def __init__(self, name: str, number: int, params: RasterScanParams, acq:AcqParams, log_level: int):
         super().__init__(name, number, params, log_level)
 
-        self._edit_widget = RasterScanConfigWidget()
-        self._edit_widget.setRasterScanParams(self.params)
-        self._plot_widget = self.rasterPlotWidget()
-        (self.format, self.endpoints) = self.getEngineParts(params)
-
-    def getEngineParts(self, params: RasterScanParams):
+        # Create engine parts for this scan
         fc = FormatPlannerConfig()
         fc.segments_per_volume = params.bscans_per_volume
         fc.records_per_segment = params.ascans_per_bscan
         fc.adapt_shape = False
-        fc.mask = Flags(self.number);
+        fc.mask = Flags(number)
 
-        self.format_planner = FormatPlanner(get_logger('{0:s}-format', 1))
-        self.format_planner.initialize(fc)
+        self._format_planner = FormatPlanner(get_logger('raster format', log_level))
+        self._format_planner.initialize(fc)
+
+        # As endpoints are created, stuff them into this list. 
+        # They are added to the engine all at once.
+        self._endpoints = []
 
         # For saving volumes, this NullEndpoint is used. The volume_callback for this 
         # endpoint will be called before that of the other endpoints. If needed, we open
         # the storage in the volume_callback for this endpoint when needed. The storage 
         # is closed in the volume_callback for the SpectraStackEndpoint, which does the 
         # saving/writing of volumes.
-        self._null_endpoint = NullEndpoint(get_logger('Traffic cop', cfg.log_level))
-        endpoints.append(self._null_endpoint)
+        self._null_endpoint = NullEndpoint(get_logger('Traffic cop', log_level))
+        self._endpoints.append(self._null_endpoint)
 
         # For DISPLAYING ascans (oct-processed data), slice away half the data. 
         # This stack format executor isn't used with the other endpoints.
         sfec = StackFormatExecutorConfig()
-        sfec.sample_slice = SimpleSlice(self._octprocess.config.samples_per_ascan // 2)
+        sfec.sample_slice = SimpleSlice(acq.samples_per_ascan // 2)
         samples_to_save = sfec.sample_slice.count()
         sfe = StackFormatExecutor()
         sfe.initialize(sfec)
 
         # endpoint for display of ascans
-        vshape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, samples_to_save)
+        vshape = (params.bscans_per_volume, params.ascans_per_bscan, samples_to_save)
         self._logger.info('Create StackDeviceTensorEndpointInt8 with shape {0:s}'.format(str(vshape)))
-        self._endpoint_ascan_display = StackDeviceTensorEndpointInt8(sfe, vshape, get_logger('stack', cfg.log_level))
-        endpoints.append(self._endpoint_ascan_display)
+        self._endpoint_ascan_display = StackDeviceTensorEndpointInt8(sfe, vshape, get_logger('stack', log_level))
+        self._endpoints.append(self._endpoint_ascan_display)
 
 
         sfec_spectra = StackFormatExecutorConfig()
         sfe_spectra  = StackFormatExecutor()
         sfe_spectra.initialize(sfec_spectra)
-        shape_spectra = (scfg.bscans_per_volume, scfg.ascans_per_bscan, acq.samples_per_ascan)
+        shape_spectra = (params.bscans_per_volume, params.ascans_per_bscan, acq.samples_per_ascan)
         self._logger.info('Create SpectraStackHostTensorEndpointUInt16 with shape {0:s}'.format(str(shape_spectra)))
-        self._endpoint_spectra_display = SpectraStackHostTensorEndpointUInt16(sfe_spectra, shape_spectra, get_logger('stack', cfg.log_level))
-        endpoints.append(self._endpoint_spectra_display)
+        self._endpoint_spectra_display = SpectraStackHostTensorEndpointUInt16(sfe_spectra, shape_spectra, get_logger('stack', log_level))
+        self._endpoints.append(self._endpoint_spectra_display)
 
         # make an endpoint for saving spectra data
-        shape = (scfg.bscans_per_volume, scfg.ascans_per_bscan, acq.samples_per_ascan, 1)
-        self._endpoint_spectra_storage, self._spectra_storage = self.getSpectraStorageEndpoint(shape)
-        endpoints.append(self._endpoint_spectra_storage)
+        shape = (params.bscans_per_volume, params.ascans_per_bscan, acq.samples_per_ascan, 1)
+        self._spectra_storage = SimpleStackUInt16(get_logger('npy-spectra', log_level))
+        sfec = StackFormatExecutorConfig()
+        sfe = StackFormatExecutor()
+        sfe.initialize(sfec)
+        self._storage_endpoint = SpectraStackEndpoint(sfe, self._spectra_storage, log=get_logger('npy-spectra', log_level))
 
 
 
-
+        self._edit_widget = RasterScanConfigWidget()
+        self._edit_widget.setRasterScanParams(self.params)
+        self._plot_widget = self.rasterPlotWidget()
 
     def getParams(self):
         params = self._edit_widget.getRasterScanParams()
         return params
 
+    def getScan(self):
+
+        params = self.getParams()
+        cfg = RasterScanConfig()
+        cfg.ascans_per_bscan = params.ascans_per_bscan
+        cfg.bscans_per_volume = params.bscans_per_volume
+        cfg.bidirectional_segments = params.bidirectional_segments
+        cfg.segment_extent = params.segment_extent
+        cfg.volume_extent = params.volume_extent
+
+        scan = RasterScan()
+        scan.initialize(cfg)
+        return scan
+
     def rasterPlotWidget(self) -> QWidget: 
-        self._raster_widget = RasterEnFaceWidget(None, cmap=mpl.colormaps['gray'])
-        self._cross_widget = CrossSectionImageWidget(None, cmap=mpl.colormaps['gray'])
-        self._ascan_trace_widget = TraceWidget(None, title="ascan")
-        self._spectra_trace_widget = TraceWidget(None, title="raw spectra")
+        self._raster_widget = RasterEnFaceWidget(self._endpoint_ascan_display, cmap=mpl.colormaps['gray'])
+        self._cross_widget = CrossSectionImageWidget(self._endpoint_ascan_display, cmap=mpl.colormaps['gray'])
+        self._ascan_trace_widget = TraceWidget(self._endpoint_ascan_display, title="ascan")
+        self._spectra_trace_widget = TraceWidget(self._endpoint_spectra_display, title="raw spectra")
 
         # 
         vbox = QVBoxLayout()
@@ -149,15 +185,6 @@ class RasterScanGUIHelper(ScanGUIHelper):
         w = QWidget()
         w.setLayout(vbox)
         return w
-
-    def connectToEngine(self, engine: VtxEngine):
-        self._raster_widget.endpoint = engine._endpoint_ascan_display
-        self._cross_widget.endpoint = engine._endpoint_ascan_display
-        self._ascan_trace_widget.endpoint = engine._endpoint_ascan_display
-        self._spectra_trace_widget.endpoint = engine._endpoint_spectra_display
-
-        engine._endpoint_spectra_display.aggregate_segment_callback = self.cb_spectra
-        engine._endpoint_ascan_display.aggregate_segment_callback = self.cb_ascan
 
     def clear(self):
         self._cross_widget.notify_segments([0])
@@ -187,9 +214,6 @@ class AimingScanGUIHelper(ScanGUIHelper):
         params = self._edit_widget.getAimingScanParams()
         return params
 
-    def connectToEngine(self, engine: VtxEngine):
-        print("AimingScanGUIHelper::connectToEngine")
-
     def clear(self):
         print("AimingScanGUIHelper::clear")
 
@@ -206,16 +230,13 @@ class LineScanGUIHelper(ScanGUIHelper):
         params = self._edit_widget.getAimingScanParams()
         return params
 
-    def connectToEngine(self, engine: VtxEngine):
-        print("LineScanGUIHelper::connectToEngine")
-
     def clear(self):
         print("LineScanGUIHelper::clear")
 
 
-def scanGUIHelperFactory(name: str, number: int, params: RasterScanParams|AimingScanParams|LineScanParams, log_level: int = 1) -> ScanGUIHelper:
+def scanGUIHelperFactory(name: str, number: int, params: RasterScanParams|AimingScanParams|LineScanParams, acq: AcqParams, log_level: int = 1) -> ScanGUIHelper:
     if isinstance(params, RasterScanParams): 
-        g=RasterScanGUIHelper(name, number, params, log_level)
+        g=RasterScanGUIHelper(name, number, params, acq, log_level)
     elif isinstance(params, AimingScanParams):
         g=AimingScanGUIHelper(name, number, params, log_level)
     elif isinstance(params, LineScanParams):

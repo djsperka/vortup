@@ -9,14 +9,13 @@ from PyQt5.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QMessageBox,
 from PyQt5.QtCore import QTimer,QDateTime
 from vortex import get_console_logger as gcl
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
-from vortex.scan import RasterScan
 from vortex.storage import SimpleStackConfig, SimpleStackHeader
 from vortex.engine import Engine, EngineStatus
 from ScanParams import ScanParams
 from ScanGUIHelper import scanGUIHelperFactory, ScanGUIHelper
 from TraceWidget import TraceWidget
 import logging
-from typing import Tuple
+from typing import Tuple, List
 from rainbow_logging_handler import RainbowLoggingHandler
 import traceback
 import matplotlib as mpl
@@ -37,7 +36,7 @@ class OCTUi():
         self._savingVolumesRequested = False
         self._timer=QTimer()
         self._timer.timeout.connect(self.showTime)
-        self._guihelpers = {}
+        self._guihelpers = []
 
         # load config file - default file only!
         # TODO - make it configurable, or be able to load a diff't config.
@@ -54,7 +53,15 @@ class OCTUi():
         self._octDialog.widgetDispersion.setDispersion(self._params.dsp)
         self._octDialog.widgetDispersion.valueChanged.connect(self.dispersionChanged)
         self._octDialog.widgetAcqParams.setAcqParams(self._params.acq)
-        self.initializeScans(self._params.scn)
+
+        # Create and initialize GUI Helpers
+        #self.initializeScans(self._params.scn)
+        number = 1;
+        for name,cfg in self._params.scn.scans.items():
+            self._guihelpers.append(scanGUIHelperFactory(name, number, cfg, self._params.acq, self._params.vtx.log_level))
+            self._octDialog.widgetScanConfig.addScanType(name, self._guihelpers[-1].edit_widget)
+            number += 1
+        self._octDialog.widgetScanConfig.setCurrentIndex(self._params.scn.current_index)
 
         # connections. 
         self._octDialog.gbSaveVolumes.saveNVolumes.connect(self.saveNVolumes)
@@ -68,14 +75,6 @@ class OCTUi():
         self._octDialog.pbStop.enabled = False  
         self._octDialog.resize(1000,800)              
         self._octDialog.show()
-
-    def initializeScans(self, scn: ScanParams):
-        number = 1;
-        for name,cfg in scn.scans.items():
-            self._guihelpers[name] = scanGUIHelperFactory(name, number, cfg, self._params.vtx.log_level)
-            self._octDialog.widgetScanConfig.addScanType(name, self._guihelpers[name].edit_widget)
-            number += 1
-        self._octDialog.widgetScanConfig.setCurrentIndex(scn.current_index)
 
     def dispersionChanged(self, dispersion: Tuple[float, float]):
         if self._vtxengine is not None:
@@ -189,21 +188,15 @@ class OCTUi():
                 del self._vtxengine
             self._vtxengine = None
 
+            # current scan type and helper
+            helper = self._guihelpers[self._params.scn.current_index]
+
             # create engine
             self._logger.info('Setting up OCT engine...')
-            self._vtxengine = VtxEngine(self._params)
+            self._vtxengine = VtxEngine(self._params, self._guihelpers)
             self._vtxengine._engine.event_callback = self.engineEventCallback
-            self._vtxengine._null_endpoint.volume_callback = self.volumeCallback
-            self._vtxengine._endpoint_spectra_storage.volume_callback = self.volumeCallback2
-
-            # put something into the scan queue
-            self._raster_scan = RasterScan()
-            self._raster_scan.initialize(self._params.rsc)
             self._vtxengine._engine.scan_queue.clear()
-            self._vtxengine._engine.scan_queue.append(self._raster_scan)
-
-            # setup plots
-            self.addPlotsToDialog()
+            self.connectCurrentScan(helper)
 
             # now start the actual engine
             self._vtxengine._engine.start()
@@ -216,6 +209,13 @@ class OCTUi():
             print("RuntimeError:")
             traceback.print_exception(e)
             sys.exit(-1)
+
+    def connectCurrentScan(self, helper: ScanGUIHelper): 
+        helper.null_endpoint.volume_callback = self.volumeCallback
+        helper.storage_endpoint.volume_callback = self.volumeCallback2
+        self._vtxengine._engine.scan_queue.append(helper.getScan())
+
+
 
     def showTime(self):
         current_time=QDateTime.currentDateTime()
