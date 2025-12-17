@@ -15,6 +15,7 @@ class RasterScanParams():
 @dataclass
 class AimingScanParams():
     ascans_per_bscan: int = 500
+    bscans_per_volume: int = 50
     bidirectional_segments: bool = False
     aim_extent: Range = field(default_factory=lambda: Range(-1,1))
     angle: float = 0.0
@@ -32,7 +33,7 @@ class LineScanParams():
 @dataclass
 class ScanParams():
     current_index: int = 0
-    scans: dict[str, RasterScanParams|AimingScanParams|LineScanParams] =  field(default_factory=lambda: {"raster": RasterScanParams(), "aiming": AimingScanParams(), "line": LineScanParams()})
+    scans: dict[str, RasterScanParams|AimingScanParams|LineScanParams] =  field(default_factory=lambda: {})
 
 #     def getRasterScanConfig(self):
 #         cfg = RasterScanConfig()

@@ -5,7 +5,7 @@ from vortex.scan import RasterScanConfig, RasterScan, Limits
 from vortex import Range
 from PyQt5.QtWidgets import QGroupBox, QApplication, QWidget
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QRegExpValidator
-from PyQt5.QtCore import QRegExp
+from PyQt5.QtCore import QRegExp, pyqtSignal
 from Ui_ScanConfigWidget import Ui_ScanConfigWidget
 from Ui_RasterScanConfigWidget import Ui_RasterScanConfigWidget
 from Ui_AimingScanConfigWidget import Ui_AimingScanConfigWidget
@@ -36,6 +36,8 @@ def getRangeFromTextEntry(txt) -> Range:
 
 
 class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
+    scanTypeChanged = pyqtSignal(object)
+
     def __init__(self, parent: QWidget=None):
         """Instantiate class
 
@@ -45,7 +47,7 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
         self.setupUi(self)
 
         # callback for radio buttons
-        self.cbScanTypes.currentIndexChanged.connect(self.stackScanTypes.setCurrentIndex)
+        self.cbScanTypes.currentIndexChanged.connect(self.setCurrentIndex)
 
         # # validators
 
@@ -76,8 +78,9 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
         self.stackScanTypes.addWidget(w)
 
     def setCurrentIndex(self, index):
-        self.cbScanTypes.setCurrentIndex(index)
-       
+        self.stackScanTypes.setCurrentIndex(index)
+        self.scanTypeChanged.emit(index)
+
     def showPatternClicked(self):
         try:
             cfg = self.getScanConfig()
@@ -165,6 +168,7 @@ class AimingScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_AimingScanConfigW
 
         # validators
         self.leAperB.setValidator(QIntValidator(1,5000))
+        self.leBperV.setValidator(QIntValidator(1,5000))
         self.leAextent.setValidator(QRegExpValidator(RegexForExtents))
 
     def getParams(self):
@@ -176,6 +180,7 @@ class AimingScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_AimingScanConfigW
     def getAimingScanParams(self) -> AimingScanParams:
         params = AimingScanParams()
         params.ascans_per_bscan = int(self.leAperB.text())
+        params.bscans_per_volume = int(self.leBperV.text())
         params.bidirectional_segments = self.cbBidirectional.isChecked()
         params.aim_extent = getRangeFromTextEntry(self.leAextent.text())
         params.angle = self.dsbAngle.value()
@@ -183,6 +188,7 @@ class AimingScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_AimingScanConfigW
 
     def setAimingScanParams(self, params: AimingScanParams):
         self.leAperB.setText("{0:d}".format(params.ascans_per_bscan))
+        self.leBperV.setText("{0:d}".format(params.bscans_per_volume))
         self.cbBidirectional.setChecked(params.bidirectional_segments)
         self.leAextent.setText("{0:.2f},{1:.2f}".format(params.aim_extent.min, params.aim_extent.max))
         self.dsbAngle.setValue(params.angle)

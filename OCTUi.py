@@ -53,15 +53,20 @@ class OCTUi():
         self._octDialog.widgetDispersion.setDispersion(self._params.dsp)
         self._octDialog.widgetDispersion.valueChanged.connect(self.dispersionChanged)
         self._octDialog.widgetAcqParams.setAcqParams(self._params.acq)
+        self._octDialog.widgetScanConfig.scanTypeChanged.connect(self.scanTypeChanged)
 
         # Create and initialize GUI Helpers
+
         #self.initializeScans(self._params.scn)
         number = 1;
+        self._octDialog.stackedWidgetDummy.removeWidget(self._octDialog.stackedWidgetDummyPage1)
         for name,cfg in self._params.scn.scans.items():
             self._guihelpers.append(scanGUIHelperFactory(name, number, cfg, self._params.acq, self._params.vtx.log_level))
             self._octDialog.widgetScanConfig.addScanType(name, self._guihelpers[-1].edit_widget)
+            self._octDialog.stackedWidgetDummy.addWidget(self._guihelpers[-1].plot_widget)
             number += 1
         self._octDialog.widgetScanConfig.setCurrentIndex(self._params.scn.current_index)
+        self._octDialog.stackedWidgetDummy.setCurrentIndex(self._params.scn.current_index)
 
         # connections. 
         self._octDialog.gbSaveVolumes.saveNVolumes.connect(self.saveNVolumes)
@@ -75,6 +80,12 @@ class OCTUi():
         self._octDialog.pbStop.enabled = False  
         self._octDialog.resize(1000,800)              
         self._octDialog.show()
+
+    def scanTypeChanged(self, index: int):
+        print("set current index to ", index)
+        self._octDialog.stackedWidgetDummy.setCurrentIndex(index)
+        #helper = self._guihelpers[self._params.scn.current_index]
+        #self.connectCurrentScan(helper)
 
     def dispersionChanged(self, dispersion: Tuple[float, float]):
         if self._vtxengine is not None:
@@ -103,49 +114,49 @@ class OCTUi():
         if v == 1:
             self._params.vtx = self._cfgDialog.getEngineParameters()
 
-    def addPlotsToDialog(self):
+    # def addPlotsToDialog(self):
 
-        # We need access to both the engine (the endpoints) and the gui (display widgets). 
-        if not self._cross_widget:
-            self._raster_widget = RasterEnFaceWidget(self._vtxengine._endpoint_ascan_display, cmap=mpl.colormaps['gray'])
-            self._cross_widget = CrossSectionImageWidget(self._vtxengine._endpoint_ascan_display, cmap=mpl.colormaps['gray'])
-            self._ascan_trace_widget = TraceWidget(self._vtxengine._endpoint_ascan_display, title="ascan")
-            self._spectra_trace_widget = TraceWidget(self._vtxengine._endpoint_spectra_display, title="raw spectra")
+    #     # We need access to both the engine (the endpoints) and the gui (display widgets). 
+    #     if not self._cross_widget:
+    #         self._raster_widget = RasterEnFaceWidget(self._vtxengine._endpoint_ascan_display, cmap=mpl.colormaps['gray'])
+    #         self._cross_widget = CrossSectionImageWidget(self._vtxengine._endpoint_ascan_display, cmap=mpl.colormaps['gray'])
+    #         self._ascan_trace_widget = TraceWidget(self._vtxengine._endpoint_ascan_display, title="ascan")
+    #         self._spectra_trace_widget = TraceWidget(self._vtxengine._endpoint_spectra_display, title="raw spectra")
 
-            # 
-            vbox = QVBoxLayout()
-            hbox_upper = QHBoxLayout()
-            hbox_upper.addWidget(self._raster_widget)
-            hbox_upper.addWidget(self._cross_widget)
-            hbox_lower = QHBoxLayout()
-            hbox_lower.addWidget(self._spectra_trace_widget)
-            hbox_lower.addWidget(self._ascan_trace_widget)
-            vbox.addLayout(hbox_upper)
-            vbox.addLayout(hbox_lower)
-            self._octDialog.widgetDummy.setLayout(vbox)
-            self._octDialog.widgetDummy.show()
+    #         # 
+    #         vbox = QVBoxLayout()
+    #         hbox_upper = QHBoxLayout()
+    #         hbox_upper.addWidget(self._raster_widget)
+    #         hbox_upper.addWidget(self._cross_widget)
+    #         hbox_lower = QHBoxLayout()
+    #         hbox_lower.addWidget(self._spectra_trace_widget)
+    #         hbox_lower.addWidget(self._ascan_trace_widget)
+    #         vbox.addLayout(hbox_upper)
+    #         vbox.addLayout(hbox_lower)
+    #         self._octDialog.widgetDummy.setLayout(vbox)
+    #         self._octDialog.widgetDummy.show()
 
-        else:
-            self._raster_widget._endpoint = self._vtxengine._endpoint_ascan_display
-            self._cross_widget._endpoint = self._vtxengine._endpoint_ascan_display
-            self._ascan_trace_widget._endpoint = self._vtxengine._endpoint_ascan_display
-            self._spectra_trace_widget._endpoint = self._vtxengine._endpoint_spectra_display
+    #     else:
+    #         self._raster_widget._endpoint = self._vtxengine._endpoint_ascan_display
+    #         self._cross_widget._endpoint = self._vtxengine._endpoint_ascan_display
+    #         self._ascan_trace_widget._endpoint = self._vtxengine._endpoint_ascan_display
+    #         self._spectra_trace_widget._endpoint = self._vtxengine._endpoint_spectra_display
 
-            # clear plots
-            self._cross_widget.notify_segments([0])
-            self._raster_widget.notify_segments([0])
-            self._ascan_trace_widget.flush()
-            self._spectra_trace_widget.flush()
+    #         # clear plots
+    #         self._cross_widget.notify_segments([0])
+    #         self._raster_widget.notify_segments([0])
+    #         self._ascan_trace_widget.flush()
+    #         self._spectra_trace_widget.flush()
             
-        def cb_ascan(v):
-            self._cross_widget.notify_segments(v)
-            self._raster_widget.notify_segments(v)
-            self._ascan_trace_widget.update_trace(v)
-        self._vtxengine._endpoint_ascan_display.aggregate_segment_callback = cb_ascan
+    #     def cb_ascan(v):
+    #         self._cross_widget.notify_segments(v)
+    #         self._raster_widget.notify_segments(v)
+    #         self._ascan_trace_widget.update_trace(v)
+    #     self._vtxengine._endpoint_ascan_display.aggregate_segment_callback = cb_ascan
 
-        def cb_spectra(v):
-             self._spectra_trace_widget.update_trace(v)
-        self._vtxengine._endpoint_spectra_display.aggregate_segment_callback = cb_spectra
+    #     def cb_spectra(v):
+    #          self._spectra_trace_widget.update_trace(v)
+    #     self._vtxengine._endpoint_spectra_display.aggregate_segment_callback = cb_spectra
 
     # def cb_segments(self, v):
     #     # argument (v) here is a number - index pointing to a segment in allocated segments.
@@ -214,9 +225,7 @@ class OCTUi():
         helper.null_endpoint.volume_callback = self.volumeCallback
         helper.storage_endpoint.volume_callback = self.volumeCallback2
         self._vtxengine._engine.scan_queue.append(helper.getScan())
-
-
-
+        
     def showTime(self):
         current_time=QDateTime.currentDateTime()
         formatted_time=current_time.toString('yyyy-MM-dd hh:mm:ss dddd')

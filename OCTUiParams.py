@@ -81,8 +81,8 @@ class _octui_decoder(json.JSONDecoder):
             d['dsp'] = tuple(d['dsp'])
         elif {'ascans_per_bscan','bscans_per_volume','bidirectional_segments','segment_extent','volume_extent','angle'}.issubset(d.keys()):
             return RasterScanParams(ascans_per_bscan=d['ascans_per_bscan'],bscans_per_volume=d['bscans_per_volume'],bidirectional_segments=d['bidirectional_segments'],segment_extent=d['segment_extent'],volume_extent=d['volume_extent'],angle=d['angle'])
-        elif {'ascans_per_bscan','bidirectional_segments','aim_extent','angle'}.issubset(d.keys()):
-            return AimingScanParams(ascans_per_bscan=d['ascans_per_bscan'],bidirectional_segments=d['bidirectional_segments'],aim_extent=d['aim_extent'],angle=d['angle'])
+        elif {'ascans_per_bscan','bscans_per_volume','bidirectional_segments','aim_extent','angle'}.issubset(d.keys()):
+            return AimingScanParams(ascans_per_bscan=d['ascans_per_bscan'],bscans_per_volume=d['bscans_per_volume'],bidirectional_segments=d['bidirectional_segments'],aim_extent=d['aim_extent'],angle=d['angle'])
         elif {'ascans_per_bscan','bidirectional_segments','line_extent','lines_per_volume','angle'}.issubset(d.keys()):
             return LineScanParams(ascans_per_bscan=d['ascans_per_bscan'],bidirectional_segments=d['bidirectional_segments'],line_extent=d['line_extent'],lines_per_volume=d['lines_per_volume'],angle=d['angle'])
         return d
