@@ -136,10 +136,6 @@ class OCTUiParams():
     def scn(self):
         return self._scn
 
-    @property
-    def rsc(self):
-        return self._scn.getRasterScanConfig()
-    
     @scn.setter
     def scn(self, value):
         if not self._scn == value:
