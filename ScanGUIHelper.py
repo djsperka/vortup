@@ -142,7 +142,7 @@ class RasterScanGUIHelper(ScanGUIHelper):
         sfe = StackFormatExecutor()
         sfe.initialize(sfec)
         self._storage_endpoint = SpectraStackEndpoint(sfe, self._spectra_storage, log=get_logger('npy-spectra', log_level))
-
+        self._endpoints.append(self._storage_endpoint)
 
 
         self._edit_widget = RasterScanConfigWidget()
@@ -163,6 +163,8 @@ class RasterScanGUIHelper(ScanGUIHelper):
         cfg.segment_extent = params.segment_extent
         cfg.volume_extent = params.volume_extent
 
+        print("CReating raster scan with params: ")
+        print(params)
         scan = RasterScan()
         scan.initialize(cfg)
         return scan
@@ -269,6 +271,7 @@ class AimingScanGUIHelper(ScanGUIHelper):
         sfe = StackFormatExecutor()
         sfe.initialize(sfec)
         self._storage_endpoint = SpectraStackEndpoint(sfe, self._spectra_storage, log=get_logger('npy-spectra', log_level))
+        self._endpoints.append(self._storage_endpoint)
 
         self._edit_widget = AimingScanConfigWidget()
         self._edit_widget.setAimingScanParams(self.params)
