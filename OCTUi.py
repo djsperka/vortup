@@ -61,6 +61,7 @@ class OCTUi():
         number = 1;
         self._octDialog.stackedWidgetDummy.removeWidget(self._octDialog.stackedWidgetDummyPage1)
         for name,cfg in self._params.scn.scans.items():
+            self._logger.info("Found scan config {0:s},{1:d}".format(name,number))
             self._guihelpers.append(scanGUIHelperFactory(name, number, cfg, self._params.acq, self._params.vtx.log_level))
             self._octDialog.widgetScanConfig.addScanType(name, self._guihelpers[-1].edit_widget)
             self._octDialog.stackedWidgetDummy.addWidget(self._guihelpers[-1].plot_widget)
@@ -83,9 +84,10 @@ class OCTUi():
 
     def scanTypeChanged(self, index: int):
         print("set current index to ", index)
+        self._params.scn.current_index = index
         self._octDialog.stackedWidgetDummy.setCurrentIndex(index)
-        #helper = self._guihelpers[self._params.scn.current_index]
-        #self.connectCurrentScan(helper)
+        helper = self._guihelpers[index]
+        self.connectCurrentScan(helper)
 
     def dispersionChanged(self, dispersion: Tuple[float, float]):
         if self._vtxengine is not None:
@@ -113,58 +115,6 @@ class OCTUi():
     def etcFinished(self, v):
         if v == 1:
             self._params.vtx = self._cfgDialog.getEngineParameters()
-
-    # def addPlotsToDialog(self):
-
-    #     # We need access to both the engine (the endpoints) and the gui (display widgets). 
-    #     if not self._cross_widget:
-    #         self._raster_widget = RasterEnFaceWidget(self._vtxengine._endpoint_ascan_display, cmap=mpl.colormaps['gray'])
-    #         self._cross_widget = CrossSectionImageWidget(self._vtxengine._endpoint_ascan_display, cmap=mpl.colormaps['gray'])
-    #         self._ascan_trace_widget = TraceWidget(self._vtxengine._endpoint_ascan_display, title="ascan")
-    #         self._spectra_trace_widget = TraceWidget(self._vtxengine._endpoint_spectra_display, title="raw spectra")
-
-    #         # 
-    #         vbox = QVBoxLayout()
-    #         hbox_upper = QHBoxLayout()
-    #         hbox_upper.addWidget(self._raster_widget)
-    #         hbox_upper.addWidget(self._cross_widget)
-    #         hbox_lower = QHBoxLayout()
-    #         hbox_lower.addWidget(self._spectra_trace_widget)
-    #         hbox_lower.addWidget(self._ascan_trace_widget)
-    #         vbox.addLayout(hbox_upper)
-    #         vbox.addLayout(hbox_lower)
-    #         self._octDialog.widgetDummy.setLayout(vbox)
-    #         self._octDialog.widgetDummy.show()
-
-    #     else:
-    #         self._raster_widget._endpoint = self._vtxengine._endpoint_ascan_display
-    #         self._cross_widget._endpoint = self._vtxengine._endpoint_ascan_display
-    #         self._ascan_trace_widget._endpoint = self._vtxengine._endpoint_ascan_display
-    #         self._spectra_trace_widget._endpoint = self._vtxengine._endpoint_spectra_display
-
-    #         # clear plots
-    #         self._cross_widget.notify_segments([0])
-    #         self._raster_widget.notify_segments([0])
-    #         self._ascan_trace_widget.flush()
-    #         self._spectra_trace_widget.flush()
-            
-    #     def cb_ascan(v):
-    #         self._cross_widget.notify_segments(v)
-    #         self._raster_widget.notify_segments(v)
-    #         self._ascan_trace_widget.update_trace(v)
-    #     self._vtxengine._endpoint_ascan_display.aggregate_segment_callback = cb_ascan
-
-    #     def cb_spectra(v):
-    #          self._spectra_trace_widget.update_trace(v)
-    #     self._vtxengine._endpoint_spectra_display.aggregate_segment_callback = cb_spectra
-
-    # def cb_segments(self, v):
-    #     # argument (v) here is a number - index pointing to a segment in allocated segments.
-    #     #print("agg segment cb: v=", v)
-    #     self._raster_widget.notify_segments(v)
-    #     self._cross_widget.notify_segments(v)
-    #     self._ascan_trace_widget.update_trace(v)
-    #     self._spectra_trace_widget.update_trace(v)
 
     def _getAllParams(self):
         # fetch current configuration for acq and scan params. The items 
@@ -224,7 +174,14 @@ class OCTUi():
     def connectCurrentScan(self, helper: ScanGUIHelper): 
         helper.null_endpoint.volume_callback = self.volumeCallback
         helper.storage_endpoint.volume_callback = self.volumeCallback2
-        self._vtxengine._engine.scan_queue.append(helper.getScan())
+        # the engine might not yet be created, if this is initialization
+        if self._vtxengine:
+            self._logger.info('Connect scan \'{0:s}\' to engine.'.format(helper.name))
+            self._vtxengine._engine.scan_queue.interrupt(helper.getScan())
+        else:
+            self._logger.info('Cannot connect scan \'{0:s}\' to engine yet...'.format(helper.name))
+
+
         
     def showTime(self):
         current_time=QDateTime.currentDateTime()
@@ -280,7 +237,13 @@ class OCTUi():
             volume_idx (int): volume index
         """
 
-        #self._logger.info("volumeCallback({0:d}, {1:d}, {2:d})".format(arg0, arg1, arg2))
+
+        # shape for raster is (BperV, AperB, depth)
+        # For an aiming scan, each "cross" consists of 2 b-scans
+
+        helper = self._guihelpers[self._params.scn.current_index]
+        shape = helper.ascan_endpoint.tensor.shape
+        self._logger.info("volumeCallback({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
         if self._savingVolumesRequested:
             (bOK, filename) = self.checkFileSaveStuff()
             if bOK:

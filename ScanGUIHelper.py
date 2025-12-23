@@ -37,7 +37,7 @@ class ScanGUIHelper(ABC):
 
     @property
     def endpoints(self) -> List[Any]:
-        return self._endpoints
+        return [self._null_endpoint, self._storage_endpoint, self._spectra_endpoint, self.ascan_endpoint]
 
     @property
     def null_endpoint(self) -> NullEndpoint:
@@ -46,6 +46,15 @@ class ScanGUIHelper(ABC):
     @property
     def storage_endpoint(self) -> NullEndpoint:
         return self._storage_endpoint
+    
+    @property
+    def ascan_endpoint(self):
+        return self._ascan_endpoint
+    
+    @property
+    def spectra_endpoint(self):
+        return self._spectra_endpoint
+
 
     @property
     def plot_widget(self):
@@ -100,17 +109,12 @@ class RasterScanGUIHelper(ScanGUIHelper):
         self._format_planner = FormatPlanner(get_logger('raster format', log_level))
         self._format_planner.initialize(fc)
 
-        # As endpoints are created, stuff them into this list. 
-        # They are added to the engine all at once.
-        self._endpoints = []
-
         # For saving volumes, this NullEndpoint is used. The volume_callback for this 
         # endpoint will be called before that of the other endpoints. If needed, we open
         # the storage in the volume_callback for this endpoint when needed. The storage 
         # is closed in the volume_callback for the SpectraStackEndpoint, which does the 
         # saving/writing of volumes.
         self._null_endpoint = NullEndpoint(get_logger('Traffic cop', log_level))
-        self._endpoints.append(self._null_endpoint)
 
         # For DISPLAYING ascans (oct-processed data), slice away half the data. 
         # This stack format executor isn't used with the other endpoints.
@@ -123,8 +127,7 @@ class RasterScanGUIHelper(ScanGUIHelper):
         # endpoint for display of ascans
         vshape = (params.bscans_per_volume, params.ascans_per_bscan, samples_to_save)
         self._logger.info('Create StackDeviceTensorEndpointInt8 with shape {0:s}'.format(str(vshape)))
-        self._endpoint_ascan_display = StackDeviceTensorEndpointInt8(sfe, vshape, get_logger('stack', log_level))
-        self._endpoints.append(self._endpoint_ascan_display)
+        self._ascan_endpoint = StackDeviceTensorEndpointInt8(sfe, vshape, get_logger('stack', log_level))
 
 
         sfec_spectra = StackFormatExecutorConfig()
@@ -132,8 +135,7 @@ class RasterScanGUIHelper(ScanGUIHelper):
         sfe_spectra.initialize(sfec_spectra)
         shape_spectra = (params.bscans_per_volume, params.ascans_per_bscan, acq.samples_per_ascan)
         self._logger.info('Create SpectraStackHostTensorEndpointUInt16 with shape {0:s}'.format(str(shape_spectra)))
-        self._endpoint_spectra_display = SpectraStackHostTensorEndpointUInt16(sfe_spectra, shape_spectra, get_logger('stack', log_level))
-        self._endpoints.append(self._endpoint_spectra_display)
+        self._spectra_endpoint = SpectraStackHostTensorEndpointUInt16(sfe_spectra, shape_spectra, get_logger('stack', log_level))
 
         # make an endpoint for saving spectra data
         shape = (params.bscans_per_volume, params.ascans_per_bscan, acq.samples_per_ascan, 1)
@@ -142,8 +144,6 @@ class RasterScanGUIHelper(ScanGUIHelper):
         sfe = StackFormatExecutor()
         sfe.initialize(sfec)
         self._storage_endpoint = SpectraStackEndpoint(sfe, self._spectra_storage, log=get_logger('npy-spectra', log_level))
-        self._endpoints.append(self._storage_endpoint)
-
 
         self._edit_widget = RasterScanConfigWidget()
         self._edit_widget.setRasterScanParams(self.params)
@@ -162,9 +162,7 @@ class RasterScanGUIHelper(ScanGUIHelper):
         cfg.bidirectional_segments = params.bidirectional_segments
         cfg.segment_extent = params.segment_extent
         cfg.volume_extent = params.volume_extent
-
-        print("CReating raster scan with params: ")
-        print(params)
+        cfg.flags = Flags(self.number)
         scan = RasterScan()
         scan.initialize(cfg)
         return scan
@@ -177,14 +175,14 @@ class RasterScanGUIHelper(ScanGUIHelper):
 
 
     def rasterPlotWidget(self) -> QWidget: 
-        self._raster_widget = RasterEnFaceWidget(self._endpoint_ascan_display, cmap=mpl.colormaps['gray'])
-        self._cross_widget = CrossSectionImageWidget(self._endpoint_ascan_display, cmap=mpl.colormaps['gray'])
-        self._ascan_trace_widget = TraceWidget(self._endpoint_ascan_display, title="ascan")
-        self._spectra_trace_widget = TraceWidget(self._endpoint_spectra_display, title="raw spectra")
+        self._raster_widget = RasterEnFaceWidget(self.ascan_endpoint, cmap=mpl.colormaps['gray'])
+        self._cross_widget = CrossSectionImageWidget(self.ascan_endpoint, cmap=mpl.colormaps['gray'])
+        self._ascan_trace_widget = TraceWidget(self.ascan_endpoint, title="ascan")
+        self._spectra_trace_widget = TraceWidget(self.spectra_endpoint, title="raw spectra")
 
         # callbacks
-        self._endpoint_ascan_display.aggregate_segment_callback = self.cb_ascan
-        self._endpoint_spectra_display.aggregate_segment_callback = self.cb_spectra
+        self.ascan_endpoint.aggregate_segment_callback = self.cb_ascan
+        self.spectra_endpoint.aggregate_segment_callback = self.cb_spectra
 
         # 
         vbox = QVBoxLayout()
@@ -216,12 +214,15 @@ class RasterScanGUIHelper(ScanGUIHelper):
 
 
 class AimingScanGUIHelper(ScanGUIHelper):
+    '''
+    GUIHelper for an aiming scan. The config for an aiming scan 
+    '''
     def __init__(self, name, number, params, acq, log_level):
         super().__init__(name, number, params, log_level)
 
         # Create engine parts for this scan
         fc = FormatPlannerConfig()
-        fc.segments_per_volume = 2  # TODO
+        fc.segments_per_volume = params.bscans_per_volume  # TODO
         fc.records_per_segment = params.ascans_per_bscan
         fc.adapt_shape = False
         fc.mask = Flags(number)
@@ -229,17 +230,12 @@ class AimingScanGUIHelper(ScanGUIHelper):
         self._format_planner = FormatPlanner(get_logger('aiming format', log_level))
         self._format_planner.initialize(fc)
 
-        # As endpoints are created, stuff them into this list. 
-        # They are added to the engine all at once.
-        self._endpoints = []
-
         # For saving volumes, this NullEndpoint is used. The volume_callback for this 
         # endpoint will be called before that of the other endpoints. If needed, we open
         # the storage in the volume_callback for this endpoint when needed. The storage 
         # is closed in the volume_callback for the SpectraStackEndpoint, which does the 
         # saving/writing of volumes.
         self._null_endpoint = NullEndpoint(get_logger('Traffic cop(aiming)', log_level))
-        self._endpoints.append(self._null_endpoint)
 
         # For DISPLAYING ascans (oct-processed data), slice away half the data. 
         # This stack format executor isn't used with the other endpoints.
@@ -252,17 +248,14 @@ class AimingScanGUIHelper(ScanGUIHelper):
         # endpoint for display of ascans
         vshape = (params.bscans_per_volume, params.ascans_per_bscan, samples_to_save)
         self._logger.info('Create StackDeviceTensorEndpointInt8 with shape {0:s}'.format(str(vshape)))
-        self._endpoint_ascan_display = StackDeviceTensorEndpointInt8(sfe, vshape, get_logger('stack', log_level))
-        self._endpoints.append(self._endpoint_ascan_display)
-
+        self._ascan_endpoint = StackDeviceTensorEndpointInt8(sfe, vshape, get_logger('stack', log_level))
 
         sfec_spectra = StackFormatExecutorConfig()
         sfe_spectra  = StackFormatExecutor()
         sfe_spectra.initialize(sfec_spectra)
         shape_spectra = (params.bscans_per_volume, params.ascans_per_bscan, acq.samples_per_ascan)
         self._logger.info('Create SpectraStackHostTensorEndpointUInt16 with shape {0:s}'.format(str(shape_spectra)))
-        self._endpoint_spectra_display = SpectraStackHostTensorEndpointUInt16(sfe_spectra, shape_spectra, get_logger('stack', log_level))
-        self._endpoints.append(self._endpoint_spectra_display)
+        self._spectra_endpoint = SpectraStackHostTensorEndpointUInt16(sfe_spectra, shape_spectra, get_logger('stack', log_level))
 
         # make an endpoint for saving spectra data
         shape = (params.bscans_per_volume, params.ascans_per_bscan, acq.samples_per_ascan, 1)
@@ -271,7 +264,6 @@ class AimingScanGUIHelper(ScanGUIHelper):
         sfe = StackFormatExecutor()
         sfe.initialize(sfec)
         self._storage_endpoint = SpectraStackEndpoint(sfe, self._spectra_storage, log=get_logger('npy-spectra', log_level))
-        self._endpoints.append(self._storage_endpoint)
 
         self._edit_widget = AimingScanConfigWidget()
         self._edit_widget.setAimingScanParams(self.params)
@@ -282,14 +274,14 @@ class AimingScanGUIHelper(ScanGUIHelper):
         # w = QLabel('Aiming')
         # w.setStyleSheet("background-color: lightgreen")
 
-        self._cross_widget_1 = CrossSectionImageWidget(self._endpoint_ascan_display, cmap=mpl.colormaps['gray'], title="horiz")
-        self._cross_widget_2 = CrossSectionImageWidget(self._endpoint_ascan_display, cmap=mpl.colormaps['gray'], title="vert")
-        self._ascan_trace_widget = TraceWidget(self._endpoint_ascan_display, title="ascan")
-        self._spectra_trace_widget = TraceWidget(self._endpoint_spectra_display, title="raw spectra")
+        self._cross_widget_1 = CrossSectionImageWidget(self.ascan_endpoint, cmap=mpl.colormaps['gray'], title="horiz")
+        self._cross_widget_2 = CrossSectionImageWidget(self.ascan_endpoint, cmap=mpl.colormaps['gray'], title="vert")
+        self._ascan_trace_widget = TraceWidget(self.ascan_endpoint, title="ascan")
+        self._spectra_trace_widget = TraceWidget(self.spectra_endpoint, title="raw spectra")
 
         # callbacks
-        self._endpoint_ascan_display.aggregate_segment_callback = self.cb_ascan
-        self._endpoint_spectra_display.aggregate_segment_callback = self.cb_spectra
+        self.ascan_endpoint.aggregate_segment_callback = self.cb_ascan
+        self.spectra_endpoint.aggregate_segment_callback = self.cb_spectra
 
         # 
         vbox = QVBoxLayout()
@@ -306,8 +298,14 @@ class AimingScanGUIHelper(ScanGUIHelper):
         return w
 
     def cb_ascan(self, v):
-        self._cross_widget_1.notify_segments(v)
-        self._cross_widget_2.notify_segments(v)
+        if v:
+            if v[-1]%2:
+                self._cross_widget_1.notify_segments(v)
+            else:
+                self._cross_widget_2.notify_segments(v)
+        else:
+            self._cross_widget_1.notify_segments(v)
+            self._cross_widget_2.notify_segments(v)
         self._ascan_trace_widget.update_trace(v)
 
     def cb_spectra(self, v):
@@ -324,7 +322,7 @@ class AimingScanGUIHelper(ScanGUIHelper):
         params = self.getParams()
         cfg = RadialScanConfig()
         cfg.ascans_per_bscan = params.ascans_per_bscan
-        cfg.bscans_per_volume = 2
+        cfg.bscans_per_volume = params.bscans_per_volume
         cfg.bidirectional_segments = params.bidirectional_segments
         cfg.segment_extent = params.aim_extent
         cfg.volume_extent = params.aim_extent
