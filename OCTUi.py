@@ -242,18 +242,23 @@ class OCTUi():
         # For an aiming scan, each "cross" consists of 2 b-scans
 
         helper = self._guihelpers[self._params.scn.current_index]
-        shape = helper.ascan_endpoint.tensor.shape
-        self._logger.info("volumeCallback({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
+        shape = helper.spectra_endpoint.tensor.shape
+        #self._logger.info("volumeCallback({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
         if self._savingVolumesRequested:
             (bOK, filename) = self.checkFileSaveStuff()
             if bOK:
                 # Create SimpleStackConfig to config storage
                 npsc = SimpleStackConfig()
-                npsc.shape = (self._params.scn.bscans_per_volume, self._params.scn.ascans_per_bscan, self._params.acq.samples_per_ascan, 1)
+
+                # shape is a mystery. Let's just copy what the endpoint is. 
+                # TODO Must figure out why this volume doesn't match acq params (see esp. non-raster scan)
+                #npsc.shape = (self._params.scn.bscans_per_volume, self._params.scn.ascans_per_bscan, self._params.acq.samples_per_ascan, 1)
+                self._logger.info("Stack shape:({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
+                npsc.shape = (shape[0], shape[1], shape[2], 1)
                 npsc.header = SimpleStackHeader.NumPy
                 npsc.path = filename
                 self._logger.info('Open storage.')
-                self._vtxengine._spectra_storage.open(npsc)
+                helper.storage.open(npsc)
                 self._savingVolumesNow = True
                 self._savingVolumesRequested = False
                 #self._savingVolumesThisMany = SHOULD HAVE BEEN SET IN PB CALLBACK WHEN SAVING VOLUMES REQUESTED
@@ -285,7 +290,8 @@ class OCTUi():
                 self._savingVolumesThisManySaved = 0
                 self._savingVolumesThisMany = 0
                 self._savingVolumesRequested = False
-                self._vtxengine._spectra_storage.close()
+                helper = self._guihelpers[self._params.scn.current_index]
+                helper.storage.close()
                 self._octDialog.gbSaveVolumes.enableSaving(True)
 
 

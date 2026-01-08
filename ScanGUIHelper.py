@@ -42,7 +42,11 @@ class ScanGUIHelper(ABC):
     @property
     def null_endpoint(self) -> NullEndpoint:
         return self._null_endpoint
-    
+
+    @property 
+    def storage(self):
+        return self._spectra_storage
+        
     @property
     def storage_endpoint(self) -> NullEndpoint:
         return self._storage_endpoint
