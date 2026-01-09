@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
 from TraceWidget import TraceWidget
 import matplotlib as mpl
+from math import radians
 
 from vortex import Range
 from vortex.scan import RasterScan, RasterScanConfig, RadialScan, RadialScanConfig
@@ -99,6 +100,16 @@ class ScanGUIHelper(ABC):
         """
         pass
 
+    @abstractmethod
+    def plotSettings(self):
+        """Return a something with settings for plots"""
+        pass
+
+    @abstractmethod
+    def restorePlotSettings(self, settings):
+        """Return a something with settings for plots"""
+        pass
+
 class RasterScanGUIHelper(ScanGUIHelper):
     def __init__(self, name: str, number: int, params: RasterScanParams, acq:AcqParams, log_level: int):
         super().__init__(name, number, params, log_level)
@@ -166,6 +177,7 @@ class RasterScanGUIHelper(ScanGUIHelper):
         cfg.bidirectional_segments = params.bidirectional_segments
         cfg.segment_extent = params.segment_extent
         cfg.volume_extent = params.volume_extent
+        cfg.angle = radians(params.angle)
         cfg.flags = Flags(self.number)
         scan = RasterScan()
         scan.initialize(cfg)
@@ -184,6 +196,9 @@ class RasterScanGUIHelper(ScanGUIHelper):
         self._ascan_trace_widget = TraceWidget(self.ascan_endpoint, title="ascan")
         self._spectra_trace_widget = TraceWidget(self.spectra_endpoint, title="raw spectra")
 
+        # HACK
+        self._raster_widget._range = [40,70]
+        
         # callbacks
         self.ascan_endpoint.aggregate_segment_callback = self.cb_ascan
         self.spectra_endpoint.aggregate_segment_callback = self.cb_spectra
@@ -216,6 +231,13 @@ class RasterScanGUIHelper(ScanGUIHelper):
     def cb_spectra(self, v):
             self._spectra_trace_widget.update_trace(v)
 
+    def plotSettings(self):
+        d = {}
+        d["range"] = self._raster_widget._range
+        return d
+    
+    def restorePlotSettings(self, settings):
+        print("Restoring ", settings)
 
 class AimingScanGUIHelper(ScanGUIHelper):
     '''
@@ -331,10 +353,17 @@ class AimingScanGUIHelper(ScanGUIHelper):
         cfg.segment_extent = params.aim_extent
         cfg.volume_extent = params.aim_extent
         cfg.flags = Flags(self.number)
+        cfg.angle = radians(params.angle)
         cfg.set_aiming()
         scan = RadialScan()
         scan.initialize(cfg)
         return scan
+
+    def plotSettings(self):
+        return {"whatever": 3,"another": 4}
+    
+    def restorePlotSettings(self, settings):
+        print("Restoring ", settings)
 
 
 class LineScanGUIHelper(ScanGUIHelper):
@@ -370,6 +399,13 @@ class LineScanGUIHelper(ScanGUIHelper):
         scan = RasterScan()
         scan.initialize(cfg)
         return scan
+
+    def plotSettings(self):
+        return {"whatever": 3,"another": 4}
+    
+    def restorePlotSettings(self, settings):
+        print("Restoring ", settings)
+
 
 def scanGUIHelperFactory(name: str, number: int, params: RasterScanParams|AimingScanParams|LineScanParams, acq: AcqParams, log_level: int = 1) -> ScanGUIHelper:
     if isinstance(params, RasterScanParams): 

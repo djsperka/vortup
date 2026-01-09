@@ -216,6 +216,9 @@ class OCTUi():
             self._octDialog.pbStart.setEnabled(True)
             self._octDialog.pbStop.setEnabled(False)
             self._vtxengine.stop()
+            for helper in self._guihelpers:
+                print("Save params for ", helper.name)
+                print(helper.plotSettings())
 
     def scanCallback(self, arg0, arg1):
         self._logger.info("scanCallback({0:d}, {1:d}, {2:d}, {3:d})".format(arg0, arg1))
