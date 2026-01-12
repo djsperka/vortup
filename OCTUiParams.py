@@ -9,7 +9,7 @@ from dataclasses import asdict, dataclass, field
 import copyreg
 from vortex import Range
 from vortex.acquire import alazar
-from typing import Tuple
+from typing import Tuple, Any, Dict
 
 local_logger = logging.getLogger('OCTUiParams')
 
@@ -31,9 +31,11 @@ class UiParams():
     acq: AcqParams = field(default_factory=lambda: DEFAULT_ACQ_PARAMS)
     scn: ScanParams = field(default_factory=lambda: ScanParams())
     dsp: Tuple = (-1.8e-05, 0)
+    settings: Dict[str, Any] = field(default_factory=lambda: {})
 
 def pickle_uiparams(u: UiParams):
-    return UiParams, (u.vtx, u.acq, u.scn)
+    print("pickling a UiParams instance")
+    return UiParams, (u.vtx, u.acq, u.scn, u.dsp, u.settings)
 copyreg.pickle(UiParams, pickle_uiparams)
 
 
@@ -79,6 +81,12 @@ class _octui_decoder(json.JSONDecoder):
             d['acq'] = AcqParams(**d['acq'])
             d['scn'] = ScanParams(**d['scn'])
             d['dsp'] = tuple(d['dsp'])
+            # if no settings, create a new one.
+            if 'settings' not in d:
+                d['settings'] = {}
+                print("created new, empty, settings")
+            else:
+                print("Keeping old settings: ", d['settings'])
         elif {'ascans_per_bscan','bscans_per_volume','bidirectional_segments','segment_extent','volume_extent','angle'}.issubset(d.keys()):
             return RasterScanParams(ascans_per_bscan=d['ascans_per_bscan'],bscans_per_volume=d['bscans_per_volume'],bidirectional_segments=d['bidirectional_segments'],segment_extent=d['segment_extent'],volume_extent=d['volume_extent'],angle=d['angle'])
         elif {'ascans_per_bscan','bscans_per_volume','bidirectional_segments','aim_extent','angle'}.issubset(d.keys()):
@@ -106,6 +114,7 @@ class OCTUiParams():
             self._acq = params.acq
             self._scn = params.scn
             self._dsp = params.dsp
+            self._settings = params.settings
             local_logger.info("Saving initial config file {0:s}".format(str(default_config_path)))
             self.save()
 
@@ -152,6 +161,16 @@ class OCTUiParams():
             self._isdirty = True
             self._dsp = value
 
+    @property
+    def settings(self):
+        return self._settings
+    
+    @settings.setter
+    def settings(self, value):
+        if not self._settings == value:
+            self._isdirty = True
+            self._settings = value
+
     def load(self, config_file=''):
         if len(config_file):
             maybepath = Path(config_file)
@@ -174,6 +193,7 @@ class OCTUiParams():
         self._acq = params.acq
         self._scn = params.scn
         self._dsp = params.dsp
+        self._settings = params.settings
         self.__cfgpath = use_this_path
 
     def path(self):
@@ -202,7 +222,7 @@ class OCTUiParams():
             use_this_path.parent.mkdir(exist_ok=True)
 
         with use_this_path.open(mode="w", encoding="utf-8") as f:
-            params = UiParams(self._vtx, self._acq, self._scn, self._dsp)
+            params = UiParams(self._vtx, self._acq, self._scn, self._dsp, self._settings)
             json.dump(params, f, indent=2, cls=_octui_encoder)
 
 

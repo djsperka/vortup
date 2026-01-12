@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Any
+from typing import List, Any, Dict
 from ScanConfigWidget import RasterScanConfigWidget, AimingScanConfigWidget, LineScanConfigWidget
 from ScanParams import RasterScanParams, AimingScanParams, LineScanParams
 from AcqParams import AcqParams
@@ -19,10 +19,11 @@ from vortex import get_console_logger as get_logger
 import logging
 
 class ScanGUIHelper(ABC):
-    def __init__(self, name, number, params, log_level=1):
+    def __init__(self, name, number, params, settings, log_level=1):
         self.name = name
         self.number = number
         self.params = params
+        self.settings = settings
         self.log_level = log_level
         self._logger = logging.getLogger('GUIHeper({0:s})'.format(self.name))
 
@@ -86,10 +87,16 @@ class ScanGUIHelper(ABC):
         
         :param self: Description
         '''
+        pass
 
     @abstractmethod
     def getParams(self):
         """Return the parameters currently specified in the edit widget"""
+        pass
+
+    @abstractmethod
+    def getSettings(self) -> Dict[str, Any]:
+        """Return the settings, a dict, associated with the plots, if any. Not scan settings!"""
         pass
 
     @abstractmethod
@@ -100,19 +107,10 @@ class ScanGUIHelper(ABC):
         """
         pass
 
-    @abstractmethod
-    def plotSettings(self):
-        """Return a something with settings for plots"""
-        pass
-
-    @abstractmethod
-    def restorePlotSettings(self, settings):
-        """Return a something with settings for plots"""
-        pass
 
 class RasterScanGUIHelper(ScanGUIHelper):
-    def __init__(self, name: str, number: int, params: RasterScanParams, acq:AcqParams, log_level: int):
-        super().__init__(name, number, params, log_level)
+    def __init__(self, name: str, number: int, params: RasterScanParams, acq:AcqParams, settings: Dict[str, Any], log_level: int):
+        super().__init__(name, number, params, settings, log_level)
 
         # Create engine parts for this scan
         fc = FormatPlannerConfig()
@@ -164,6 +162,12 @@ class RasterScanGUIHelper(ScanGUIHelper):
         self._edit_widget.setRasterScanParams(self.params)
         self._plot_widget = self.rasterPlotWidget()
 
+    def getSettings(self):
+        settings = {}
+        settings['enface.range'] = self._raster_widget._range
+        settings['cross.range'] = self._cross_widget._range
+        return settings
+
     def getParams(self):
         params = self._edit_widget.getRasterScanParams()
         return params
@@ -196,8 +200,12 @@ class RasterScanGUIHelper(ScanGUIHelper):
         self._ascan_trace_widget = TraceWidget(self.ascan_endpoint, title="ascan")
         self._spectra_trace_widget = TraceWidget(self.spectra_endpoint, title="raw spectra")
 
-        # HACK
-        self._raster_widget._range = [40,70]
+        # apply settings
+        if 'enface.range' in self.settings:
+            self._raster_widget._range = self.settings['enface.range']
+
+        if 'cross.range' in self.settings:
+            self._cross_widget._range = self.settings['cross.range']
         
         # callbacks
         self.ascan_endpoint.aggregate_segment_callback = self.cb_ascan
@@ -231,20 +239,13 @@ class RasterScanGUIHelper(ScanGUIHelper):
     def cb_spectra(self, v):
             self._spectra_trace_widget.update_trace(v)
 
-    def plotSettings(self):
-        d = {}
-        d["range"] = self._raster_widget._range
-        return d
-    
-    def restorePlotSettings(self, settings):
-        print("Restoring ", settings)
 
 class AimingScanGUIHelper(ScanGUIHelper):
     '''
     GUIHelper for an aiming scan. The config for an aiming scan 
     '''
-    def __init__(self, name, number, params, acq, log_level):
-        super().__init__(name, number, params, log_level)
+    def __init__(self, name: str, number: int, params: AimingScanParams, acq:AcqParams, settings: Dict[str, Any], log_level: int):
+        super().__init__(name, number, params, settings, log_level)
 
         # Create engine parts for this scan
         fc = FormatPlannerConfig()
@@ -305,6 +306,13 @@ class AimingScanGUIHelper(ScanGUIHelper):
         self._ascan_trace_widget = TraceWidget(self.ascan_endpoint, title="ascan")
         self._spectra_trace_widget = TraceWidget(self.spectra_endpoint, title="raw spectra")
 
+        # apply settings
+        if 'cross1.range' in self.settings:
+            self._cross_widget_1._range = self.settings['cross1.range']
+
+        if 'cross.range' in self.settings:
+            self._cross_widget_2._range = self.settings['cross2.range']
+
         # callbacks
         self.ascan_endpoint.aggregate_segment_callback = self.cb_ascan
         self.spectra_endpoint.aggregate_segment_callback = self.cb_spectra
@@ -344,6 +352,12 @@ class AimingScanGUIHelper(ScanGUIHelper):
     def clear(self):
         print("AimingScanGUIHelper::clear")
 
+    def getSettings(self):
+        settings = {}
+        settings['cross1.range'] = self._cross_widget_1._range
+        settings['cross2.range'] = self._cross_widget_2._range
+        return settings
+    
     def getScan(self):
         params = self.getParams()
         cfg = RadialScanConfig()
@@ -359,16 +373,9 @@ class AimingScanGUIHelper(ScanGUIHelper):
         scan.initialize(cfg)
         return scan
 
-    def plotSettings(self):
-        return {"whatever": 3,"another": 4}
-    
-    def restorePlotSettings(self, settings):
-        print("Restoring ", settings)
-
-
 class LineScanGUIHelper(ScanGUIHelper):
-    def __init__(self, name, number, params, log_level):
-        super().__init__(name, number, params, log_level)
+    def __init__(self, name: str, number: int, params: LineScanParams, acq:AcqParams, settings: Dict[str, Any], log_level: int):
+        super().__init__(name, number, params, settings, log_level)
 
         self._edit_widget = LineScanConfigWidget()
         self._edit_widget.setLineScanParams(self.params)
@@ -400,20 +407,16 @@ class LineScanGUIHelper(ScanGUIHelper):
         scan.initialize(cfg)
         return scan
 
-    def plotSettings(self):
-        return {"whatever": 3,"another": 4}
-    
-    def restorePlotSettings(self, settings):
-        print("Restoring ", settings)
+    def getSettings(self):
+        return {}
 
-
-def scanGUIHelperFactory(name: str, number: int, params: RasterScanParams|AimingScanParams|LineScanParams, acq: AcqParams, log_level: int = 1) -> ScanGUIHelper:
+def scanGUIHelperFactory(name: str, number: int, params: RasterScanParams|AimingScanParams|LineScanParams, acq: AcqParams, settings: Dict[str, Any], log_level: int = 1) -> ScanGUIHelper:
     if isinstance(params, RasterScanParams): 
-        g=RasterScanGUIHelper(name, number, params, acq, log_level)
+        g=RasterScanGUIHelper(name, number, params, acq, settings, log_level)
     elif isinstance(params, AimingScanParams):
-        g=AimingScanGUIHelper(name, number, params, acq, log_level)
+        g=AimingScanGUIHelper(name, number, params, acq, settings, log_level)
     elif isinstance(params, LineScanParams):
-        g=LineScanGUIHelper(name, number, params, log_level)
+        g=LineScanGUIHelper(name, number, params, settings, log_level)
     else:
         raise TypeError('Must pass one of these: RasterScanParams|AimingScanParams|LineScanParams')
     return g

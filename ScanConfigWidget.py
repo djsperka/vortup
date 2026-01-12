@@ -78,7 +78,6 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
         self.stackScanTypes.addWidget(w)
 
     def setCurrentIndex(self, index):
-        print("ScanConfigWidget: Set current index to {0:d}".format(index))
         self.stackScanTypes.setCurrentIndex(index)
         self.scanTypeChanged.emit(index)
 
