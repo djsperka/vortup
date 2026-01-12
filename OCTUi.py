@@ -103,6 +103,7 @@ class OCTUi():
             print("Updated dispersion ", dispersion)
 
     def dialogClosing(self):
+        self.stopClicked()
         self._getAllParams()
         if self._params.isdirty():
             dlg = QMessageBox(self._octDialog)

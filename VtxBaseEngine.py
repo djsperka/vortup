@@ -1,7 +1,7 @@
 from vortex import Range, get_console_logger as get_logger
 from vortex.engine import Block, dispersion_phasor
 from vortex.acquire import AlazarConfig, AlazarAcquisition, alazar, FileAcquisitionConfig, FileAcquisition
-from vortex.process import CUDAProcessor, CUDAProcessorConfig, NullProcessor, NullProcessorConfig
+from vortex.process import CUDAProcessor, CUDAProcessorConfig
 from vortex.io import DAQmxIO, DAQmxConfig, daqmx
 from VtxEngineParams import VtxEngineParams, AcquisitionType
 from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
@@ -34,8 +34,6 @@ class VtxBaseEngine():
             ac.samples_per_record = board.info.smallest_aligned_samples_per_record(cfg.ssrc_clock_rising_edges_per_trigger)
 
             # trigger with range - must be 5000 (2500 will err). TTL will work in config also. Discrepancy with docs
-            print(acq)
-            print(cfg)
             ac.trigger = alazar.SingleExternalTrigger(range_millivolts=cfg.trigger_range_millivolts, level_ratio=cfg.trigger_level_fraction, delay_samples=acq.trigger_delay_samples, slope=alazar.TriggerSlope.Positive)
 
             # only input channel A
@@ -114,8 +112,6 @@ class VtxBaseEngine():
         # and should show up in your NI-MAX application under "Devices and Instruments". Make a note
         # of the name("Dev1" in our case).
         #
-        # The config values that refer to the x axis are here configured to be the "fast" axis.
-        # The config values that refer to the y axis are here configured to be the "slow" axis.
 
         if cfg.galvo_enabled:
             ioc_out = DAQmxConfig()
@@ -125,6 +121,7 @@ class VtxBaseEngine():
             ioc_out.clock.source = cfg.galvo_clock_source
             ioc_out.name = 'output'
 
+            # channel 0, will be
             xAVO = daqmx.AnalogVoltageOutput(cfg.galvo_x_device_channel, cfg.galvo_x_units_per_volt, Block.StreamIndex.GalvoTarget, 0)
             xAVO.limits = cfg.galvo_x_voltage_range
             ioc_out.channels.append(xAVO)
