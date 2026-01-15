@@ -166,6 +166,8 @@ class RasterScanGUIHelper(ScanGUIHelper):
         settings = {}
         settings['enface.range'] = self._raster_widget._range
         settings['cross.range'] = self._cross_widget._range
+        settings['ascan.ylim'] = list(self._ascan_trace_widget._axes.get_ylim())
+        settings['spectra.ylim'] = list(self._spectra_trace_widget._axes.get_ylim())
         return settings
 
     def getParams(self):
@@ -206,6 +208,13 @@ class RasterScanGUIHelper(ScanGUIHelper):
 
         if 'cross.range' in self.settings:
             self._cross_widget._range = self.settings['cross.range']
+
+        if 'ascan.ylim' in self.settings:
+            self._ascan_trace_widget.set_ylim(self.settings['ascan.ylim'])
+
+        if 'spectra.ylim' in self.settings:
+            self._spectra_trace_widget.set_ylim(self.settings['spectra.ylim'])
+
         
         # callbacks
         self.ascan_endpoint.aggregate_segment_callback = self.cb_ascan
@@ -313,6 +322,12 @@ class AimingScanGUIHelper(ScanGUIHelper):
         if 'cross.range' in self.settings:
             self._cross_widget_2._range = self.settings['cross2.range']
 
+        if 'ascan.ylim' in self.settings:
+            self._ascan_trace_widget.set_ylim(self.settings['ascan.ylim'])
+
+        if 'spectra.ylim' in self.settings:
+            self._spectra_trace_widget.set_ylim(self.settings['spectra.ylim'])
+
         # callbacks
         self.ascan_endpoint.aggregate_segment_callback = self.cb_ascan
         self.spectra_endpoint.aggregate_segment_callback = self.cb_spectra
@@ -356,6 +371,8 @@ class AimingScanGUIHelper(ScanGUIHelper):
         settings = {}
         settings['cross1.range'] = self._cross_widget_1._range
         settings['cross2.range'] = self._cross_widget_2._range
+        settings['ascan.ylim'] = list(self._ascan_trace_widget._axes.get_ylim())
+        settings['spectra.ylim'] = list(self._spectra_trace_widget._axes.get_ylim())
         return settings
     
     def getScan(self):

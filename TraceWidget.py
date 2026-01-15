@@ -1,5 +1,8 @@
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+from qtpy.QtGui import QKeyEvent, QPaintEvent
+from qtpy.QtCore import Qt
+
 import numpy
 import cupy
 from typing import Iterable, List
@@ -24,6 +27,11 @@ class TraceWidget(FigureCanvas):
         self._ydata = None
         self._invalidated = False
         self._bidx = 0
+        self._update_ylim_start_idx = -1
+        self._update_ylim_last_idx = -1
+        self._update_ylim = False
+        self._update_ylim_ready = False
+        self._ylim_temp = [999999,-999999]
 
         # call flush() to force a re-draw of the line (including re-doing range)
         self._is_flushed = False
@@ -33,6 +41,10 @@ class TraceWidget(FigureCanvas):
         self._is_cuda_known = False
         self._is_cuda = False
         super().__init__(fig)
+        self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+
+    def set_ylim(self, lim):
+        self._axes.set_ylim(lim[0], lim[1])
 
     def flush(self):
         if self._axes is not None:
@@ -62,6 +74,38 @@ class TraceWidget(FigureCanvas):
                 else:
                     self._ydata = volume[self._bidx].mean(axis=0)
 
+                if self._update_ylim and not self._update_ylim_ready:
+
+                    # This is true on the first time only.
+                    # 'start_idx' is the bscan index right now. We will watch the indices, 
+                    # and look for when the _new_ incoming index is LESS THAN the last one --
+                    # this is when the bscan finished a volume and started the next one.
+                    # Once we see that, we wait until the index is GREATER THAN the first one -- 
+                    # that means we've cycled through an entire volume.
+
+                    if self._update_ylim_start_idx<0:
+                        self._update_ylim_start_idx = self._bidx
+                        self._update_ylim_last_idx = self._bidx
+                        self._update_ylim_lap = False
+                        self._ylim_temp = [999999,-999999]
+
+                    # check how far we've cycled for ylim. Important that on first time through, 
+                    # the last_idx is set to current _bidx
+                    if not self._update_ylim_lap:
+                        if self._bidx < self._update_ylim_last_idx:
+                            self._update_ylim_lap = True
+                    else:
+                        if self._bidx > self._update_ylim_last_idx:
+                            self._update_ylim_ready = True
+
+                    self._update_ylim_last_idx = self._bidx
+                    ylow = numpy.min(self._ydata)
+                    yhi = numpy.max(self._ydata)
+                    if ylow < self._ylim_temp[0]:
+                        self._ylim_temp[0] = ylow
+                    if yhi > self._ylim_temp[1]:
+                        self._ylim_temp[1] = yhi
+                    #print("ylim update first {0:d} last {1:d}, lap , lim ({2:f},{3:f})".format(self._update_ylim_start_idx, self._update_ylim_last_idx, self._ylim_temp[0], self._ylim_temp[1]))
             have_data = True
 
             # check for x data
@@ -90,6 +134,13 @@ class TraceWidget(FigureCanvas):
             self._line2d = line2ds[0]
         else:
             self._line2d.set_ydata(self._ydata)
+
+        if self._update_ylim_ready:
+            self._update_ylim = False
+            self._update_ylim_ready = False
+            self._update_ylim_start_idx = -1
+            self._axes.set_ylim(self._ylim_temp[0], self._ylim_temp[1])
+
         self._invalidated = False
 
         self.draw()
@@ -107,3 +158,9 @@ class TraceWidget(FigureCanvas):
 
     def clear(self):
         self._axes.clear()
+
+    def keyPressEvent(self, e: QKeyEvent) -> None:
+        if e.key() == Qt.Key.Key_Y:
+            if not self._update_ylim:
+                self._update_ylim = True
+
