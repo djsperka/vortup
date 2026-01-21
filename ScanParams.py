@@ -28,12 +28,19 @@ class LineScanParams():
     lines_per_volume: int = 10
     angle: float = 0.0
 
+@dataclass
+class GalvoTuningScanParams():
+    ascans_per_bscan: int = 500
+    line_extent: Range = field(default_factory=lambda: Range(-1,1))
+    lines_per_volume: int = 10
+    angle: float = 0.0
+
 
 
 @dataclass
 class ScanParams():
     current_index: int = 0
-    scans: dict[str, RasterScanParams|AimingScanParams|LineScanParams] =  field(default_factory=lambda: {})
+    scans: dict[str, RasterScanParams|AimingScanParams|LineScanParams|GalvoTuningScanParams] =  field(default_factory=lambda: {})
 
 #     def getRasterScanConfig(self):
 #         cfg = RasterScanConfig()

@@ -1,6 +1,6 @@
 import sys
 import math
-from ScanParams import ScanParams, RasterScanParams, AimingScanParams, LineScanParams
+from ScanParams import ScanParams, RasterScanParams, AimingScanParams, LineScanParams, GalvoTuningScanParams
 from vortex.scan import RasterScanConfig, RasterScan, Limits
 from vortex import Range
 from PyQt5.QtWidgets import QGroupBox, QApplication, QWidget
@@ -10,13 +10,14 @@ from Ui_ScanConfigWidget import Ui_ScanConfigWidget
 from Ui_RasterScanConfigWidget import Ui_RasterScanConfigWidget
 from Ui_AimingScanConfigWidget import Ui_AimingScanConfigWidget
 from Ui_LineScanConfigWidget import Ui_LineScanConfigWidget
+from Ui_GalvoTuningScanConfigWidget import Ui_GalvoTuningScanConfigWidget
 from vortex_tools.scan import plot_annotated_waveforms_time, plot_annotated_waveforms_space
 from matplotlib import pyplot
 import traceback
 
 
 f_sFloat = "([+-]?([0-9]*[.])?[0-9]+)"
-RegexForExtents = QRegExp("({0:s}[\s,]{1:s})|{2:s}".format(f_sFloat, f_sFloat, f_sFloat))
+RegexForExtents = QRegExp("({0:s}[\\s,]{1:s})|{2:s}".format(f_sFloat, f_sFloat, f_sFloat))
 
 def getRangeFromTextEntry(txt) -> Range:
     # match regex. Validator should ensure that there is ALWAYS a match, but throw exception if not.
@@ -230,11 +231,44 @@ class LineScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_LineScanConfigWidge
         self.dsbAngle.setValue(params.angle)
 
 
+class GalvoTuningScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_GalvoTuningScanConfigWidget, metaclass=_ABCQWidgetMeta):
+    def __init__(self, parent: QWidget=None):
+        """Instantiate class
+
+        Args:
+        """
+        super().__init__(parent)
+        self.setupUi(self)
+
+        # validators
+        self.leAperB.setValidator(QIntValidator(1,5000))
+        self.leXextent.setValidator(QRegExpValidator(RegexForExtents))
+
+    def getParams(self):
+        return self.getGalvoTuningScanParams()
+    
+    def setParams(self, params):
+        self.setGalvoTuningScanParams(params)
+
+    def getGalvoTuningScanParams(self) -> GalvoTuningScanParams:
+        params = GalvoTuningScanParams()
+        params.ascans_per_bscan = int(self.leAperB.text())
+        params.lines_per_volume = int(self.leLperV.text())
+        params.line_extent = getRangeFromTextEntry(self.leXextent.text())
+        params.angle = self.dsbAngle.value()
+        return params
+
+    def setGalvoTuningScanParams(self, params: GalvoTuningScanParams):
+        self.leAperB.setText("{0:d}".format(params.ascans_per_bscan))
+        self.leXextent.setText("{0:.2f},{1:.2f}".format(params.line_extent.min, params.line_extent.max))
+        self.leLperV.setText("{0:d}".format(params.lines_per_volume))
+        self.dsbAngle.setValue(params.angle)
+
 
 if __name__ == "__main__":
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description='save volume to disk', formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--type', choices=['raster', 'aim', 'line'], default='raster', help='dlg type')
+    parser.add_argument('--type', choices=['raster', 'aim', 'line', 'galvo'], default='raster', help='dlg type')
     args = parser.parse_args()
     app = QApplication([])
     match args.type:
@@ -288,4 +322,18 @@ if __name__ == "__main__":
             print(r)
             print(r2)
 
+        case 'galvo':
+            w = GalvoTuningScanConfigWidget()
+
+            r = GalvoTuningScanParams()
+            r.angle=99
+            r.line_extent = Range(-1,4)
+            r.ascans_per_bscan = 423
+            w.setGalvoTuningScanParams(r)
+            w.show()
+            app.exec()
+
+            r2 = w.getGalvoTuningScanParams()
+            print(r)
+            print(r2)
 
