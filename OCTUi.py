@@ -2,21 +2,17 @@ import sys
 import os
 from VtxEngineParamsDialog import VtxEngineParamsDialog
 from VtxEngine import VtxEngine
-#from OCTDialog import OCTDialog
 from OCTUiMainWindow import OCTUiMainWindow
 from OCTUiParams import OCTUiParams
-from PyQt5.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QMessageBox, QLabel
+from PyQt5.QtWidgets import QApplication, QMessageBox, QLabel
 from PyQt5.QtCore import QTimer,QDateTime
+from vortex.engine import Engine, EngineConfig, EngineStatus
 from vortex import get_console_logger as gcl
-from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
 from vortex.storage import SimpleStackConfig, SimpleStackHeader
-from vortex.engine import Engine, EngineStatus
-from ScanParams import ScanParams
-from ScanGUIHelper import scanGUIHelperFactory, ScanGUIHelper
-from TraceWidget import TraceWidget
+from ScanGUIHelper import ScanGUIHelper
+from scanGUIHelperFactory import scanGUIHelperFactory
 import logging
-from typing import Tuple, List
-from rainbow_logging_handler import RainbowLoggingHandler
+from typing import Tuple
 import traceback
 import matplotlib as mpl
 from datetime import datetime
