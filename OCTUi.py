@@ -54,10 +54,10 @@ class OCTUi():
         from json import dumps
 
         #self.initializeScans(self._params.scn)
-        number = 1;
         self._octDialog.stackedWidgetDummy.removeWidget(self._octDialog.stackedWidgetDummyPage1)
-        for name,cfg in self._params.scn.scans.items():
-            self._logger.info("Found scan config {0:s},{1:d}".format(name,number))
+        for number,(name,cfg) in enumerate(self._params.scn.scans.items()):
+            flag = 1<<number
+            self._logger.info("Found scan config {0:s},{1:x}".format(name,flag))
             # are there settings for this scan config? 
             if name in self._params.settings:
                 s = self._params.settings[name]
@@ -65,10 +65,10 @@ class OCTUi():
             else:
                 s = {}
 
-            self._guihelpers.append(scanGUIHelperFactory(name, number, cfg, self._params.acq, s, self._params.vtx.log_level))
+            self._guihelpers.append(scanGUIHelperFactory(name, flag, cfg, self._params.acq, s, self._params.vtx.log_level))
             self._octDialog.widgetScanConfig.addScanType(name, self._guihelpers[-1].edit_widget)
             self._octDialog.stackedWidgetDummy.addWidget(self._guihelpers[-1].plot_widget)
-            number += 1
+
         self._octDialog.widgetScanConfig.setCurrentIndex(self._params.scn.current_index)
         self._octDialog.stackedWidgetDummy.setCurrentIndex(self._params.scn.current_index)
 
@@ -185,6 +185,7 @@ class OCTUi():
     def connectCurrentScan(self, helper: ScanGUIHelper): 
         helper.null_endpoint.volume_callback = self.volumeCallback
         helper.storage_endpoint.volume_callback = self.volumeCallback2
+
         # the engine might not yet be created, if this is initialization
         if self._vtxengine:
             self._logger.info('Connect scan \'{0:s}\' to engine.'.format(helper.name))
