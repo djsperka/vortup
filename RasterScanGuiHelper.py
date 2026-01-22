@@ -129,7 +129,7 @@ class RasterScanGUIHelper(ScanGUIHelper):
         self.ascan_endpoint.aggregate_segment_callback = self.cb_ascan
         self.spectra_endpoint.aggregate_segment_callback = self.cb_spectra
         self.spectra_endpoint.volume_callback = self.cb_volume
-        
+
         # 
         vbox = QVBoxLayout()
         hbox_upper = QHBoxLayout()
@@ -168,4 +168,5 @@ class RasterScanGUIHelper(ScanGUIHelper):
             scan_idx (int): scan index
             volume_idx (int): volume index
         """
-        print("raster cb_volume({0:d},{1:d},{2:d})".format(sample_idx, scan_idx, volume_idx))
+        #print("raster cb_volume({0:d},{1:d},{2:d})".format(sample_idx, scan_idx, volume_idx))
+        pass
