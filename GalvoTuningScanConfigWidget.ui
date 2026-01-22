@@ -48,7 +48,7 @@
     </widget>
    </item>
    <item row="0" column="2">
-    <widget class="QLineEdit" name="leXextent">
+    <widget class="QLineEdit" name="leTextent">
      <property name="minimumSize">
       <size>
        <width>40</width>
@@ -70,20 +70,6 @@
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Line extent</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1" colspan="2">
-    <widget class="QDoubleSpinBox" name="dsbAngle">
-     <property name="buttonSymbols">
-      <enum>QAbstractSpinBox::NoButtons</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Angle</string>
      </property>
     </widget>
    </item>

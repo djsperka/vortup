@@ -1,6 +1,6 @@
 from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, AcquisitionType
 from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
-from ScanParams import ScanParams, RasterScanParams, AimingScanParams, LineScanParams
+from ScanParams import ScanParams, RasterScanParams, AimingScanParams, LineScanParams, GalvoTuningScanParams
 from platformdirs import site_config_dir
 from pathlib import Path
 import json
@@ -93,6 +93,8 @@ class _octui_decoder(json.JSONDecoder):
             return AimingScanParams(ascans_per_bscan=d['ascans_per_bscan'],bscans_per_volume=d['bscans_per_volume'],bidirectional_segments=d['bidirectional_segments'],aim_extent=d['aim_extent'],angle=d['angle'])
         elif {'ascans_per_bscan','bidirectional_segments','line_extent','lines_per_volume','angle'}.issubset(d.keys()):
             return LineScanParams(ascans_per_bscan=d['ascans_per_bscan'],bidirectional_segments=d['bidirectional_segments'],line_extent=d['line_extent'],lines_per_volume=d['lines_per_volume'],angle=d['angle'])
+        elif {'ascans_per_bscan','tuning_extent','lines_per_volume'}.issubset(d.keys()):
+            return GalvoTuningScanParams(ascans_per_bscan=d['ascans_per_bscan'], tuning_extent=d['tuning_extent'], lines_per_volume=d['lines_per_volume'])
         return d
 
 

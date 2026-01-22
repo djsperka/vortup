@@ -50,20 +50,6 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
         # callback for radio buttons
         self.cbScanTypes.currentIndexChanged.connect(self.setCurrentIndex)
 
-        # # validators
-
-        # # This regular expression matches a comma-separated range with or without floating-point numbers.
-        # # It also matches a single number (float or not). 
-        # # The capture [1] is for the former, and capture[6] is for the single number.
-        # sFloat = "([+-]?([0-9]*[.])?[0-9]+)"
-        # self._regexForExtents = QRegExp("({0:s}[\s,]{1:s})|{2:s}".format(sFloat, sFloat, sFloat))
-        # #self._regexForExtents = QRegExp("((-?\d+)[\s,]+(-?\d+))|(-?\d+)")
-        # self.leAperB.setValidator(QIntValidator(1,5000))
-        # self.leBperV.setValidator(QIntValidator(1,5000))
-        # self.leXextent.setValidator(QRegExpValidator(self._regexForExtents))
-        # self.leYextent.setValidator(QRegExpValidator(self._regexForExtents))
-        # self.pushButtonShowPattern.clicked.connect(self.showPatternClicked)
-
     def getScanParams(self) -> ScanParams:
         params = ScanParams()
         params.current_index = self.cbScanTypes.currentIndex()
@@ -242,7 +228,7 @@ class GalvoTuningScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_GalvoTuningS
 
         # validators
         self.leAperB.setValidator(QIntValidator(1,5000))
-        self.leXextent.setValidator(QRegExpValidator(RegexForExtents))
+        self.leTextent.setValidator(QRegExpValidator(RegexForExtents))
 
     def getParams(self):
         return self.getGalvoTuningScanParams()
@@ -254,15 +240,13 @@ class GalvoTuningScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_GalvoTuningS
         params = GalvoTuningScanParams()
         params.ascans_per_bscan = int(self.leAperB.text())
         params.lines_per_volume = int(self.leLperV.text())
-        params.line_extent = getRangeFromTextEntry(self.leXextent.text())
-        params.angle = self.dsbAngle.value()
+        params.tuning_extent = getRangeFromTextEntry(self.leTextent.text())
         return params
 
     def setGalvoTuningScanParams(self, params: GalvoTuningScanParams):
         self.leAperB.setText("{0:d}".format(params.ascans_per_bscan))
-        self.leXextent.setText("{0:.2f},{1:.2f}".format(params.line_extent.min, params.line_extent.max))
+        self.leTextent.setText("{0:.2f},{1:.2f}".format(params.tuning_extent.min, params.tuning_extent.max))
         self.leLperV.setText("{0:d}".format(params.lines_per_volume))
-        self.dsbAngle.setValue(params.angle)
 
 
 if __name__ == "__main__":
@@ -326,9 +310,9 @@ if __name__ == "__main__":
             w = GalvoTuningScanConfigWidget()
 
             r = GalvoTuningScanParams()
-            r.angle=99
-            r.line_extent = Range(-1,4)
+            r.tuning_extent = Range(-1,4)
             r.ascans_per_bscan = 423
+            r.lines_per_volume = 333
             w.setGalvoTuningScanParams(r)
             w.show()
             app.exec()

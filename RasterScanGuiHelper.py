@@ -128,7 +128,8 @@ class RasterScanGUIHelper(ScanGUIHelper):
         # callbacks
         self.ascan_endpoint.aggregate_segment_callback = self.cb_ascan
         self.spectra_endpoint.aggregate_segment_callback = self.cb_spectra
-
+        self.spectra_endpoint.volume_callback = self.cb_volume
+        
         # 
         vbox = QVBoxLayout()
         hbox_upper = QHBoxLayout()
@@ -157,3 +158,14 @@ class RasterScanGUIHelper(ScanGUIHelper):
     def cb_spectra(self, v):
             self._spectra_trace_widget.update_trace(v)
 
+    def cb_volume(self, sample_idx, scan_idx, volume_idx):
+        """volume callback that is (should be) called prior to other volume callbacks. 
+        Because of that arrangement, this callback will open storage. Same storage is closed 
+        in volumeCallback2
+
+        Args:
+            sample_idx (int): sample index
+            scan_idx (int): scan index
+            volume_idx (int): volume index
+        """
+        print("raster cb_volume({0:d},{1:d},{2:d})".format(sample_idx, scan_idx, volume_idx))
