@@ -6,6 +6,7 @@ from AcqParams import AcqParams
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
 from vortex_tools.ui.display import CrossSectionImageWidget
 from TraceWidget import TraceWidget
+from LineScanTraceWidget import LineScanTraceWidget
 import matplotlib as mpl
 from math import radians
 
@@ -81,44 +82,41 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
 
         self._cross_widget_1 = CrossSectionImageWidget(self.ascan_endpoint, cmap=mpl.colormaps['gray'], title="one way")
         self._cross_widget_2 = CrossSectionImageWidget(self.ascan_endpoint, cmap=mpl.colormaps['gray'], title="other way")
-        self._ascan_trace_widget = TraceWidget(self.ascan_endpoint, title="ascan")
-        self._spectra_trace_widget = TraceWidget(self.spectra_endpoint, title="raw spectra")
+        # self._ascan_trace_widget = TraceWidget(self.ascan_endpoint, title="ascan")
+        # self._spectra_trace_widget = TraceWidget(self.spectra_endpoint, title="raw spectra")
+        self._linescan_trace_widget = LineScanTraceWidget(self._ascan_endpoint, title="Galvo tuning")
 
         # apply settings
         if 'cross1.range' in self.settings:
             self._cross_widget_1._range = self.settings['cross1.range']
 
-        if 'cross.range' in self.settings:
+        if 'cross2.range' in self.settings:
             self._cross_widget_2._range = self.settings['cross2.range']
 
-        if 'ascan.ylim' in self.settings:
-            self._ascan_trace_widget.set_ylim(self.settings['ascan.ylim'])
-
-        if 'spectra.ylim' in self.settings:
-            self._spectra_trace_widget.set_ylim(self.settings['spectra.ylim'])
+        if 'linescan.ylim' in self.settings:
+            self._linescan_trace_widget.set_ylim(self.settings['linescan.ylim'])
 
         # callbacks
         self.ascan_endpoint.aggregate_segment_callback = self.cb_ascan
-        self.spectra_endpoint.aggregate_segment_callback = self.cb_spectra
-        self.spectra_endpoint.volume_callback = self.cb_volume
+        # self.spectra_endpoint.aggregate_segment_callback = self.cb_spectra
+        # self.spectra_endpoint.volume_callback = self.cb_volume
 
         # 
-        vbox = QVBoxLayout()
-        hbox_upper = QHBoxLayout()
-        hbox_upper.addWidget(self._cross_widget_1)
-        hbox_upper.addWidget(self._cross_widget_2)
-        hbox_lower = QHBoxLayout()
-        hbox_lower.addWidget(self._spectra_trace_widget)
-        hbox_lower.addWidget(self._ascan_trace_widget)
-        vbox.addLayout(hbox_upper)
-        vbox.addLayout(hbox_lower)
+        hbox = QHBoxLayout()
+        vbox_left = QVBoxLayout()
+        vbox_left.addWidget(self._cross_widget_1)
+        vbox_left.addWidget(self._cross_widget_2)
+        vbox_right = QVBoxLayout()
+        vbox_right.addWidget(self._linescan_trace_widget)
+        hbox.addLayout(vbox_left)
+        hbox.addLayout(vbox_right)
         w = QWidget()
-        w.setLayout(vbox)
+        w.setLayout(hbox)
         return w
 
     def cb_ascan(self, v):
-        with self.spectra_endpoint.tensor as volume:
-            print("{0:d}, ({1:d},{2:d},{3:d})".format(v[-1], volume.shape[0], volume.shape[1], volume.shape[2]))
+        # with self.spectra_endpoint.tensor as volume:
+        #     print("{0:d}, ({1:d},{2:d},{3:d})".format(v[-1], volume.shape[0], volume.shape[1], volume.shape[2]))
         if v:
             if v[-1]%2:
                 self._cross_widget_1.notify_segments(v)
@@ -127,10 +125,10 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
         else:
             self._cross_widget_1.notify_segments(v)
             self._cross_widget_2.notify_segments(v)
-        self._ascan_trace_widget.update_trace(v)
+        self._linescan_trace_widget.update_trace(v)
 
-    def cb_spectra(self, v):
-            self._spectra_trace_widget.update_trace(v)
+    # def cb_spectra(self, v):
+    #         self._spectra_trace_widget.update_trace(v)
 
     def cb_volume(self, sample_idx, scan_idx, volume_idx):
         """volume callback that is (should be) called prior to other volume callbacks. 
@@ -157,8 +155,7 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
         settings = {}
         settings['cross1.range'] = self._cross_widget_1._range
         settings['cross2.range'] = self._cross_widget_2._range
-        settings['ascan.ylim'] = list(self._ascan_trace_widget._axes.get_ylim())
-        settings['spectra.ylim'] = list(self._spectra_trace_widget._axes.get_ylim())
+        settings['linescan.ylim'] = list(self._linescan_trace_widget._axes.get_ylim())
         return settings
     
     def getScan(self):
