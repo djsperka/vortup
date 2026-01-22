@@ -27,6 +27,8 @@ class LineScanTraceWidget(FigureCanvas):
         self._line2d_b = None
         self._ydata_a = None
         self._ydata_b = None
+        self._color_a = (1,0,0)
+        self._color_b = (0,0,1)
         self._mip = None
         self._invalidated = False
         self._bscan_index_list = []     # when _invalidated is true, this is list of bscans to fetch
@@ -44,74 +46,6 @@ class LineScanTraceWidget(FigureCanvas):
             self._line2d = None
 
 
-    # def get_xy_data(self) -> Tuple[bool, bool]:
-    #     have_data = False
-    #     must_plot = False
-    #     if self._bidx >= 0:
-
-    #         with self._endpoint.tensor as volume:
-
-    #             if not self._is_cuda_known:
-    #                 # Do this just one time - check data type
-    #                 if isinstance(volume, cupy.ndarray):
-    #                     self._is_cuda = True
-    #                 else:
-    #                     self._is_cuda = False
-    #                 self._is_cuda_known = True
-
-    #             if self._is_cuda:
-    #                 with self._endpoint.stream:
-    #                     self._ydata = volume[self._bidx].mean(axis=0).get()
-    #             else:
-    #                 self._ydata = volume[self._bidx].mean(axis=0)
-
-    #             if self._update_ylim and not self._update_ylim_ready:
-
-    #                 # This is true on the first time only.
-    #                 # 'start_idx' is the bscan index right now. We will watch the indices, 
-    #                 # and look for when the _new_ incoming index is LESS THAN the last one --
-    #                 # this is when the bscan finished a volume and started the next one.
-    #                 # Once we see that, we wait until the index is GREATER THAN the first one -- 
-    #                 # that means we've cycled through an entire volume.
-
-    #                 if self._update_ylim_start_idx<0:
-    #                     self._update_ylim_start_idx = self._bidx
-    #                     self._update_ylim_last_idx = self._bidx
-    #                     self._update_ylim_lap = False
-    #                     self._ylim_temp = [999999,-999999]
-
-    #                 # check how far we've cycled for ylim. Important that on first time through, 
-    #                 # the last_idx is set to current _bidx
-    #                 if not self._update_ylim_lap:
-    #                     if self._bidx < self._update_ylim_last_idx:
-    #                         self._update_ylim_lap = True
-    #                 else:
-    #                     if self._bidx > self._update_ylim_last_idx:
-    #                         self._update_ylim_ready = True
-
-    #                 self._update_ylim_last_idx = self._bidx
-    #                 ylow = numpy.min(self._ydata)
-    #                 yhi = numpy.max(self._ydata)
-    #                 if ylow < self._ylim_temp[0]:
-    #                     self._ylim_temp[0] = ylow
-    #                 if yhi > self._ylim_temp[1]:
-    #                     self._ylim_temp[1] = yhi
-    #                 #print("ylim update first {0:d} last {1:d}, lap , lim ({2:f},{3:f})".format(self._update_ylim_start_idx, self._update_ylim_last_idx, self._ylim_temp[0], self._ylim_temp[1]))
-    #         have_data = True
-
-    #         # check for x data
-    #         if self._xdata is None or len(self._ydata) != len(self._xdata):
-    #             self._xdata = list(range(1,len(self._ydata)+1))
-    #             must_plot = True
-
-    #         # flushed?
-    #         if self._is_flushed:
-    #             must_plot = True
-    #             self._is_flushed = False
-
-    #     return (have_data, must_plot)
-
-
     def get_data(self) -> bool:
         retval = False
         if self._invalidated:
@@ -120,7 +54,6 @@ class LineScanTraceWidget(FigureCanvas):
             retval = True
             with self._endpoint.tensor as volume:
                 if self._mip is None:
-                    print("Create array for mip, shape: ", volume.shape)
                     self._mip = np.full((volume.shape[0], volume.shape[1]), np.nan)
                 self._mip[temp_list] = cp.max(volume[temp_list], axis=2).get()
 
@@ -138,51 +71,20 @@ class LineScanTraceWidget(FigureCanvas):
             if self._not_ylim_yet:
                 maxa = np.max(self._ydata_a)
                 mina = np.min(self._ydata_a)
-                print("min max: ", mina, maxa)
                 self._axes.set_ylim(mina, maxa)
                 self._not_ylim_yet = False
 
             if self._line2d_a:
                 self._line2d_a.set_ydata(self._ydata_a)
             else:
-                l2ds = self._axes.plot(self._ydata_a)
+                l2ds = self._axes.plot(self._ydata_a, 'r')
                 self._line2d_a = l2ds[0]
             if self._line2d_b:
                 self._line2d_b.set_ydata(self._ydata_b)
             else:
-                l2ds = self._axes.plot(self._ydata_b)
+                l2ds = self._axes.plot(self._ydata_b, 'b')
                 self._line2d_b = l2ds[0]
-
-
-        # if self._cuda:
-        #     with self._endpoint.tensor as volume:
-        #         self._mip[self._bscan_index_list]
-
-
-    #                 with self._endpoint.stream:
-    #                     self._ydata = volume[self._bidx].mean(axis=0).get()
-    #             else:
-    #                 self._ydata = volume[self._bidx].mean(axis=0)
-
-
-
         self._bscan_index_list.clear()
-        # (have_data, must_plot) = self.get_xy_data()
-        # if not have_data:
-        #     return
-        
-        # if must_plot:
-        #     line2ds = self._axes.plot(self._xdata, self._ydata)
-        #     self._line2d = line2ds[0]
-        # else:
-        #     self._line2d.set_ydata(self._ydata)
-
-        # if self._update_ylim_ready:
-        #     self._update_ylim = False
-        #     self._update_ylim_ready = False
-        #     self._update_ylim_start_idx = -1
-        #     self._axes.set_ylim(self._ylim_temp[0], self._ylim_temp[1])
-
         self._invalidated = False
 
         self.draw()
