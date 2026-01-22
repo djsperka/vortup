@@ -19,6 +19,7 @@ class LineScanTraceWidget(FigureCanvas):
         self._cuda = cuda
         fig = Figure(figsize=(width, height), dpi=dpi)
         self._axes = fig.add_subplot(111)
+        self._axes.set_ylim(0, 100)
         #self._axes.get_yaxis().set_visible(False)
         if title:
             self._axes.set_title(title)
@@ -29,12 +30,13 @@ class LineScanTraceWidget(FigureCanvas):
         self._ydata_b = None
         self._color_a = (1,0,0)
         self._color_b = (0,0,1)
+        self._update_ylim = False
         self._mip = None
         self._invalidated = False
         self._bscan_index_list = []     # when _invalidated is true, this is list of bscans to fetch
         self._not_ylim_yet = True
         super().__init__(fig)
-        #self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+        self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
 
     def set_ylim(self, lim):
         self._axes.set_ylim(lim[0], lim[1])
@@ -68,11 +70,11 @@ class LineScanTraceWidget(FigureCanvas):
 
         if self.get_data():
 
-            if self._not_ylim_yet:
+            if self._update_ylim:
                 maxa = np.max(self._ydata_a)
                 mina = np.min(self._ydata_a)
                 self._axes.set_ylim(mina, maxa)
-                self._not_ylim_yet = False
+                self._update_ylim = False
 
             if self._line2d_a:
                 self._line2d_a.set_ydata(self._ydata_a)
@@ -103,8 +105,8 @@ class LineScanTraceWidget(FigureCanvas):
     def clear(self):
         self._axes.clear()
 
-    # def keyPressEvent(self, e: QKeyEvent) -> None:
-    #     if e.key() == Qt.Key.Key_Y:
-    #         if not self._update_ylim:
-    #             self._update_ylim = True
+    def keyPressEvent(self, e: QKeyEvent) -> None:
+        if e.key() == Qt.Key.Key_Y:
+            if not self._update_ylim:
+                self._update_ylim = True
 
