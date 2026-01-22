@@ -48,7 +48,7 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
         self.setupUi(self)
 
         # callback for radio buttons
-        self.cbScanTypes.currentIndexChanged.connect(self.setCurrentIndex)
+        self.cbScanTypes.currentIndexChanged.connect(self.indexChanged)
 
     def getScanParams(self) -> ScanParams:
         params = ScanParams()
@@ -64,9 +64,12 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
         # add page to stacked widget
         self.stackScanTypes.addWidget(w)
 
-    def setCurrentIndex(self, index):
+    def indexChanged(self, index):
         self.stackScanTypes.setCurrentIndex(index)
         self.scanTypeChanged.emit(index)
+
+    def setCurrentIndex(self, index):
+        self.cbScanTypes.setCurrentIndex(index)
 
     def showPatternClicked(self):
         try:
