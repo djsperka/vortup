@@ -135,22 +135,22 @@ class VtxBaseEngine():
         else:
             self._io_out = None
 
+        # WIP: strobes added in VtxEngine. GUIHelpers might provide strobes.
+        # # examples show this being a copy of ioc_out. Make a new one instead.
 
-        # examples show this being a copy of ioc_out. Make a new one instead.
-
-        if cfg.strobe_enabled:
-            strobec = DAQmxConfig()
-            strobec.samples_per_block = ac.records_per_block
-            strobec.samples_per_second = cfg.ssrc_triggers_per_second
-            strobec.blocks_to_buffer = cfg.preload_count
-            strobec.clock.source = cfg.strobe_clock_source
-            strobec.name = 'strobe'
-            strobec.channels.append(daqmx.DigitalOutput(cfg.strobe_device_channel, Block.StreamIndex.Strobes))
-            strobe = DAQmxIO(get_logger(strobec.name, cfg.log_level))
-            strobe.initialize(strobec)
-            self._strobe = strobe
-        else:
-            self._strobe = None
+        # if cfg.strobe_enabled:
+        #     strobec = DAQmxConfig()
+        #     strobec.samples_per_block = ac.records_per_block
+        #     strobec.samples_per_second = cfg.ssrc_triggers_per_second
+        #     strobec.blocks_to_buffer = cfg.preload_count
+        #     strobec.clock.source = cfg.strobe_clock_source
+        #     strobec.name = 'strobe'
+        #     strobec.channels.append(daqmx.DigitalOutput(cfg.strobe_device_channel, Block.StreamIndex.Strobes))
+        #     strobe = DAQmxIO(get_logger(strobec.name, cfg.log_level))
+        #     strobe.initialize(strobec)
+        #     self._strobe = strobe
+        # else:
+        #     self._strobe = None
 
     def get_spectral_filter(self, dispersion: Tuple[float, float]) -> np.ndarray:
         window = np.hanning(self._octprocess_config.samples_per_ascan)
