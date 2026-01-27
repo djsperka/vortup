@@ -16,6 +16,7 @@ from typing import Tuple
 import traceback
 import matplotlib as mpl
 from datetime import datetime
+from json import dumps
 
 class OCTUi():
     
@@ -51,7 +52,6 @@ class OCTUi():
 
         # Create and initialize GUI Helpers
 
-        from json import dumps
 
         #self.initializeScans(self._params.scn)
         self._octDialog.stackedWidgetDummy.removeWidget(self._octDialog.stackedWidgetDummyPage1)
