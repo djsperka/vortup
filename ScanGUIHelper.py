@@ -8,9 +8,9 @@ from vortex import get_console_logger as get_logger
 import logging
 
 class ScanGUIHelper(ABC):
-    def __init__(self, name, number, params, settings, log_level=1):
+    def __init__(self, name, flags, params, settings, log_level=1):
         self.name = name
-        self.number = number
+        self.flags = flags
         self.params = params
         self.settings = settings
         self.log_level = log_level

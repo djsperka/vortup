@@ -18,15 +18,15 @@ from vortex import get_console_logger as get_logger
 
 
 class RasterScanGUIHelper(ScanGUIHelper):
-    def __init__(self, name: str, number: int, params: RasterScanParams, acq:AcqParams, settings: Dict[str, Any], log_level: int):
-        super().__init__(name, number, params, settings, log_level)
+    def __init__(self, name: str, flags: int, params: RasterScanParams, acq:AcqParams, settings: Dict[str, Any], log_level: int):
+        super().__init__(name, flags, params, settings, log_level)
 
         # Create engine parts for this scan
         fc = FormatPlannerConfig()
         fc.segments_per_volume = params.bscans_per_volume
         fc.records_per_segment = params.ascans_per_bscan
         fc.adapt_shape = False
-        fc.mask = Flags(number)
+        fc.mask = Flags(flags)
 
         self._format_planner = FormatPlanner(get_logger('raster format', log_level))
         self._format_planner.initialize(fc)
@@ -93,7 +93,7 @@ class RasterScanGUIHelper(ScanGUIHelper):
         cfg.segment_extent = params.segment_extent
         cfg.volume_extent = params.volume_extent
         cfg.angle = radians(params.angle)
-        cfg.flags = Flags(self.number)
+        cfg.flags = Flags(self.flags)
         scan = RasterScan()
         scan.initialize(cfg)
         return scan

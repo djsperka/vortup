@@ -21,15 +21,15 @@ class AimingScanGUIHelper(ScanGUIHelper):
     '''
     GUIHelper for an aiming scan. The config for an aiming scan 
     '''
-    def __init__(self, name: str, number: int, params: AimingScanParams, acq:AcqParams, settings: Dict[str, Any], log_level: int):
-        super().__init__(name, number, params, settings, log_level)
+    def __init__(self, name: str, flags: int, params: AimingScanParams, acq:AcqParams, settings: Dict[str, Any], log_level: int):
+        super().__init__(name, flags, params, settings, log_level)
 
         # Create engine parts for this scan
         fc = FormatPlannerConfig()
         fc.segments_per_volume = params.bscans_per_volume  # TODO
         fc.records_per_segment = params.ascans_per_bscan
         fc.adapt_shape = False
-        fc.mask = Flags(number)
+        fc.mask = Flags(flags)
 
         self._format_planner = FormatPlanner(get_logger('aiming format', log_level))
         self._format_planner.initialize(fc)
@@ -151,7 +151,7 @@ class AimingScanGUIHelper(ScanGUIHelper):
         cfg.bidirectional_segments = params.bidirectional_segments
         cfg.segment_extent = params.aim_extent
         cfg.volume_extent = params.aim_extent
-        cfg.flags = Flags(self.number)
+        cfg.flags = Flags(self.flags)
         cfg.angle = radians(params.angle)
         cfg.set_aiming()
         scan = RadialScan()

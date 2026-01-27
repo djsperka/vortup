@@ -224,6 +224,7 @@ class LineScanGUIHelper(ScanGUIHelper):
         cfg.volume_extent = Range(0, 0)
         cfg.bidirectional_segments = params.bidirectional_segments
         cfg.loop = True
+        cfg.flags = Flags(self.flags)
         scan = RasterScan()
         scan.initialize(cfg)
         return scan

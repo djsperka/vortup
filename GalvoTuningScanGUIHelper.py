@@ -23,15 +23,15 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
     '''
     GUIHelper for a scan used for tuning galvo delays. Creates a bidirectional line scan, can adjust delay to tune.
     '''
-    def __init__(self, name: str, number: int, params: GalvoTuningScanParams, acq:AcqParams, settings: Dict[str, Any], log_level: int):
-        super().__init__(name, number, params, settings, log_level)
+    def __init__(self, name: str, flags: int, params: GalvoTuningScanParams, acq:AcqParams, settings: Dict[str, Any], log_level: int):
+        super().__init__(name, flags, params, settings, log_level)
 
         # Create engine parts for this scan
         fc = FormatPlannerConfig()
         fc.segments_per_volume = params.lines_per_volume  # TODO
         fc.records_per_segment = params.ascans_per_bscan
         fc.adapt_shape = False
-        fc.mask = Flags(number)
+        fc.mask = Flags(flags)
 
         self._format_planner = FormatPlanner(get_logger('galvo tuning format', log_level))
         self._format_planner.initialize(fc)
@@ -167,6 +167,7 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
         cfg.volume_extent = Range(0, 0)
         cfg.bidirectional_segments = True
         cfg.loop = True
+        cfg.flags = Flags(self.flags)
         scan = RasterScan()
         scan.initialize(cfg)
         return scan
