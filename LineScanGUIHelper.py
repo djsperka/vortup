@@ -1,59 +1,3 @@
-# from ScanGUIHelper import ScanGUIHelper
-# from typing import Any, Dict
-# from ScanConfigWidget import LineScanConfigWidget
-# from ScanParams import LineScanParams
-# from AcqParams import AcqParams
-# from PyQt5.QtWidgets import QLabel
-# from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
-# from TraceWidget import TraceWidget
-# import matplotlib as mpl
-# from math import radians
-
-# from vortex import Range
-# from vortex.scan import RasterScan, RasterScanConfig
-# from vortex.engine import StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, SpectraStackEndpoint, NullEndpoint
-# from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, SimpleSlice
-# from vortex.storage import SimpleStackUInt16
-# from vortex.marker import Flags
-# from vortex import get_console_logger as get_logger
-
-# class LineScanGUIHelper(ScanGUIHelper):
-#     def __init__(self, name: str, number: int, params: LineScanParams, acq:AcqParams, settings: Dict[str, Any], log_level: int):
-#         super().__init__(name, number, params, settings, log_level)
-
-#         self._edit_widget = LineScanConfigWidget()
-#         self._edit_widget.setLineScanParams(self.params)
-#         self._plot_widget = self.linePlotWidget()
-
-#     def linePlotWidget(self):
-#         # importing the required libraries
-#         w = QLabel('Line')
-#         w.setStyleSheet("background-color: lightblue")
-#         return w
-
-#     def getParams(self):
-#         params = self._edit_widget.getLineScanParams()
-#         return params
-
-#     def clear(self):
-#         print("LineScanGUIHelper::clear")
-
-#     def getScan(self):
-#         params = self.getParams()
-#         cfg = RasterScanConfig()
-#         cfg.ascans_per_bscan = params.ascans_per_bscan
-#         cfg.bscans_per_volume = params.lines_per_volume
-#         cfg.bidirectional_segments = params.bidirectional_segments
-#         cfg.segment_extent = params.line_extent
-#         cfg.volume_extent = Range(0,0)
-#         cfg.flags = Flags(self.number)
-#         scan = RasterScan()
-#         scan.initialize(cfg)
-#         return scan
-
-#     def getSettings(self):
-#         return {}
-
 from ScanGUIHelper import ScanGUIHelper
 from typing import Any, Dict
 from ScanConfigWidget import LineScanConfigWidget
@@ -67,11 +11,11 @@ import matplotlib as mpl
 from math import radians
 
 from vortex import Range
-from vortex.scan import RasterScan, RasterScanConfig
+from vortex.scan import RasterScan, RasterScanConfig, FreeformScan, FreeformScanConfig
 from vortex.engine import StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, SpectraStackEndpoint, NullEndpoint
 from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, SimpleSlice
 from vortex.storage import SimpleStackUInt16
-from vortex.marker import Flags
+from vortex.marker import Flags, Event
 from vortex import get_console_logger as get_logger
 
 
@@ -225,7 +169,24 @@ class LineScanGUIHelper(ScanGUIHelper):
         cfg.bidirectional_segments = params.bidirectional_segments
         cfg.loop = True
         cfg.flags = Flags(self.flags)
-        scan = RasterScan()
-        scan.initialize(cfg)
+
+        # now, for grins, let's get the segments for this scan
+        segments = cfg.to_segments()
+
+        # Now stick an Event into the markers for the first segment
+        e = Event()
+        e.flags = Flags(self.flags)
+        e.id = 1
+        e.sample = 0
+        segments[0].markers.append(e)
+
+        ffsc = FreeformScanConfig()
+        ffsc.pattern = segments
+        ffsc.loop = True
+
+        scan = FreeformScan()
+        scan.initialize(ffsc)
+        # scan = RasterScan()
+        # scan.initialize(cfg)
         return scan
 
