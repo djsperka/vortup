@@ -29,7 +29,6 @@ class VtxEngineParams:
     # strobe stuff
     strobe_enabled: bool = True
     strobe_clock_source: str = "pf12"
-    strobe_device_channel: str = "Dev1/port0"
     
     # hardware configuration
     ssrc_triggers_per_second: int = 100000
@@ -71,7 +70,6 @@ DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
     galvo_y_device_channel='Dev1/ao1',
     strobe_enabled=True,
     strobe_clock_source='pfi12',
-    strobe_device_channel='Dev1/port0',
 
     # These are probably rig-specific? Hasn't been an issue to use these. 
     blocks_to_allocate=128,
