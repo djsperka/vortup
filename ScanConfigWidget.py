@@ -195,7 +195,9 @@ class LineScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_LineScanConfigWidge
 
         # validators
         self.leAperB.setValidator(QIntValidator(1,5000))
+        self.leLperV.setValidator(QIntValidator(1,5000))
         self.leXextent.setValidator(QRegExpValidator(RegexForExtents))
+        self.leBscanTriggerIndex.setValidator(QIntValidator(1,500)) # TODO This must be less than BperV
 
     def getParams(self):
         return self.getLineScanParams()
@@ -210,6 +212,9 @@ class LineScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_LineScanConfigWidge
         params.bidirectional_segments = self.cbBidirectional.isChecked()
         params.line_extent = getRangeFromTextEntry(self.leXextent.text())
         params.angle = self.dsbAngle.value()
+        params.strobe_enabled = self.gbStrobeOutput.isChecked()
+        params.strobe_bscan_index = int(self.leBscanTriggerIndex.text())
+        params.strobe_output_device = self.leOutputDevice.text()
         return params
 
     def setLineScanParams(self, params: LineScanParams):
@@ -218,6 +223,9 @@ class LineScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_LineScanConfigWidge
         self.leXextent.setText("{0:.2f},{1:.2f}".format(params.line_extent.min, params.line_extent.max))
         self.leLperV.setText("{0:d}".format(params.lines_per_volume))
         self.dsbAngle.setValue(params.angle)
+        self.gbStrobeOutput.setChecked(params.strobe_enabled)
+        self.leBscanTriggerIndex.setText("{0:d}".format(params.strobe_bscan_index))
+        self.leOutputDevice.setText(params.strobe_output_device)
 
 
 class GalvoTuningScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_GalvoTuningScanConfigWidget, metaclass=_ABCQWidgetMeta):
