@@ -112,6 +112,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.lineEditGalvoXDevice.setText(cfg.galvo_x_device_channel)
         self.lineEditGalvoYDevice.setText(cfg.galvo_y_device_channel)
         self.lineEditStrobeClockSource.setText(cfg.strobe_clock_source)
+        self.lineEditStrobeDevice.setText(cfg.strobe_device_channel)
 
         # enable/disable
         self.groupBoxGalvo.setChecked(cfg.galvo_enabled)
@@ -158,6 +159,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         s.galvo_x_device_channel = self.lineEditGalvoXDevice.text()
         s.galvo_y_device_channel = self.lineEditGalvoYDevice.text()
         s.strobe_clock_source = self.lineEditStrobeClockSource.text()
+        s.strobe_device_channel = self.lineEditStrobeDevice.text()
         return s
 
 
