@@ -12,7 +12,7 @@ from math import radians
 
 from vortex import Range
 from vortex.scan import RasterScan, RasterScanConfig, FreeformScan, FreeformScanConfig
-from vortex.engine import StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, SpectraStackEndpoint, NullEndpoint
+from vortex.engine import StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, SpectraStackEndpoint, NullEndpoint, EventStrobe
 from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, SimpleSlice
 from vortex.storage import SimpleStackUInt16
 from vortex.marker import Flags, Event
@@ -173,13 +173,18 @@ class LineScanGUIHelper(ScanGUIHelper):
         # now, for grins, let's get the segments for this scan
         segments = cfg.to_segments()
 
-        # Now stick an Event into the markers for the first segment
-        e = Event()
-        e.flags = Flags(self.flags)
-        e.id = 1
-        e.sample = 0
-        segments[0].markers.append(e)
+        # if strobe needed, put marker into correct segment
+        if params.strobe_enabled:
+            if params.strobe_bscan_index < 0 or params.strobe_bscan_index>(params.lines_per_volume-1):
+                self._logger.warning("Cannot add strobe trigger at bscan index {0:d}: must be in less than lines per volume ({1:d})".format(params.strobe_bscan_index, params.lines_per_volume))
+            else:
+                e = Event()
+                e.flags = Flags(self.flags)
+                e.id = 1
+                e.sample = 0
+                segments[params.strobe_bscan_index].markers.append(e)
 
+        # now make scan
         ffsc = FreeformScanConfig()
         ffsc.pattern = segments
         ffsc.loop = True
@@ -190,3 +195,10 @@ class LineScanGUIHelper(ScanGUIHelper):
         # scan.initialize(cfg)
         return scan
 
+    def getStrobe(self):
+        if self.params.strobe_enabled:
+            s = EventStrobe(0)
+            s.flags = Flags(self.flags)
+            return (self.params.strobe_output_device, s)
+        else:
+            return None

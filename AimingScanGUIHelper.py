@@ -158,3 +158,6 @@ class AimingScanGUIHelper(ScanGUIHelper):
         scan.initialize(cfg)
         return scan
 
+    def getStrobe(self):
+        return super().getStrobe()
+    

@@ -170,3 +170,6 @@ class RasterScanGUIHelper(ScanGUIHelper):
         """
         #print("raster cb_volume({0:d},{1:d},{2:d})".format(sample_idx, scan_idx, volume_idx))
         pass
+
+    def getStrobe(self):
+        return super().getStrobe()

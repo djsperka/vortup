@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import List, Any, Dict
+from typing import List, Any, Dict, Tuple
 from ScanParams import RasterScanParams, AimingScanParams, LineScanParams
 from AcqParams import AcqParams
-from vortex.engine import NullEndpoint
+from vortex.engine import NullEndpoint, VolumeStrobe, SegmentStrobe, SampleStrobe, EventStrobe
 from vortex.format import FormatPlanner
 from vortex import get_console_logger as get_logger
 import logging
@@ -96,3 +96,14 @@ class ScanGUIHelper(ABC):
         """
         pass
 
+    @abstractmethod
+    def getStrobe(self) -> None|Tuple[str,VolumeStrobe|SegmentStrobe|SampleStrobe|EventStrobe]:
+        """
+        Return None (if no strobe for this scan type), or return a tuple with the device name and the strobe to use. 
+        The strobe's 'line' parameter will be re-set, so just create it with any old line value. 
+        
+        :param self: Description
+        :return: Description
+        :rtype: Tuple[str, VolumeStrobe | SegmentStrobe | SampleStrobe | EventStrobe] | None
+        """
+        return None
