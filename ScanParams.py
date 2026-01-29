@@ -26,7 +26,7 @@ class LineScanParams():
     lines_per_volume: int = 10
     angle: float = 0.0
     strobe_enabled: bool = False
-    strobe_output_device: str = "Dev1/port0"
+    strobe_output_line: int = 0
     strobe_bscan_index: int = 0
 
 @dataclass

@@ -69,9 +69,9 @@ class Ui_LineScanConfigWidget(object):
         self.label_7 = QtWidgets.QLabel(self.gbStrobeOutput)
         self.label_7.setObjectName("label_7")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.label_7)
-        self.leOutputDevice = QtWidgets.QLineEdit(self.gbStrobeOutput)
-        self.leOutputDevice.setObjectName("leOutputDevice")
-        self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.leOutputDevice)
+        self.leOutputLine = QtWidgets.QLineEdit(self.gbStrobeOutput)
+        self.leOutputLine.setObjectName("leOutputLine")
+        self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.leOutputLine)
         self.gridLayout.addWidget(self.gbStrobeOutput, 5, 0, 1, 3)
 
         self.retranslateUi(LineScanConfigWidget)
@@ -91,7 +91,7 @@ class Ui_LineScanConfigWidget(object):
         self.gbStrobeOutput.setTitle(_translate("LineScanConfigWidget", "Trigger output"))
         self.label_5.setText(_translate("LineScanConfigWidget", "Trigger at bscan #"))
         self.leBscanTriggerIndex.setText(_translate("LineScanConfigWidget", "0"))
-        self.label_7.setText(_translate("LineScanConfigWidget", "Output device"))
+        self.label_7.setText(_translate("LineScanConfigWidget", "device line#"))
 
 
 if __name__ == "__main__":
