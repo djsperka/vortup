@@ -122,9 +122,11 @@ class VtxBaseEngine():
             ioc_out.name = 'output'
 
             # channel 0, will be
+            LOGGER.info("Galvo slow axis output on \"{0:s}\", {1:f} units/volt".format(cfg.galvo_x_device_channel, cfg.galvo_x_units_per_volt))
             xAVO = daqmx.AnalogVoltageOutput(cfg.galvo_x_device_channel, cfg.galvo_x_units_per_volt, Block.StreamIndex.GalvoTarget, 0)
             xAVO.limits = cfg.galvo_x_voltage_range
             ioc_out.channels.append(xAVO)
+            LOGGER.info("Galvo fast axis output on \"{0:s}\", {1:f} units/volt".format(cfg.galvo_y_device_channel, cfg.galvo_y_units_per_volt))
             yAVO = daqmx.AnalogVoltageOutput(cfg.galvo_y_device_channel, cfg.galvo_y_units_per_volt, Block.StreamIndex.GalvoTarget, 1)
             yAVO.limits = cfg.galvo_y_voltage_range
             ioc_out.channels.append(yAVO)

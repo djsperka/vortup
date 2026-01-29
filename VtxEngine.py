@@ -32,9 +32,16 @@ class VtxEngine(VtxBaseEngine):
         ec.add_acquisition(self._acquire, [self._octprocess])
 
         # Add formatter and endpoints for each scan type in the parameters 
+        strobe_tuples = []
         for helper in helpers:
             ec.add_processor(self._octprocess, [helper.format_planner])
             ec.add_formatter(helper.format_planner, helper.endpoints)
+            t = helper.getStrobe()
+            if t is not None:
+                self._logger.info("Scan {0:s} has strobe output on device {1:s}".format(helper.name, t[0]))
+                strobe_tuples.append(t)
+
+
 
         # add galvo output
         if self._io_out is not None:
@@ -43,29 +50,34 @@ class VtxEngine(VtxBaseEngine):
 
         # strobe
         if cfg.strobe_enabled:
-            strobec = DAQmxConfig()
-            strobec.samples_per_block = acq.ascans_per_block
-            strobec.samples_per_second = cfg.ssrc_triggers_per_second
-            strobec.blocks_to_buffer = cfg.preload_count
-            strobec.clock.source = cfg.strobe_clock_source
-            strobec.name = 'strobe'
-            #strobec.channels.append(daqmx.DigitalOutput(cfg.strobe_device_channel, Block.StreamIndex.Strobes))
-            strobec.channels.append(daqmx.DigitalOutput("Dev1/port0", Block.StreamIndex.Strobes))
-            #strobec.channels.append(daqmx.DigitalOutput("Dev1/port1", Block.StreamIndex.Strobes))
-            strobe = DAQmxIO(get_logger(strobec.name, cfg.log_level))
-            strobe.initialize(strobec)
-            self._strobe = strobe
+            if len(strobe_tuples) > 0:
+                strobec = DAQmxConfig()
+                strobec.samples_per_block = acq.ascans_per_block
+                strobec.samples_per_second = cfg.ssrc_triggers_per_second
+                strobec.blocks_to_buffer = cfg.preload_count
+                strobec.clock.source = cfg.strobe_clock_source
+                strobec.name = 'strobe'
+                for i,t in enumerate(strobe_tuples):
+                    self._logger.info("Adding strobe output on device {0:s}".format(t[0]))
+                    strobec.channels.append(daqmx.DigitalOutput(t[0], Block.StreamIndex.Strobes))
+                strobe = DAQmxIO(get_logger(strobec.name, cfg.log_level))
+                strobe.initialize(strobec)
+                self._strobe = strobe
+            else:
+                self._logger.warning('Strobe is enabled, but no strobe outputs are configured.')
+                self._strobe = None
         else:
             self._strobe = None
 
 
-        # strobe output
-        # default is [SampleStrobe(0, 2), SampleStrobe(1, 1000), SampleStrobe(2, 1000, Polarity.Low), SegmentStrobe(3), VolumeStrobe(4)]
-        es = EventStrobe(0)
-        ec.strobes = [es]
+        # # strobe output
+        # # default is [SampleStrobe(0, 2), SampleStrobe(1, 1000), SampleStrobe(2, 1000, Polarity.Low), SegmentStrobe(3), VolumeStrobe(4)]
+        # es = EventStrobe(0)
+        # ec.strobes = [es]
 
         # ec.strobes = [SegmentStrobe(0)]
         if self._strobe is not None:
+            ec.strobes = [t[1] for t in strobe_tuples]
             ec.add_io(self._strobe)
 
 
