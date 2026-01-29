@@ -31,22 +31,26 @@ class VtxEngine(VtxBaseEngine):
         ec = EngineConfig()
         ec.add_acquisition(self._acquire, [self._octprocess])
 
+        # add galvo output
+        if self._io_out is not None:
+            ec.add_io(self._io_out, lead_samples=round(cfg.galvo_delay * cfg.ssrc_triggers_per_second))
+            ec.galvo_output_channels = len(self._io_out.config.channels)
+
         # Add formatter and endpoints for each scan type in the parameters 
-        strobe_tuples = []
+        # Also pick up any strobes that the scans might request
+        # Pre-populate the strobes with a single universal VolumeStrobe
+        # TODO make this part of config
+        v=VolumeStrobe(0)   # default flags value is 0xfffffffffffff..., so this is active on all scans
+        strobe_tuples = [("Dev1/port0/line7", VolumeStrobe(0))]
         for helper in helpers:
             ec.add_processor(self._octprocess, [helper.format_planner])
             ec.add_formatter(helper.format_planner, helper.endpoints)
             t = helper.getStrobe()
             if t is not None:
+                t[1].line = len(strobe_tuples)
                 self._logger.info("Scan {0:s} has strobe output on device {1:s}".format(helper.name, t[0]))
                 strobe_tuples.append(t)
 
-
-
-        # add galvo output
-        if self._io_out is not None:
-            ec.add_io(self._io_out, lead_samples=round(cfg.galvo_delay * cfg.ssrc_triggers_per_second))
-            ec.galvo_output_channels = len(self._io_out.config.channels)
 
         # strobe
         if cfg.strobe_enabled:
@@ -58,7 +62,7 @@ class VtxEngine(VtxBaseEngine):
                 strobec.clock.source = cfg.strobe_clock_source
                 strobec.name = 'strobe'
                 for i,t in enumerate(strobe_tuples):
-                    self._logger.info("Adding strobe output on device {0:s}".format(t[0]))
+                    self._logger.info("Adding DigitalOutput channel for strobe on device {0:s}, line {1:d}, flags {2:x}".format(t[0], t[1].line, t[1].flags.value))
                     strobec.channels.append(daqmx.DigitalOutput(t[0], Block.StreamIndex.Strobes))
                 strobe = DAQmxIO(get_logger(strobec.name, cfg.log_level))
                 strobe.initialize(strobec)
