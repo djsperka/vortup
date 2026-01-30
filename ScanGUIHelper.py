@@ -97,13 +97,13 @@ class ScanGUIHelper(ABC):
         pass
 
     @abstractmethod
-    def getStrobe(self) -> None|Tuple[str,VolumeStrobe|SegmentStrobe|SampleStrobe|EventStrobe]:
+    def getStrobe(self) -> None|VolumeStrobe|SegmentStrobe|SampleStrobe|EventStrobe:
         """
         Return None (if no strobe for this scan type), or return a tuple with the device name and the strobe to use. 
-        The strobe's 'line' parameter will be re-set, so just create it with any old line value. 
+        The strobe's 'line' parameter should be set here!  
         
         :param self: Description
         :return: Description
-        :rtype: Tuple[str, VolumeStrobe | SegmentStrobe | SampleStrobe | EventStrobe] | None
+        :rtype: None | VolumeStrobe | SegmentStrobe | SampleStrobe | EventStrobe
         """
         return None

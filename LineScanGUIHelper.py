@@ -197,8 +197,6 @@ class LineScanGUIHelper(ScanGUIHelper):
 
     def getStrobe(self):
         if self.params.strobe_enabled:
-            s = EventStrobe(0)
-            s.flags = Flags(self.flags)
-            return (self.params.strobe_output_device, s)
+            return EventStrobe(line=self.params.strobe_output_line, flags=Flags(self.flags))
         else:
             return None
