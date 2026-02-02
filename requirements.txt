@@ -1,0 +1,13 @@
+--extra-index-url https://vortex-oct.dev/stable
+cupy==13.6.0
+dataclasses_json==0.6.7
+matplotlib==3.10.8
+numpy==2.4.2
+platformdirs==4.5.1
+PyQt5==5.15.11
+pyqt5_sip==12.18.0
+QtPy==2.4.3
+rainbow_logging_handler==2.2.2
+scientific_spinbox==1.0.1b1
+vortex_oct_cuda12x==0.5.1
+vortex_oct_tools==0.4.0
