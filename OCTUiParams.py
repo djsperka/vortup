@@ -2,7 +2,7 @@ from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, Acquisit
 from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
 from ScanParams import ScanParams, RasterScanParams, AimingScanParams, LineScanParams, GalvoTuningScanParams
 from platformdirs import site_config_dir
-from pathlib import Path
+from pathlib import Path, PurePath
 import json
 import logging
 from dataclasses import asdict, dataclass, field
@@ -10,6 +10,7 @@ import copyreg
 from vortex import Range
 from vortex.acquire import alazar
 from typing import Tuple, Any, Dict
+import os
 
 local_logger = logging.getLogger('OCTUiParams')
 
@@ -84,9 +85,6 @@ class _octui_decoder(json.JSONDecoder):
             # if no settings, create a new one.
             if 'settings' not in d:
                 d['settings'] = {}
-                print("created new, empty, settings")
-            else:
-                print("Keeping old settings: ", d['settings'])
         elif {'ascans_per_bscan','bscans_per_volume','bidirectional_segments','segment_extent','volume_extent','angle'}.issubset(d.keys()):
             return RasterScanParams(ascans_per_bscan=d['ascans_per_bscan'],bscans_per_volume=d['bscans_per_volume'],bidirectional_segments=d['bidirectional_segments'],segment_extent=d['segment_extent'],volume_extent=d['volume_extent'],angle=d['angle'])
         elif {'ascans_per_bscan','bscans_per_volume','bidirectional_segments','aim_extent','angle'}.issubset(d.keys()):
@@ -110,6 +108,7 @@ class OCTUiParams():
         else:
             self.__cfgpath = default_config_path
 
+        # if load is False, just create a dummy struct, otherwise, load the file.
         if not load:
             params = UiParams()
             self._vtx = params.vtx
@@ -117,10 +116,9 @@ class OCTUiParams():
             self._scn = params.scn
             self._dsp = params.dsp
             self._settings = params.settings
-            local_logger.info("Saving initial config file {0:s}".format(str(default_config_path)))
-            self.save()
-
-        self.load()
+            local_logger.info("created dummy config file")
+        else:
+            self.load()
         self._isdirty = False
 
     @property
@@ -173,6 +171,15 @@ class OCTUiParams():
             self._isdirty = True
             self._settings = value
 
+    @property
+    def path(self):
+        return self.__cfgpath
+    
+    @path.setter
+    def path(self, p: Path):
+        self.__cfgpath = p
+
+
     def load(self, config_file=''):
         if len(config_file):
             maybepath = Path(config_file)
@@ -198,9 +205,6 @@ class OCTUiParams():
         self._settings = params.settings
         self.__cfgpath = use_this_path
 
-    def path(self):
-        return self.__cfgpath
-    
     def isdirty(self):
         return self._isdirty
 
@@ -241,7 +245,13 @@ if __name__ == "__main__":
 
     if args.create:
         local_logger.info("creating new config file")
-        p=OCTUiParams(config_file=args.config, load=False)
+        script_directory = Path(__file__).parent.resolve()
+        octui_file = PurePath(script_directory, 'octui.conf')
+        print(octui_file)
+        p = OCTUiParams(config_file=str(octui_file), load=True)
+        p.path = default_config_path
+        p.save()
+        local_logger.info("Done.")
     elif args.update:
         local_logger.info("Load existing config file...")
         p=OCTUiParams(config_file=args.config, load=True)
