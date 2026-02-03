@@ -1,4 +1,4 @@
-from ScanGUIHelper import ScanGUIHelper
+from ScanGUIHelper import ScanGUIHelper, ScanGUIHelperComponents
 from typing import Any, Dict
 from ScanConfigWidget import LineScanConfigWidget
 from ScanParams import LineScanParams
@@ -25,95 +25,10 @@ class LineScanGUIHelper(ScanGUIHelper):
     '''
     def __init__(self, name: str, number: int, params: LineScanParams, acq:AcqParams, settings: Dict[str, Any], log_level: int):
         super().__init__(name, number, params, settings, log_level)
-    
-        print("LineScanGUIHelper.init()")
-        # Create engine parts for this scan
-        fc = FormatPlannerConfig()
-        fc.segments_per_volume = params.lines_per_volume
-        fc.records_per_segment = params.ascans_per_bscan
-        fc.adapt_shape = False
-        fc.mask = Flags(number)
-
-        self._format_planner = FormatPlanner(get_logger('line format', log_level))
-        self._format_planner.initialize(fc)
-
-        # For saving volumes, this NullEndpoint is used. The volume_callback for this 
-        # endpoint will be called before that of the other endpoints. If needed, we open
-        # the storage in the volume_callback for this endpoint when needed. The storage 
-        # is closed in the volume_callback for the SpectraStackEndpoint, which does the 
-        # saving/writing of volumes.
-        self._null_endpoint = NullEndpoint(get_logger('Traffic cop(line)', log_level))
-
-        # For DISPLAYING ascans (oct-processed data), slice away half the data. 
-        # This stack format executor isn't used with the other endpoints.
-        sfec = StackFormatExecutorConfig()
-        sfec.sample_slice = SimpleSlice(acq.samples_per_ascan // 2)
-        samples_to_save = sfec.sample_slice.count()
-        sfe = StackFormatExecutor()
-        sfe.initialize(sfec)
-
-        # endpoint for display of ascans
-        vshape = (params.lines_per_volume, params.ascans_per_bscan, samples_to_save)
-        self._logger.info('Create StackDeviceTensorEndpointInt8 with shape {0:s}'.format(str(vshape)))
-        self._ascan_endpoint = StackDeviceTensorEndpointInt8(sfe, vshape, get_logger('stack', log_level))
-
-        sfec_spectra = StackFormatExecutorConfig()
-        sfe_spectra  = StackFormatExecutor()
-        sfe_spectra.initialize(sfec_spectra)
-        shape_spectra = (params.lines_per_volume, params.ascans_per_bscan, acq.samples_per_ascan)
-        self._logger.info('Create SpectraStackHostTensorEndpointUInt16 with shape {0:s}'.format(str(shape_spectra)))
-        self._spectra_endpoint = SpectraStackHostTensorEndpointUInt16(sfe_spectra, shape_spectra, get_logger('stack', log_level))
-
-        # make an endpoint for saving spectra data
-        shape = (params.lines_per_volume, params.ascans_per_bscan, acq.samples_per_ascan, 1)
-        self._spectra_storage = SimpleStackUInt16(get_logger('npy-spectra', log_level))
-        sfec = StackFormatExecutorConfig()
-        sfe = StackFormatExecutor()
-        sfe.initialize(sfec)
-        self._storage_endpoint = SpectraStackEndpoint(sfe, self._spectra_storage, log=get_logger('npy-spectra', log_level))
 
         self._edit_widget = LineScanConfigWidget()
         self._edit_widget.setLineScanParams(self.params)
-        self._plot_widget = self.linePlotWidget()
-
-    def linePlotWidget(self):
-        # importing the required libraries
-        # w = QLabel('Aiming')
-        # w.setStyleSheet("background-color: lightgreen")
-
-        self._cross_widget_1 = CrossSectionImageWidget(self.ascan_endpoint, cmap=mpl.colormaps['gray'], title="one way")
-        self._cross_widget_2 = CrossSectionImageWidget(self.ascan_endpoint, cmap=mpl.colormaps['gray'], title="other way")
-        # self._ascan_trace_widget = TraceWidget(self.ascan_endpoint, title="ascan")
-        # self._spectra_trace_widget = TraceWidget(self.spectra_endpoint, title="raw spectra")
-        self._linescan_trace_widget = LineScanTraceWidget(self._ascan_endpoint, title="Galvo tuning")
-
-        # apply settings
-        if 'cross1.range' in self.settings:
-            self._cross_widget_1._range = self.settings['cross1.range']
-
-        if 'cross2.range' in self.settings:
-            self._cross_widget_2._range = self.settings['cross2.range']
-
-        if 'linescan.ylim' in self.settings:
-            self._linescan_trace_widget.set_ylim(self.settings['linescan.ylim'])
-
-        # callbacks
-        self.ascan_endpoint.aggregate_segment_callback = self.cb_ascan
-        # self.spectra_endpoint.aggregate_segment_callback = self.cb_spectra
-        # self.spectra_endpoint.volume_callback = self.cb_volume
-
-        # 
-        hbox = QHBoxLayout()
-        vbox_left = QVBoxLayout()
-        vbox_left.addWidget(self._cross_widget_1)
-        vbox_left.addWidget(self._cross_widget_2)
-        vbox_right = QVBoxLayout()
-        vbox_right.addWidget(self._linescan_trace_widget)
-        hbox.addLayout(vbox_left)
-        hbox.addLayout(vbox_right)
-        w = QWidget()
-        w.setLayout(hbox)
-        return w
+        #self._plot_widget = self.linePlotWidget()
 
     def cb_ascan(self, v):
         # with self.spectra_endpoint.tensor as volume:
@@ -200,3 +115,83 @@ class LineScanGUIHelper(ScanGUIHelper):
             return EventStrobe(line=self.params.strobe_output_line, flags=Flags(self.flags))
         else:
             return None
+        
+    def getEngineComponents(self, octuiparams):
+
+        fc = FormatPlannerConfig()
+        fc.segments_per_volume = self.params.lines_per_volume
+        fc.records_per_segment = self.params.ascans_per_bscan
+        fc.adapt_shape = False
+        fc.mask = Flags(self.flags)
+
+        format_planner = FormatPlanner(get_logger('line format', self.log_level))
+        format_planner.initialize(fc)
+
+        # For saving volumes, this NullEndpoint is used. The volume_callback for this 
+        # endpoint will be called before that of the other endpoints. If needed, we open
+        # the storage in the volume_callback for this endpoint when needed. The storage 
+        # is closed in the volume_callback for the SpectraStackEndpoint, which does the 
+        # saving/writing of volumes.
+        null_endpoint = NullEndpoint(get_logger('Traffic cop(line)', self.log_level))
+
+        # For DISPLAYING ascans (oct-processed data), slice away half the data. 
+        # This stack format executor isn't used with the other endpoints.
+        sfec = StackFormatExecutorConfig()
+        sfec.sample_slice = SimpleSlice(acq.samples_per_ascan // 2)
+        samples_to_save = sfec.sample_slice.count()
+        sfe = StackFormatExecutor()
+        sfe.initialize(sfec)
+
+        # endpoint for display of ascans
+        vshape = (self.params.lines_per_volume, self.params.ascans_per_bscan, samples_to_save)
+        self._logger.info('Create StackDeviceTensorEndpointInt8 with shape {0:s}'.format(str(vshape)))
+        ascan_endpoint = StackDeviceTensorEndpointInt8(sfe, vshape, get_logger('stack', self.log_level))
+
+        sfec_spectra = StackFormatExecutorConfig()
+        sfe_spectra  = StackFormatExecutor()
+        sfe_spectra.initialize(sfec_spectra)
+        shape_spectra = (self.params.lines_per_volume, self.params.ascans_per_bscan, octuiparams.acq.samples_per_ascan)
+        self._logger.info('Create SpectraStackHostTensorEndpointUInt16 with shape {0:s}'.format(str(shape_spectra)))
+        spectra_endpoint = SpectraStackHostTensorEndpointUInt16(sfe_spectra, shape_spectra, get_logger('stack', self.log_level))
+
+        # make an endpoint for saving spectra data
+        shape = (self.params.lines_per_volume, self.params.ascans_per_bscan, octuiparams.acq.samples_per_ascan, 1)
+        spectra_storage = SimpleStackUInt16(get_logger('npy-spectra', self.log_level))
+        sfec = StackFormatExecutorConfig()
+        sfe = StackFormatExecutor()
+        sfe.initialize(sfec)
+        storage_endpoint = SpectraStackEndpoint(sfe, spectra_storage, log=get_logger('npy-spectra', self.log_level))
+
+        return ScanGUIHelperComponents(format_planner=format_planner, null_endpoint=null_endpoint, storage_endpoint=storage_endpoint, spectra_endpoint=spectra_endpoint, ascan_endpoint=ascan_endpoint)
+    
+    def getPlotWidget(self, components: ScanGUIHelperComponents) -> QWidget:
+        cross_widget_1 = CrossSectionImageWidget(components.ascan_endpoint, cmap=mpl.colormaps['gray'], title="one way")
+        cross_widget_2 = CrossSectionImageWidget(components.ascan_endpoint, cmap=mpl.colormaps['gray'], title="other way")
+        linescan_trace_widget = LineScanTraceWidget(components.ascan_endpoint, title="Galvo tuning")
+
+        # apply settings
+        if 'cross1.range' in self.settings:
+            cross_widget_1._range = self.settings['cross1.range']
+
+        if 'cross2.range' in self.settings:
+            cross_widget_2._range = self.settings['cross2.range']
+
+        if 'linescan.ylim' in self.settings:
+            linescan_trace_widget.set_ylim(self.settings['linescan.ylim'])
+
+        # callbacks
+        components.ascan_endpoint.aggregate_segment_callback = self.cb_ascan
+
+        # 
+        hbox = QHBoxLayout()
+        vbox_left = QVBoxLayout()
+        vbox_left.addWidget(cross_widget_1)
+        vbox_left.addWidget(cross_widget_2)
+        vbox_right = QVBoxLayout()
+        vbox_right.addWidget(linescan_trace_widget)
+        hbox.addLayout(vbox_left)
+        hbox.addLayout(vbox_right)
+        w = QWidget()
+        w.setLayout(hbox)
+        return w
+

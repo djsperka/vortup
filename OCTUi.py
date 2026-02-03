@@ -54,7 +54,8 @@ class OCTUi():
 
 
         #self.initializeScans(self._params.scn)
-        self._octDialog.stackedWidgetDummy.removeWidget(self._octDialog.stackedWidgetDummyPage1)
+        #self._octDialog.stackedWidgetDummy.removeWidget(self._octDialog.stackedWidgetDummyPage1)
+        self._octDialog.stackedWidgetDummy.setVisible(False)
         for number,(name,cfg) in enumerate(self._params.scn.scans.items()):
             flag = 1<<number
             self._logger.info("Found scan config {0:s},{1:x}".format(name,flag))
@@ -67,10 +68,10 @@ class OCTUi():
 
             self._guihelpers.append(scanGUIHelperFactory(name, flag, cfg, self._params.acq, s, self._params.vtx.log_level))
             self._octDialog.widgetScanConfig.addScanType(name, self._guihelpers[-1].edit_widget)
-            self._octDialog.stackedWidgetDummy.addWidget(self._guihelpers[-1].plot_widget)
+            #self._octDialog.stackedWidgetDummy.addWidget(self._guihelpers[-1].plot_widget)
 
         self._octDialog.widgetScanConfig.setCurrentIndex(self._params.scn.current_index)
-        self._octDialog.stackedWidgetDummy.setCurrentIndex(self._params.scn.current_index)
+        #self._octDialog.stackedWidgetDummy.setCurrentIndex(self._params.scn.current_index)
 
         # connections. 
         self._octDialog.widgetDispersion.valueChanged.connect(self.dispersionChanged)
@@ -89,7 +90,7 @@ class OCTUi():
 
     def scanTypeChanged(self, index: int):
         self._params.scn.current_index = index
-        self._octDialog.stackedWidgetDummy.setCurrentIndex(index)
+        #self._octDialog.stackedWidgetDummy.setCurrentIndex(index)
         helper = self._guihelpers[index]
         self.connectCurrentScan(helper)
 
@@ -129,11 +130,12 @@ class OCTUi():
         self._params.scn = self._octDialog.widgetScanConfig.getScanParams()
         self._params.dsp = self._octDialog.widgetDispersion.getDispersion()
 
-        # get settings
-        settings = {}
-        for helper in self._guihelpers:
-            settings[helper.name] = helper.getSettings()
-        self._params.settings = settings
+        # # get settings
+        # settings = {}
+        # for helper in self._guihelpers:
+        #     settings[helper.name] = helper.getSettings()
+        # self._params.settings = settings
+        self._logger.warning("_getAllParams() - settings are ignored - TODO")
 
 
     def startClicked(self):

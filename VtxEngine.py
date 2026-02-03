@@ -24,7 +24,6 @@ class VtxEngine(VtxBaseEngine):
         # self._acquire
         # self._octprocess  - CUDA based processing
         # self._io_out
-        # self._strobe
 
 
         # Engine configuration
@@ -105,23 +104,23 @@ class VtxEngine(VtxBaseEngine):
         else:
             self._logger.warning('engine is not running')
             
-    def getSpectraStorageEndpoint(self, shape) -> Tuple[Any, Any]:
+    # def getSpectraStorageEndpoint(self, shape) -> Tuple[Any, Any]:
 
-            storage = SimpleStackUInt16(get_logger('npy-spectra', self._cfg.log_level))
+    #         storage = SimpleStackUInt16(get_logger('npy-spectra', self._cfg.log_level))
 
-            # Executor config has only three properties:
-            #
-            # property erase_after_volume - not sure
-            # property sample_slice  - Collect only a slice of samples from each ascan
-            # property sample_transform - not sure
-            # 
-            # So basically, I'm not sure what the executor's role is here. 
-            # But - when the Endpoint class is created, the executor is the first
-            # arg to the constructor. 
+    #         # Executor config has only three properties:
+    #         #
+    #         # property erase_after_volume - not sure
+    #         # property sample_slice  - Collect only a slice of samples from each ascan
+    #         # property sample_transform - not sure
+    #         # 
+    #         # So basically, I'm not sure what the executor's role is here. 
+    #         # But - when the Endpoint class is created, the executor is the first
+    #         # arg to the constructor. 
 
-            sfec = StackFormatExecutorConfig()
-            sfe = StackFormatExecutor()
-            sfe.initialize(sfec)
-            endpoint_storage = SpectraStackEndpoint(sfe, storage, log=get_logger('npy-spectra', self._cfg.log_level))
+    #         sfec = StackFormatExecutorConfig()
+    #         sfe = StackFormatExecutor()
+    #         sfe.initialize(sfec)
+    #         endpoint_storage = SpectraStackEndpoint(sfe, storage, log=get_logger('npy-spectra', self._cfg.log_level))
 
-            return endpoint_storage, storage
+    #         return endpoint_storage, storage
