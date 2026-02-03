@@ -1,6 +1,6 @@
 # VORTUP: Instrumentation software for slo-oct device at EyePod
 
-This application will control the SLO-OCT device at UCDavis EyePod lab. More generally, I hope it will control a device similar to this one. the main limitation is hardware, specifically the acquisition and IO cards used. This software will work with acquisition cards from Alazar, and IO cards from National Instruments (NI-DAQmx cards).
+This application will control the SLO-OCT device at UCDavis. More generally, I hope it will control a device similar to this one. the main limitation is hardware, specifically the acquisition and IO cards used. This software will work with acquisition cards from Alazar, and IO cards from National Instruments (NI-DAQmx cards).
 
 
 ## Table of contents
@@ -14,7 +14,21 @@ This application will control the SLO-OCT device at UCDavis EyePod lab. More gen
 
 ## Usage
 
+### Installation
 
+Install CUDA for your device, then install from the requirements file - see below. 
+
+This code works with python 3.10 and 3.12 on Windows. I have not tested hardware on a linux machine.
+
+```
+git clone https://github.com/djsperka/vortup
+cd vortup
+pip install -r requirements.txt
+```
+
+### Initial configuration file
+
+Copy the configuration file from the `vortup` folder to your
 
 ### Basic operation
 
