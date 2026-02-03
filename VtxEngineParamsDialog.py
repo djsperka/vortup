@@ -63,10 +63,10 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.initializeDialog(cfg)        # takes whatever is in cfg and inits dlg
 
         # slots for accept and cancel
-        self.buttonBoxMain.accepted.connect(self.accepted)
+        self.buttonBoxMain.accepted.connect(self._accepted)
         self.buttonBoxMain.rejected.connect(self.reject)
 
-    def accepted(self):
+    def _accepted(self) -> None:
         self._cfg = self.getEngineParameters()        
         self.accept()
         
