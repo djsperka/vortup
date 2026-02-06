@@ -11,6 +11,7 @@ from vortex import Range
 from vortex.acquire import alazar
 from typing import Tuple, Any, Dict
 import os
+import sys
 
 local_logger = logging.getLogger('OCTUiParams')
 
@@ -243,17 +244,39 @@ if __name__ == "__main__":
     parser.add_argument('--config', default='', help='path to config file [default = {0:s}]'.format(str(default_config_path)))
     args = parser.parse_args()
 
+    # check if a config file was passed with --config arg
+    # If --create, this will be the new file created (dir must exist, and file must not)
+    # If --update, this file must already exist, and it will be overwritten
+    use_config_path = default_config_path
+    if len(args.config) > 0:
+        use_config_path = Path(args.config)
+        if not use_config_path.parent.exists():
+            local_logger.error("config file folder {0:s} does not exist".format(str(use_config_path.parent)))
+            sys.exit()
+    print("use ", use_config_path)
+
     if args.create:
         local_logger.info("creating new config file")
+
+        # check that use_config_path does not already exist
+        if use_config_path.exists():
+            local_logger.error("config file {0:s} already exists - please move, remove, or rename".format(str(use_config_path)))
+            sys.exit()
+
+        # load config file from the dir where this file lives
         script_directory = Path(__file__).parent.resolve()
-        octui_file = PurePath(script_directory, 'octui.conf')
-        print(octui_file)
+        octui_file = script_directory / 'octui.conf'
         p = OCTUiParams(config_file=str(octui_file), load=True)
-        p.path = default_config_path
+
+        # now change the path of the OCTUiParams object and save
+        p.path = use_config_path
         p.save()
         local_logger.info("Done.")
+
     elif args.update:
         local_logger.info("Load existing config file...")
+        if not use_config_path.exists():
+            local_logger.error("Cannot update config file {0:s}, file not found.".format(str(use_config_path)))
         p=OCTUiParams(config_file=args.config, load=True)
         p.save()
         local_logger.info("Done.")
