@@ -253,7 +253,6 @@ if __name__ == "__main__":
         if not use_config_path.parent.exists():
             local_logger.error("config file folder {0:s} does not exist".format(str(use_config_path.parent)))
             sys.exit()
-    print("use ", use_config_path)
 
     if args.create:
         local_logger.info("creating new config file")
