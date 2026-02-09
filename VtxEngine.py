@@ -41,8 +41,9 @@ class VtxEngine(VtxBaseEngine):
         # TODO make this part of config
         strobes = [VolumeStrobe(7)]
         for helper in helpers:
-            ec.add_processor(self._octprocess, [helper.format_planner])
-            ec.add_formatter(helper.format_planner, helper.endpoints)
+            helper.createEngineComponents(params)
+            ec.add_processor(self._octprocess, [helper.components.format_planner])
+            ec.add_formatter(helper.components.format_planner, helper.components.endpoints)
             s = helper.getStrobe()
             if s is not None:
                 self._logger.info("Scan {0:s} has strobe output on device line {1:d} with flags {2:x}".format(helper.name, s.line, s.flags.value))

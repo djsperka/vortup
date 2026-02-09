@@ -3,6 +3,7 @@ from typing import Any, Dict
 from ScanConfigWidget import AimingScanConfigWidget
 from ScanParams import AimingScanParams
 from AcqParams import AcqParams
+from OCTUiParams import OCTUiParams
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
 from vortex_tools.ui.display import CrossSectionImageWidget
 from TraceWidget import TraceWidget
@@ -26,6 +27,10 @@ class AimingScanGUIHelper(ScanGUIHelper):
 
         self._edit_widget = AimingScanConfigWidget()
         self._edit_widget.setAimingScanParams(self.params)
+        self._cross_widget_1 = None
+        self._cross_widget_2 = None
+        self._ascan_trace_widget = None
+        self._spectra_trace_widget = None
         #self._plot_widget = self.aimingPlotWidget()
 
 
@@ -75,8 +80,10 @@ class AimingScanGUIHelper(ScanGUIHelper):
 
     def getStrobe(self):
         return super().getStrobe()
-    
-    def getEngineComponents(self, octuiparams):
+
+
+    def createEngineComponents(self, octuiparams: OCTUiParams):
+
         # Create engine parts for this scan
         fc = FormatPlannerConfig()
         fc.segments_per_volume = self.params.bscans_per_volume  # TODO
@@ -122,41 +129,40 @@ class AimingScanGUIHelper(ScanGUIHelper):
         sfe.initialize(sfec)
         storage_endpoint = SpectraStackEndpoint(sfe, spectra_storage, log=get_logger('npy-spectra', self.log_level))
 
+        self._components = ScanGUIHelperComponents(format_planner=format_planner, null_endpoint=null_endpoint, storage_endpoint=storage_endpoint, spectra_endpoint=spectra_endpoint, storage=spectra_storage, ascan_endpoint=ascan_endpoint, plot_widget=self.getPlotWidget(ascan_endpoint, spectra_endpoint))
 
-        return ScanGUIHelperComponents(format_planner=format_planner, null_endpoint=null_endpoint, storage_endpoint=storage_endpoint, spectra_endpoint=spectra_endpoint, ascan_endpoint=ascan_endpoint)
 
-
-    def getPlotWidget(self, components: ScanGUIHelperComponents) -> QWidget:
-        cross_widget_1 = CrossSectionImageWidget(components.ascan_endpoint, cmap=mpl.colormaps['gray'], title="horiz")
-        cross_widget_2 = CrossSectionImageWidget(components.ascan_endpoint, cmap=mpl.colormaps['gray'], title="vert")
-        ascan_trace_widget = TraceWidget(components.ascan_endpoint, title="ascan")
-        spectra_trace_widget = TraceWidget(components.spectra_endpoint, title="raw spectra")
+    def getPlotWidget(self, ascan_endpoint, spectra_endpoint) -> QWidget:
+        self._cross_widget_1 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="horiz")
+        self._cross_widget_2 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="vert")
+        self._ascan_trace_widget = TraceWidget(ascan_endpoint, title="ascan")
+        self._spectra_trace_widget = TraceWidget(spectra_endpoint, title="raw spectra")
 
         # apply settings
         if 'cross1.range' in self.settings:
-            cross_widget_1._range = self.settings['cross1.range']
+            self._cross_widget_1._range = self.settings['cross1.range']
 
         if 'cross.range' in self.settings:
-            cross_widget_2._range = self.settings['cross2.range']
+            self._cross_widget_2._range = self.settings['cross2.range']
 
         if 'ascan.ylim' in self.settings:
-            ascan_trace_widget.set_ylim(self.settings['ascan.ylim'])
+            self._ascan_trace_widget.set_ylim(self.settings['ascan.ylim'])
 
         if 'spectra.ylim' in self.settings:
-            spectra_trace_widget.set_ylim(self.settings['spectra.ylim'])
+            self._spectra_trace_widget.set_ylim(self.settings['spectra.ylim'])
 
         # callbacks
-        self.ascan_endpoint.aggregate_segment_callback = self.cb_ascan
-        self.spectra_endpoint.aggregate_segment_callback = self.cb_spectra
+        ascan_endpoint.aggregate_segment_callback = self.cb_ascan
+        spectra_endpoint.aggregate_segment_callback = self.cb_spectra
 
         # 
         vbox = QVBoxLayout()
         hbox_upper = QHBoxLayout()
-        hbox_upper.addWidget(cross_widget_1)
-        hbox_upper.addWidget(cross_widget_2)
+        hbox_upper.addWidget(self._cross_widget_1)
+        hbox_upper.addWidget(self._cross_widget_2)
         hbox_lower = QHBoxLayout()
-        hbox_lower.addWidget(spectra_trace_widget)
-        hbox_lower.addWidget(ascan_trace_widget)
+        hbox_lower.addWidget(self._spectra_trace_widget)
+        hbox_lower.addWidget(self._ascan_trace_widget)
         vbox.addLayout(hbox_upper)
         vbox.addLayout(hbox_lower)
         w = QWidget()

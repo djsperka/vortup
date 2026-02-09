@@ -3,15 +3,14 @@ from typing import Any, Dict
 from ScanConfigWidget import LineScanConfigWidget
 from ScanParams import LineScanParams
 from AcqParams import AcqParams
+from OCTUiParams import OCTUiParams
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
 from vortex_tools.ui.display import CrossSectionImageWidget
-from TraceWidget import TraceWidget
 from LineScanTraceWidget import LineScanTraceWidget
 import matplotlib as mpl
-from math import radians
 
 from vortex import Range
-from vortex.scan import RasterScan, RasterScanConfig, FreeformScan, FreeformScanConfig
+from vortex.scan import RasterScanConfig, FreeformScan, FreeformScanConfig
 from vortex.engine import StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, SpectraStackEndpoint, NullEndpoint, EventStrobe
 from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, SimpleSlice
 from vortex.storage import SimpleStackUInt16
@@ -28,6 +27,13 @@ class LineScanGUIHelper(ScanGUIHelper):
 
         self._edit_widget = LineScanConfigWidget()
         self._edit_widget.setLineScanParams(self.params)
+
+        # These are saved here (they are also in _components, as part of the plot_widget)
+        # for convenience
+        self._cross_widget_1 = None
+        self._cross_widget_2 = None
+        self._linescan_trace_widget = None
+        
         #self._plot_widget = self.linePlotWidget()
 
     def cb_ascan(self, v):
@@ -116,8 +122,8 @@ class LineScanGUIHelper(ScanGUIHelper):
         else:
             return None
         
-    def getEngineComponents(self, octuiparams):
-
+    def createEngineComponents(self, octuiparams: OCTUiParams):
+ 
         fc = FormatPlannerConfig()
         fc.segments_per_volume = self.params.lines_per_volume
         fc.records_per_segment = self.params.ascans_per_bscan
@@ -137,7 +143,7 @@ class LineScanGUIHelper(ScanGUIHelper):
         # For DISPLAYING ascans (oct-processed data), slice away half the data. 
         # This stack format executor isn't used with the other endpoints.
         sfec = StackFormatExecutorConfig()
-        sfec.sample_slice = SimpleSlice(acq.samples_per_ascan // 2)
+        sfec.sample_slice = SimpleSlice(octuiparams.acq.samples_per_ascan // 2)
         samples_to_save = sfec.sample_slice.count()
         sfe = StackFormatExecutor()
         sfe.initialize(sfec)
@@ -162,33 +168,33 @@ class LineScanGUIHelper(ScanGUIHelper):
         sfe.initialize(sfec)
         storage_endpoint = SpectraStackEndpoint(sfe, spectra_storage, log=get_logger('npy-spectra', self.log_level))
 
-        return ScanGUIHelperComponents(format_planner=format_planner, null_endpoint=null_endpoint, storage_endpoint=storage_endpoint, spectra_endpoint=spectra_endpoint, ascan_endpoint=ascan_endpoint)
+        self._components = ScanGUIHelperComponents(format_planner=format_planner, null_endpoint=null_endpoint, storage_endpoint=storage_endpoint, spectra_endpoint=spectra_endpoint, storage=spectra_storage, ascan_endpoint=ascan_endpoint, plot_widget=self.getPlotWidget(ascan_endpoint))
     
-    def getPlotWidget(self, components: ScanGUIHelperComponents) -> QWidget:
-        cross_widget_1 = CrossSectionImageWidget(components.ascan_endpoint, cmap=mpl.colormaps['gray'], title="one way")
-        cross_widget_2 = CrossSectionImageWidget(components.ascan_endpoint, cmap=mpl.colormaps['gray'], title="other way")
-        linescan_trace_widget = LineScanTraceWidget(components.ascan_endpoint, title="Galvo tuning")
+    def getPlotWidget(self, ascan_endpoint) -> QWidget:
+        self._cross_widget_1 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="one way")
+        self._cross_widget_2 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="other way")
+        self._linescan_trace_widget = LineScanTraceWidget(ascan_endpoint, title="Galvo tuning")
 
         # apply settings
         if 'cross1.range' in self.settings:
-            cross_widget_1._range = self.settings['cross1.range']
+            self._cross_widget_1._range = self.settings['cross1.range']
 
         if 'cross2.range' in self.settings:
-            cross_widget_2._range = self.settings['cross2.range']
+            self._cross_widget_2._range = self.settings['cross2.range']
 
         if 'linescan.ylim' in self.settings:
-            linescan_trace_widget.set_ylim(self.settings['linescan.ylim'])
+            self._linescan_trace_widget.set_ylim(self.settings['linescan.ylim'])
 
         # callbacks
-        components.ascan_endpoint.aggregate_segment_callback = self.cb_ascan
+        ascan_endpoint.aggregate_segment_callback = self.cb_ascan
 
         # 
         hbox = QHBoxLayout()
         vbox_left = QVBoxLayout()
-        vbox_left.addWidget(cross_widget_1)
-        vbox_left.addWidget(cross_widget_2)
+        vbox_left.addWidget(self._cross_widget_1)
+        vbox_left.addWidget(self._cross_widget_2)
         vbox_right = QVBoxLayout()
-        vbox_right.addWidget(linescan_trace_widget)
+        vbox_right.addWidget(self._linescan_trace_widget)
         hbox.addLayout(vbox_left)
         hbox.addLayout(vbox_right)
         w = QWidget()

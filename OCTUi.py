@@ -51,11 +51,7 @@ class OCTUi():
         self._octDialog.widgetAcqParams.setAcqParams(self._params.acq)
 
         # Create and initialize GUI Helpers
-
-
-        #self.initializeScans(self._params.scn)
-        #self._octDialog.stackedWidgetDummy.removeWidget(self._octDialog.stackedWidgetDummyPage1)
-        self._octDialog.stackedWidgetDummy.setVisible(False)
+        #self._octDialog.stackedWidgetDummy.setVisible(False)
         for number,(name,cfg) in enumerate(self._params.scn.scans.items()):
             flag = 1<<number
             self._logger.info("Found scan config {0:s},{1:x}".format(name,flag))
@@ -90,7 +86,11 @@ class OCTUi():
 
     def scanTypeChanged(self, index: int):
         self._params.scn.current_index = index
-        #self._octDialog.stackedWidgetDummy.setCurrentIndex(index)
+        # only do this if the engine exists. 
+        # This isn't a clean way to test, as the existence of the engine might
+        # not be the best test here. 
+        if self._vtxengine:        
+            self._octDialog.stackedWidgetDummy.setCurrentIndex(index)
         helper = self._guihelpers[index]
         self.connectCurrentScan(helper)
 
@@ -102,6 +102,7 @@ class OCTUi():
     def dialogClosing(self):
         self.stopClicked()
         self._getAllParams()
+        self._getPlotSettings()
         if self._params.isdirty():
             dlg = QMessageBox(self._octDialog)
             dlg.setWindowTitle("OCTUi is exiting...")
@@ -130,12 +131,13 @@ class OCTUi():
         self._params.scn = self._octDialog.widgetScanConfig.getScanParams()
         self._params.dsp = self._octDialog.widgetDispersion.getDispersion()
 
-        # # get settings
-        # settings = {}
-        # for helper in self._guihelpers:
-        #     settings[helper.name] = helper.getSettings()
-        # self._params.settings = settings
-        self._logger.warning("_getAllParams() - settings are ignored - TODO")
+    def _getPlotSettings(self):
+
+        # get settings
+        settings = {}
+        for helper in self._guihelpers:
+            settings[helper.name] = helper.getSettings()
+        self._params.settings = settings
 
 
     def startClicked(self):
@@ -162,15 +164,22 @@ class OCTUi():
                 del self._vtxengine
             self._vtxengine = None
 
-            # current scan type and helper
-            helper = self._guihelpers[self._params.scn.current_index]
+            # Create engine components for each of the scan types
+            for helper in self._guihelpers:
+                helper.createEngineComponents(self._params)
+                self._octDialog.stackedWidgetDummy.addWidget(helper.components.plot_widget)
+
+            # make plots visible
+            self._octDialog.stackedWidgetDummy.setCurrentIndex(self._params.scn.current_index)
+            self._octDialog.stackedWidgetDummy.setVisible(True)
 
             # create engine
             self._logger.info('Setting up OCT engine...')
             self._vtxengine = VtxEngine(self._params, self._guihelpers)
             self._vtxengine._engine.event_callback = self.engineEventCallback
             self._vtxengine._engine.scan_queue.clear()
-            self.connectCurrentScan(helper)
+            self.connectCurrentScan(self._guihelpers[self._params.scn.current_index])
+
 
             # now start the actual engine
             self._vtxengine._engine.start()
@@ -185,15 +194,21 @@ class OCTUi():
             sys.exit(-1)
 
     def connectCurrentScan(self, helper: ScanGUIHelper): 
-        helper.null_endpoint.volume_callback = self.volumeCallback
-        helper.storage_endpoint.volume_callback = self.volumeCallback2
 
-        # the engine might not yet be created, if this is initialization
-        if self._vtxengine:
-            self._logger.info('Connect scan \'{0:s}\' to engine.'.format(helper.name))
-            self._vtxengine._engine.scan_queue.interrupt(helper.getScan())
+        if helper.has_components():
+
+            helper.components.null_endpoint.volume_callback = self.volumeCallback
+            helper.components.storage_endpoint.volume_callback = self.volumeCallback2
+
+            # the engine might not yet be created, if this is initialization
+            if self._vtxengine:
+                self._logger.info('Connect scan \'{0:s}\' to engine.'.format(helper.name))
+                self._vtxengine._engine.scan_queue.interrupt(helper.getScan())
+            else:
+                self._logger.info('Cannot connect scan \'{0:s}\' to engine yet...'.format(helper.name))
+
         else:
-            self._logger.info('Cannot connect scan \'{0:s}\' to engine yet...'.format(helper.name))
+            self._logger.info('Cannot connect scan \'{0:s}\' to engine (no components yet)...'.format(helper.name))
 
 
         
@@ -256,7 +271,7 @@ class OCTUi():
         # For an aiming scan, each "cross" consists of 2 b-scans
 
         helper = self._guihelpers[self._params.scn.current_index]
-        shape = helper.spectra_endpoint.tensor.shape
+        shape = helper.components.spectra_endpoint.tensor.shape
         #self._logger.info("volumeCallback({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
         if self._savingVolumesRequested:
             (bOK, filename) = self.checkFileSaveStuff()
@@ -272,7 +287,7 @@ class OCTUi():
                 npsc.header = SimpleStackHeader.NumPy
                 npsc.path = filename
                 self._logger.info('Open storage.')
-                helper.storage.open(npsc)
+                helper.components.storage.open(npsc)
                 self._savingVolumesNow = True
                 self._savingVolumesRequested = False
                 #self._savingVolumesThisMany = SHOULD HAVE BEEN SET IN PB CALLBACK WHEN SAVING VOLUMES REQUESTED
