@@ -164,19 +164,21 @@ class OCTUi():
                 del self._vtxengine
             self._vtxengine = None
 
-            # Create engine components for each of the scan types
-            for helper in self._guihelpers:
-                helper.createEngineComponents(self._params)
-                self._octDialog.stackedWidgetDummy.addWidget(helper.components.plot_widget)
-
-            # make plots visible
-            self._octDialog.stackedWidgetDummy.setCurrentIndex(self._params.scn.current_index)
-            self._octDialog.stackedWidgetDummy.setVisible(True)
-
             # create engine
             self._logger.info('Setting up OCT engine...')
             self._vtxengine = VtxEngine(self._params, self._guihelpers)
             self._vtxengine._engine.event_callback = self.engineEventCallback
+
+            # Create engine components for each of the scan types
+            for helper in self._guihelpers:
+                helper.createEngineComponents(self._params)
+                print("Add widget for ", helper.name, ": ", helper.components.plot_widget)
+                self._octDialog.stackedWidgetDummy.addWidget(helper.components.plot_widget)
+
+            # make plots visible
+            self._octDialog.stackedWidgetDummy.setCurrentIndex(self._params.scn.current_index)
+
+
             self._vtxengine._engine.scan_queue.clear()
             self.connectCurrentScan(self._guihelpers[self._params.scn.current_index])
 
