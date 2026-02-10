@@ -174,7 +174,6 @@ class OCTUi():
 
             # Create engine components for each of the scan types
             for helper in self._guihelpers:
-                helper.createEngineComponents(self._params)
                 print("Add widget for ", helper.name, ": ", helper.components.plot_widget)
                 self._octDialog.stackedWidgetDummy.addWidget(helper.components.plot_widget)
 
