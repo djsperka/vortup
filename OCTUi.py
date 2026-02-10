@@ -50,8 +50,11 @@ class OCTUi():
         self._octDialog.widgetDispersion.setDispersion(self._params.dsp)
         self._octDialog.widgetAcqParams.setAcqParams(self._params.acq)
 
+        # remove this now. By default the stacked widget comes with a single page.
+        self._octDialog.stackedWidgetDummy.removeWidget(self._octDialog.stackedWidgetDummyPage1)
+
+
         # Create and initialize GUI Helpers
-        #self._octDialog.stackedWidgetDummy.setVisible(False)
         for number,(name,cfg) in enumerate(self._params.scn.scans.items()):
             flag = 1<<number
             self._logger.info("Found scan config {0:s},{1:x}".format(name,flag))
