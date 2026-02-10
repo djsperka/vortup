@@ -290,7 +290,7 @@ class OCTUi():
                 # shape is a mystery. Let's just copy what the endpoint is. 
                 # TODO Must figure out why this volume doesn't match acq params (see esp. non-raster scan)
                 #npsc.shape = (self._params.scn.bscans_per_volume, self._params.scn.ascans_per_bscan, self._params.acq.samples_per_ascan, 1)
-                self._logger.info("Stack shape:({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
+                self._logger.info("volumeCallback:({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
                 npsc.shape = (shape[0], shape[1], shape[2], 1)
                 npsc.header = SimpleStackHeader.NumPy
                 npsc.path = filename
@@ -328,7 +328,7 @@ class OCTUi():
                 self._savingVolumesThisMany = 0
                 self._savingVolumesRequested = False
                 helper = self._guihelpers[self._params.scn.current_index]
-                helper.storage.close()
+                helper.components.storage.close()
                 self._octDialog.gbSaveVolumes.enableSaving(True)
 
 
