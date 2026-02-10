@@ -172,9 +172,12 @@ class OCTUi():
             self._vtxengine = VtxEngine(self._params, self._guihelpers)
             self._vtxengine._engine.event_callback = self.engineEventCallback
 
-            # Create engine components for each of the scan types
+            # Clear out widgets previously located in the stacked widget, then add
+            # newly-created plots. 
+            for i in range(self._octDialog.stackedWidgetDummy.count()):
+                self._octDialog.stackedWidgetDummy.removeWidget(self._octDialog.stackedWidgetDummy.widget(0))
+                
             for helper in self._guihelpers:
-                print("Add widget for ", helper.name, ": ", helper.components.plot_widget)
                 self._octDialog.stackedWidgetDummy.addWidget(helper.components.plot_widget)
 
             # make plots visible
