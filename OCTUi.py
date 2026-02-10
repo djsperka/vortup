@@ -61,7 +61,7 @@ class OCTUi():
             # are there settings for this scan config? 
             if name in self._params.settings:
                 s = self._params.settings[name]
-                self._logger.info("Found settings: {0:s}".format(dumps(s)))
+                self._logger.debug("Found settings: {0:s}".format(dumps(s)))
             else:
                 s = {}
 
@@ -136,12 +136,13 @@ class OCTUi():
 
     def _getPlotSettings(self):
 
-        # get settings
-        settings = {}
-        for helper in self._guihelpers:
-            settings[helper.name] = helper.getSettings()
-        self._params.settings = settings
-
+        # get settings if components have been created. 
+        # If one of the helpers has no components, then they all probably do not. 
+        if all(helper.has_components() for helper in self._guihelpers):
+            settings = {}
+            for helper in self._guihelpers:
+                settings[helper.name] = helper.getSettings()
+            self._params.settings = settings
 
     def startClicked(self):
         self._octDialog.pbEtc.setEnabled(False)
