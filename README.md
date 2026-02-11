@@ -28,7 +28,19 @@ pip install -r requirements.txt
 
 ### Initial configuration file
 
-Copy the configuration file from the `vortup` folder to your
+Initialize a configuration file. From the folder where the code is installed, run OCTUiParams to create a new config file:
+
+
+```
+dan@bucky:~$ cd work/oct/vortup/
+dan@bucky:~/work/oct/vortup$ 
+dan@bucky:~/work/oct/vortup$ python OCTUiParams.py --create
+INFO:OCTUiParams:creating new config file
+INFO:OCTUiParams:loading OCTUi config from /home/dan/work/oct/vortup/octui.conf
+INFO:OCTUiParams:saving OCTUi config to /home/dan/.octui/octui.conf
+INFO:OCTUiParams:Creating directory /home/dan/.octui
+INFO:OCTUiParams:Done.
+```
 
 ### Basic operation
 
