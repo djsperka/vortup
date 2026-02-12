@@ -2,7 +2,6 @@ from ScanGUIHelper import ScanGUIHelper, ScanGUIHelperComponents
 from typing import Any, Dict
 from ScanConfigWidget import RasterScanConfigWidget
 from ScanParams import RasterScanParams
-from AcqParams import AcqParams
 from OCTUiParams import OCTUiParams
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
@@ -19,8 +18,8 @@ from vortex import get_console_logger as get_logger
 
 
 class RasterScanGUIHelper(ScanGUIHelper):
-    def __init__(self, name: str, flags: int, params: RasterScanParams, acq:AcqParams, settings: Dict[str, Any], log_level: int):
-        super().__init__(name, flags, params, settings, log_level)
+    def __init__(self, name: str, flags: int, params: RasterScanParams, settings: Dict[str, Any]):
+        super().__init__(name, flags, params, settings)
 
         self._edit_widget = RasterScanConfigWidget()
         self._edit_widget.setRasterScanParams(self.params)

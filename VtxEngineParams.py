@@ -3,6 +3,7 @@ from vortex.acquire import alazar
 from vortex.engine import source, Source
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import Tuple
 
 class AcquisitionType(Enum):
     ALAZAR_ACQUISITION = 1
@@ -12,6 +13,12 @@ class AcquisitionType(Enum):
 class VtxEngineParams:
     # acquisition type
     acquisition_type: AcquisitionType = AcquisitionType.ALAZAR_ACQUISITION
+
+    # Acquisition params
+    ascans_per_block: int=0
+    samples_per_ascan: int=0
+    blocks_to_acquire: int=0
+    trigger_delay_samples: int=0
 
     # left over from scan parameters
     galvo_delay: float = 0.0
@@ -30,6 +37,9 @@ class VtxEngineParams:
     strobe_enabled: bool = True
     strobe_clock_source: str = "pf12"
     strobe_device_channel: str = "Dev1/port0"
+
+    # dispersion
+    dispersion: Tuple = (-1.8e-05, 0)
     
     # hardware configuration
     ssrc_triggers_per_second: int = 100000
@@ -60,6 +70,13 @@ class VtxEngineParams:
 DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
 
     acquisition_type=AcquisitionType.ALAZAR_ACQUISITION,
+
+    ascans_per_block=1000,
+    samples_per_ascan=1280,
+    blocks_to_acquire=0,
+    trigger_delay_samples=0,
+
+    # galvo 
     galvo_delay=0.0,
     galvo_enabled=True,
     galvo_clock_source='pfi12',
@@ -69,9 +86,15 @@ DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
     galvo_y_units_per_volt=1.5,
     galvo_x_device_channel='Dev1/ao0',
     galvo_y_device_channel='Dev1/ao1',
+
+    # strobe
     strobe_enabled=True,
     strobe_clock_source='pfi12',
     strobe_device_channel='Dev1/port0',
+
+    # dispersion
+    dispersion=(-1.8e-05, 0),
+
 
     # These are probably rig-specific? Hasn't been an issue to use these. 
     blocks_to_allocate=128,

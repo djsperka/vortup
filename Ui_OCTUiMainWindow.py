@@ -27,13 +27,6 @@ class Ui_OCTUiMainWindow(object):
         self.widgetScanConfig.setMinimumSize(QtCore.QSize(0, 80))
         self.widgetScanConfig.setObjectName("widgetScanConfig")
         self.verticalLayout_3.addWidget(self.widgetScanConfig)
-        self.widgetAcqParams = AcqParamsWidget(self.centralwidget)
-        self.widgetAcqParams.setMinimumSize(QtCore.QSize(0, 80))
-        self.widgetAcqParams.setObjectName("widgetAcqParams")
-        self.verticalLayout_3.addWidget(self.widgetAcqParams)
-        self.widgetDispersion = DispersionWidget(self.centralwidget)
-        self.widgetDispersion.setObjectName("widgetDispersion")
-        self.verticalLayout_3.addWidget(self.widgetDispersion)
         self.pbEtc = QtWidgets.QPushButton(self.centralwidget)
         self.pbEtc.setObjectName("pbEtc")
         self.verticalLayout_3.addWidget(self.pbEtc)
@@ -66,7 +59,7 @@ class Ui_OCTUiMainWindow(object):
         self.verticalLayout_5.addLayout(self.verticalLayout_4)
         OCTUiMainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(OCTUiMainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 996, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 996, 24))
         self.menubar.setObjectName("menubar")
         OCTUiMainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(OCTUiMainWindow)
@@ -79,12 +72,10 @@ class Ui_OCTUiMainWindow(object):
     def retranslateUi(self, OCTUiMainWindow):
         _translate = QtCore.QCoreApplication.translate
         OCTUiMainWindow.setWindowTitle(_translate("OCTUiMainWindow", "MainWindow"))
-        self.pbEtc.setText(_translate("OCTUiMainWindow", "Etc"))
+        self.pbEtc.setText(_translate("OCTUiMainWindow", "Engine Configuration"))
         self.pbStart.setText(_translate("OCTUiMainWindow", "Start"))
         self.pbStop.setText(_translate("OCTUiMainWindow", "Stop"))
         self.gbSaveVolumes.setTitle(_translate("OCTUiMainWindow", "Saving Volume Data"))
-from AcqParamsWidget import AcqParamsWidget
-from DispersionWidget import DispersionWidget
 from SaveVolumeGroupBox import SaveVolumeGroupBox
 from ScanConfigWidget import ScanConfigWidget
 

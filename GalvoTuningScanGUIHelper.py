@@ -22,8 +22,8 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
     '''
     GUIHelper for a scan used for tuning galvo delays. Creates a bidirectional line scan, can adjust delay to tune.
     '''
-    def __init__(self, name: str, flags: int, params: GalvoTuningScanParams, acq:AcqParams, settings: Dict[str, Any], log_level: int):
-        super().__init__(name, flags, params, settings, log_level)
+    def __init__(self, name: str, flags: int, params: GalvoTuningScanParams, settings: Dict[str, Any]):
+        super().__init__(name, flags, params, settings)
 
 
         self._edit_widget = GalvoTuningScanConfigWidget()

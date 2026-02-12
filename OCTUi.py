@@ -45,11 +45,6 @@ class OCTUi():
         self._labelEngineStatus = QLabel("Not started...")
         self._octDialog.statusBar().addPermanentWidget(self._labelEngineStatus)
 
-
-        # initializations
-        self._octDialog.widgetDispersion.setDispersion(self._params.dsp)
-        self._octDialog.widgetAcqParams.setAcqParams(self._params.acq)
-
         # remove this now. By default the stacked widget comes with a single page.
         self._octDialog.stackedWidgetDummy.removeWidget(self._octDialog.stackedWidgetDummyPage1)
 
@@ -65,7 +60,7 @@ class OCTUi():
             else:
                 s = {}
 
-            self._guihelpers.append(scanGUIHelperFactory(name, flag, cfg, self._params.acq, s, self._params.vtx.log_level))
+            self._guihelpers.append(scanGUIHelperFactory(name, flag, cfg, s))
             self._octDialog.widgetScanConfig.addScanType(name, self._guihelpers[-1].edit_widget)
             #self._octDialog.stackedWidgetDummy.addWidget(self._guihelpers[-1].plot_widget)
 
@@ -73,7 +68,7 @@ class OCTUi():
         #self._octDialog.stackedWidgetDummy.setCurrentIndex(self._params.scn.current_index)
 
         # connections. 
-        self._octDialog.widgetDispersion.valueChanged.connect(self.dispersionChanged)
+        #self._octDialog.widgetDispersion.valueChanged.connect(self.dispersionChanged)
         self._octDialog.widgetScanConfig.scanTypeChanged.connect(self.scanTypeChanged)
         self._octDialog.gbSaveVolumes.saveNVolumes.connect(self.saveNVolumes)
         self._octDialog.gbSaveVolumes.saveContVolumes.connect(self.saveContVolumes)
@@ -130,9 +125,7 @@ class OCTUi():
         # fetch current configuration for acq and scan params. The items 
         # in the engineConfig are updated when that dlg is accepted, so no 
         # fetch here.
-        self._params.acq = self._octDialog.widgetAcqParams.getAcqParams()
         self._params.scn = self._octDialog.widgetScanConfig.getScanParams()
-        self._params.dsp = self._octDialog.widgetDispersion.getDispersion()
 
     def _getPlotSettings(self):
 

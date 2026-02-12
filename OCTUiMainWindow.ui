@@ -30,22 +30,9 @@
          </widget>
         </item>
         <item>
-         <widget class="AcqParamsWidget" name="widgetAcqParams" native="true">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>80</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="DispersionWidget" name="widgetDispersion" native="true"/>
-        </item>
-        <item>
          <widget class="QPushButton" name="pbEtc">
           <property name="text">
-           <string>Etc</string>
+           <string>Engine Configuration</string>
           </property>
          </widget>
         </item>
@@ -114,7 +101,7 @@
      <x>0</x>
      <y>0</y>
      <width>996</width>
-     <height>21</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>
@@ -125,18 +112,6 @@
    <class>ScanConfigWidget</class>
    <extends>QWidget</extends>
    <header>ScanConfigWidget</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>AcqParamsWidget</class>
-   <extends>QWidget</extends>
-   <header>AcqParamsWidget</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>DispersionWidget</class>
-   <extends>QWidget</extends>
-   <header>DispersionWidget</header>
    <container>1</container>
   </customwidget>
   <customwidget>

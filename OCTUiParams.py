@@ -1,5 +1,4 @@
 from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, AcquisitionType
-from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
 from ScanParams import ScanParams, RasterScanParams, AimingScanParams, LineScanParams, GalvoTuningScanParams
 from platformdirs import site_config_dir
 from pathlib import Path, PurePath
@@ -30,14 +29,12 @@ copyreg.pickle(Range, pickle_range)
 class UiParams():
     #vtx: VtxEngineParams = DEFAULT_VTX_ENGINE_PARAMS
     vtx: VtxEngineParams = field(default_factory=VtxEngineParams)
-    acq: AcqParams = field(default_factory=lambda: DEFAULT_ACQ_PARAMS)
     scn: ScanParams = field(default_factory=lambda: ScanParams())
-    dsp: Tuple = (-1.8e-05, 0)
     settings: Dict[str, Any] = field(default_factory=lambda: {})
 
 def pickle_uiparams(u: UiParams):
     print("pickling a UiParams instance")
-    return UiParams, (u.vtx, u.acq, u.scn, u.dsp, u.settings)
+    return UiParams, (u.vtx, u.scn, u.settings)
 copyreg.pickle(UiParams, pickle_uiparams)
 
 
@@ -49,8 +46,6 @@ class _octui_encoder(json.JSONEncoder):
             elif isinstance(o, VtxEngineParams):
                 value = asdict(o)
             elif isinstance(o, ScanParams):
-                value = asdict(o)
-            elif isinstance(o, AcqParams):
                 value = asdict(o)
             elif isinstance(o, AcquisitionType):
                 value = o.value
@@ -78,11 +73,9 @@ class _octui_decoder(json.JSONDecoder):
         elif {'acquisition_type',  'galvo_delay', 'galvo_y_voltage_range', 'save_profiler_data'}.issubset(d.keys()):
             # This should be the VtxEngineParams object itself. 
             d['acquisition_type'] = AcquisitionType(d['acquisition_type'])
-        elif {'vtx', 'acq', 'scn', 'dsp'}.issubset(d.keys()):
+        elif {'vtx', 'scn'}.issubset(d.keys()):
             d['vtx'] = VtxEngineParams(**d['vtx'])
-            d['acq'] = AcqParams(**d['acq'])
             d['scn'] = ScanParams(**d['scn'])
-            d['dsp'] = tuple(d['dsp'])
             # if no settings, create a new one.
             if 'settings' not in d:
                 d['settings'] = {}
@@ -113,9 +106,7 @@ class OCTUiParams():
         if not load:
             params = UiParams()
             self._vtx = params.vtx
-            self._acq = params.acq
             self._scn = params.scn
-            self._dsp = params.dsp
             self._settings = params.settings
             local_logger.info("created dummy config file")
         else:
@@ -133,16 +124,6 @@ class OCTUiParams():
             self._vtx = value
 
     @property
-    def acq(self):
-        return self._acq
-    
-    @acq.setter
-    def acq(self, value):
-        if not self._acq == value:
-            self._isdirty = True
-            self._acq = value
-
-    @property
     def scn(self):
         return self._scn
 
@@ -151,16 +132,6 @@ class OCTUiParams():
         if not self._scn == value:
             self._isdirty = True
             self._scn = value
-
-    @property
-    def dsp(self):
-        return self._dsp
-    
-    @dsp.setter
-    def dsp(self, value):
-        if not self._dsp == value:
-            self._isdirty = True
-            self._dsp = value
 
     @property
     def settings(self):
@@ -200,9 +171,7 @@ class OCTUiParams():
         
         params = UiParams(**dct)
         self._vtx = params.vtx
-        self._acq = params.acq
         self._scn = params.scn
-        self._dsp = params.dsp
         self._settings = params.settings
         self.__cfgpath = use_this_path
 
@@ -229,7 +198,7 @@ class OCTUiParams():
             use_this_path.parent.mkdir(exist_ok=True)
 
         with use_this_path.open(mode="w", encoding="utf-8") as f:
-            params = UiParams(self._vtx, self._acq, self._scn, self._dsp, self._settings)
+            params = UiParams(self._vtx, self._scn, self._settings)
             json.dump(params, f, indent=2, cls=_octui_encoder)
 
 

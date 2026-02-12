@@ -1,6 +1,7 @@
 import sys
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import QDialog, QApplication
+from DispersionWidget import DispersionWidget
 from DAQConst import ATS9350InputRange
 from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, AcquisitionType
 from Ui_VtxEngineParamsDialog import Ui_VtxEngineParamsDialog
@@ -69,16 +70,39 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
     def _accepted(self) -> None:
         self._cfg = self.getEngineParameters()        
         self.accept()
-        
+
+    # def getAcqParams(self) -> AcqParams: 
+    #     cfg = AcqParams()
+    #     cfg.ascans_per_block = int(self.leAperBlock.text())
+    #     cfg.samples_per_ascan = int(self.leSperA.text())
+    #     cfg.blocks_to_acquire = int(self.leNBlocks.text())
+    #     cfg.trigger_delay_samples = int(self.leTriggerDelay.text())
+    #     return cfg
+    
+    # def setAcqParams(self, cfg: AcqParams):
+    #     self.leAperBlock.setText(str(cfg.ascans_per_block))
+    #     self.leSperA.setText(str(cfg.samples_per_ascan))
+    #     self.leNBlocks.setText(str(cfg.blocks_to_acquire))
+    #     self.leTriggerDelay.setText(str(cfg.trigger_delay_samples))
+
+
+    # def getDispersion(self) -> Tuple[float, float]:
+    #     return (float(self.dsbDispersion0.value) * self.c2multiplier, float(self.dsbDispersion1.value) * self.c3multiplier)
+    
+    # def setDispersion(self, d: Tuple[float, float]):
+    #     self.dsbDispersion0.setValue(d[0]/self.c2multiplier)
+    #     self.dsbDispersion1.setValue(d[1]/self.c3multiplier)
+
+
+
     def initializeDialog(self, cfg: VtxEngineParams):
         self._cfg = cfg
-        if self._cfg.acquisition_type==AcquisitionType.ALAZAR_ACQUISITION:
-            self.radioButtonAlazarAcquisition.setChecked(True)
-        elif self._cfg.acquisition_type==AcquisitionType.FILE_ACQUISITION:
-            self.radioButtonFileAcquisition.setChecked(True)
+
+        self.leAperBlock.setText(str(cfg.ascans_per_block))
+        self.leSperA.setText(str(cfg.samples_per_ascan))
+        self.leTriggerDelay.setText(str(cfg.trigger_delay_samples))
 
         self.lineEditGalvoDelay.setText(str(cfg.galvo_delay))
-
         self.lineEditGalvoXmin.setText(str(cfg.galvo_x_voltage_range.min))
         self.lineEditGalvoXmax.setText(str(cfg.galvo_x_voltage_range.max))
         self.lineEditGalvoYmin.setText(str(cfg.galvo_y_voltage_range.min))
@@ -94,9 +118,10 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.lineEditExternalClockLevelPct.setText(str(cfg.external_clock_level_pct))
 
         self.comboBoxInputChannel.setCurrentText(cfg.input_channel)
-        self.comboBoxClockChannel.setCurrentText(cfg.clock_channel)
         self.lineEditTriggerRange.setText(str(cfg.trigger_range_millivolts))
         self.lineEditTriggerLevelFraction.setText(str(cfg.trigger_level_fraction))
+
+        self.widgetDispersion.setDispersion(cfg.dispersion)
 
         self.lineEditBlocksToAllocate.setText(str(cfg.blocks_to_allocate))
         self.lineEditPreloadCount.setText(str(cfg.preload_count))
@@ -121,10 +146,10 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
 
     def getEngineParameters(self) -> VtxEngineParams:
         s = VtxEngineParams()
-        if self.radioButtonAlazarAcquisition.isChecked():
-            s.acquisition_type = AcquisitionType.ALAZAR_ACQUISITION
-        elif self.radioButtonFileAcquisition.isChecked():
-            s.acquisition_type = AcquisitionType.FILE_ACQUISITION
+
+        s.ascans_per_block = int(self.leAperBlock.text())
+        s.samples_per_ascan = int(self.leSperA.text())
+        s.trigger_delay_samples = int(self.leTriggerDelay.text())
 
         s.galvo_delay = float(self.lineEditGalvoDelay.text())
         s.galvo_x_voltage_range = Range(float(self.lineEditGalvoXmin.text()), float(self.lineEditGalvoXmax.text()))
@@ -136,10 +161,11 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         s.ssrc_triggers_per_second = int(self.lineEditTriggersPerSecond.text())
         s.ssrc_clock_rising_edges_per_trigger = int(self.lineEditClockRisingEdgesPerTrigger.text())
 
+        s.dispersion = self.widgetDispersion.getDispersion()
+
         s.internal_clock = bool(self.checkBoxInternalClock.isChecked())
         s.external_clock_level_pct = int(self.lineEditExternalClockLevelPct.text())
         s.input_channel = self.comboBoxInputChannel.currentText()
-        s.clock_channel = self.comboBoxClockChannel.currentText()
         s.trigger_range_millivolts = int(self.lineEditTriggerRange.text())
         s.trigger_level_fraction = float(self.lineEditTriggerLevelFraction.text())
         s.input_channel_range_millivolts = self.comboBoxInputRange.itemData(self.comboBoxInputRange.currentIndex())

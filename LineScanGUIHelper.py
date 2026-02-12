@@ -22,8 +22,8 @@ class LineScanGUIHelper(ScanGUIHelper):
     '''
     GUIHelper for a line scan.
     '''
-    def __init__(self, name: str, number: int, params: LineScanParams, acq:AcqParams, settings: Dict[str, Any], log_level: int):
-        super().__init__(name, number, params, settings, log_level)
+    def __init__(self, name: str, number: int, params: LineScanParams, settings: Dict[str, Any]):
+        super().__init__(name, number, params, settings)
 
         self._edit_widget = LineScanConfigWidget()
         self._edit_widget.setLineScanParams(self.params)
