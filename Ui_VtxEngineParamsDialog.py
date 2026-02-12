@@ -31,6 +31,8 @@ class Ui_VtxEngineParamsDialog(object):
         self.label_10.setObjectName("label_10")
         self.horizontalLayout_17.addWidget(self.label_10)
         self.lineEditTriggersPerSecond = QtWidgets.QLineEdit(self.groupBox_3)
+        self.lineEditTriggersPerSecond.setToolTip("")
+        self.lineEditTriggersPerSecond.setToolTipDuration(5)
         self.lineEditTriggersPerSecond.setObjectName("lineEditTriggersPerSecond")
         self.horizontalLayout_17.addWidget(self.lineEditTriggersPerSecond)
         self.horizontalLayout_17.setStretch(0, 1)
@@ -94,6 +96,7 @@ class Ui_VtxEngineParamsDialog(object):
         self.label_15.setObjectName("label_15")
         self.horizontalLayout_23.addWidget(self.label_15)
         self.lineEditInternalClockRate = QtWidgets.QLineEdit(self.groupBox_3)
+        self.lineEditInternalClockRate.setEnabled(False)
         self.lineEditInternalClockRate.setToolTip("")
         self.lineEditInternalClockRate.setObjectName("lineEditInternalClockRate")
         self.horizontalLayout_23.addWidget(self.lineEditInternalClockRate)
@@ -106,6 +109,7 @@ class Ui_VtxEngineParamsDialog(object):
         self.label_17.setObjectName("label_17")
         self.horizontalLayout_27.addWidget(self.label_17)
         self.leSperA = QtWidgets.QLineEdit(self.groupBox_3)
+        self.leSperA.setEnabled(False)
         self.leSperA.setToolTip("")
         self.leSperA.setObjectName("leSperA")
         self.horizontalLayout_27.addWidget(self.leSperA)
@@ -385,6 +389,9 @@ class Ui_VtxEngineParamsDialog(object):
         self.verticalLayout_9.addLayout(self.horizontalLayout_30)
 
         self.retranslateUi(VtxEngineParamsDialog)
+        self.checkBoxInternalClock.toggled['bool'].connect(self.lineEditInternalClockRate.setEnabled) # type: ignore
+        self.checkBoxInternalClock.toggled['bool'].connect(self.leSperA.setEnabled) # type: ignore
+        self.checkBoxInternalClock.toggled['bool'].connect(self.lineEditExternalClockLevelPct.setDisabled) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(VtxEngineParamsDialog)
 
     def retranslateUi(self, VtxEngineParamsDialog):

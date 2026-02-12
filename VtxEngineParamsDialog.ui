@@ -34,7 +34,14 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEditTriggersPerSecond"/>
+             <widget class="QLineEdit" name="lineEditTriggersPerSecond">
+              <property name="toolTip">
+               <string notr="true" extracomment="This is the triggers per sec toolTip comment."/>
+              </property>
+              <property name="toolTipDuration">
+               <number>5</number>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -123,6 +130,9 @@
             </item>
             <item>
              <widget class="QLineEdit" name="lineEditInternalClockRate">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="toolTip">
                <string extracomment="Rate for internal trigger clock, when used. "/>
               </property>
@@ -141,6 +151,9 @@
             </item>
             <item>
              <widget class="QLineEdit" name="leSperA">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="toolTip">
                <string extracomment="Internally-generated K-clock triggers, only used with internal clock."/>
               </property>
@@ -566,5 +579,54 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>checkBoxInternalClock</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lineEditInternalClockRate</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>132</x>
+     <y>233</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>188</x>
+     <y>267</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxInternalClock</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>leSperA</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>132</x>
+     <y>233</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>188</x>
+     <y>302</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxInternalClock</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lineEditExternalClockLevelPct</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>132</x>
+     <y>233</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>191</x>
+     <y>337</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
