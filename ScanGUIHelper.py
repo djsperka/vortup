@@ -2,12 +2,11 @@ from dataclasses import dataclass, field
 from typing import Union
 from abc import ABC, abstractmethod
 from typing import List, Any, Dict, Tuple
-from ScanParams import RasterScanParams, AimingScanParams, LineScanParams
-from AcqParams import AcqParams
 from OCTUiParams import OCTUiParams
+from VtxEngineParams import VtxEngineParams, AcquisitionType
 from vortex.engine import NullEndpoint, VolumeStrobe, SegmentStrobe, SampleStrobe, EventStrobe
-from vortex.engine import StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, SpectraStackEndpoint, NullEndpoint, EventStrobe
-from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, SimpleSlice
+from vortex.engine import StackDeviceTensorEndpointInt8, StackHostTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, SpectraStackEndpoint, NullEndpoint, EventStrobe
+from vortex.format import FormatPlanner, StackFormatExecutor
 from vortex.storage import SimpleStackUInt16
 from qtpy.QtWidgets import QWidget
 
@@ -199,7 +198,7 @@ class ScanGUIHelper(ABC):
         return None
 
     @abstractmethod
-    def createEngineComponents(self, octuiparams: OCTUiParams):
+    def createEngineComponents(self, octuiparams: OCTUiParams, samples_per_record: int) -> ScanGUIHelperComponents:
         '''
         Creates SCanGUIHelperComponents using the params passed. The scan params in octuiparams
         are the same as the params that this class has, so its OK to use self.params instead of 
@@ -210,3 +209,27 @@ class ScanGUIHelper(ABC):
         :type octuiparams: OCTUiParams
         '''
         pass
+
+    def _createAscanEndpoint(self, sfe: StackFormatExecutor, shape: Tuple[int, int, int], vtx: VtxEngineParams, logger) -> StackDeviceTensorEndpointInt8 | StackHostTensorEndpointInt8:
+        '''
+        Subclasses should call this to get the endpoint for ascans. Checks the acquisition type and returns the 
+        correct endpoint type. 
+        
+        :param self: Description
+        :param sfe: Stack format executor for this endpoint
+        :type sfe: StackFormatExecutor
+        :param shape: Endpoint shape
+        :type shape: Tuple[int, int, int]
+        :param vtx: Engine parameters
+        :type vtx: VtxEngineParams
+        :param logger: Logger for the endpoint
+        :return: The endpoint for ascans (post-processing)
+        :rtype: StackDeviceTensorEndpointInt8 | StackHostTensorEndpointInt8
+        '''
+        if vtx.acquisition_type == AcquisitionType.ALAZAR_ACQUISITION:
+            self._logger.info('Create StackDeviceTensorEndpointInt8 with shape {0:s}'.format(str(shape)))
+            return StackDeviceTensorEndpointInt8(sfe, shape, logger)
+        elif vtx.acquisition_type == AcquisitionType.FILE_ACQUISITION:
+            self._logger.info('Create StackHostTensorEndpointInt8 with shape {0:s}'.format(str(shape)))
+            return StackHostTensorEndpointInt8(sfe, shape, logger)
+        

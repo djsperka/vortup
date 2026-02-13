@@ -1,4 +1,5 @@
 from VtxBaseEngine import VtxBaseEngine
+from VtxEngineParams import AcquisitionType
 from vortex import get_console_logger as get_logger
 from vortex.engine import Engine, EngineConfig, SpectraStackEndpoint, VolumeStrobe, Block, EventStrobe
 from vortex.io import DAQmxIO, DAQmxConfig, daqmx
@@ -13,12 +14,9 @@ class VtxEngine(VtxBaseEngine):
     def __init__(self, params: OCTUiParams, helpers: List[ScanGUIHelper]):
 
         cfg = params.vtx
-        acq = params.acq 
-        scfg = params.scn
 
         # base class 
-        super().__init__(params.vtx, params.acq)
-        self._cfg = params.vtx
+        super().__init__(params.vtx)
         self._logger = logging.getLogger(__name__)
         # Base class has stuff made, but no engine constructed:
         # self._acquire
@@ -28,7 +26,7 @@ class VtxEngine(VtxBaseEngine):
 
         # Engine configuration
         ec = EngineConfig()
-        ec.add_acquisition(self._acquire, [self._octprocess])
+        ec.add_acquisition(self._acquire, [self._processor])
 
         # add galvo output
         if self._io_out is not None:
@@ -41,8 +39,8 @@ class VtxEngine(VtxBaseEngine):
         # TODO make this part of config
         strobes = [VolumeStrobe(7)]
         for helper in helpers:
-            helper.createEngineComponents(params)
-            ec.add_processor(self._octprocess, [helper.components.format_planner])
+            helper.createEngineComponents(params, self._processor.config.samples_per_record)
+            ec.add_processor(self._processor, [helper.components.format_planner])
             ec.add_formatter(helper.components.format_planner, helper.components.endpoints)
             s = helper.getStrobe()
             if s is not None:
@@ -51,10 +49,10 @@ class VtxEngine(VtxBaseEngine):
 
 
         # strobe
-        if cfg.strobe_enabled:
+        if cfg.strobe_enabled and cfg.acquisition_type == AcquisitionType.ALAZAR_ACQUISITION:
             if len(strobes) > 0:
                 strobec = DAQmxConfig()
-                strobec.samples_per_block = acq.ascans_per_block
+                strobec.samples_per_block = cfg.ascans_per_block
                 strobec.samples_per_second = cfg.ssrc_triggers_per_second
                 strobec.blocks_to_buffer = cfg.preload_count
                 strobec.clock.source = cfg.strobe_clock_source
@@ -85,9 +83,9 @@ class VtxEngine(VtxBaseEngine):
 
 
         ec.preload_count = cfg.preload_count
-        ec.records_per_block = acq.ascans_per_block
+        ec.records_per_block = cfg.ascans_per_block
         ec.blocks_to_allocate = cfg.blocks_to_allocate
-        ec.blocks_to_acquire = acq.blocks_to_acquire
+        ec.blocks_to_acquire = cfg.blocks_to_acquire
 
         engine = Engine(get_logger('engine', cfg.log_level))
         engine.initialize(ec)
@@ -105,23 +103,3 @@ class VtxEngine(VtxBaseEngine):
         else:
             self._logger.warning('engine is not running')
             
-    # def getSpectraStorageEndpoint(self, shape) -> Tuple[Any, Any]:
-
-    #         storage = SimpleStackUInt16(get_logger('npy-spectra', self._cfg.log_level))
-
-    #         # Executor config has only three properties:
-    #         #
-    #         # property erase_after_volume - not sure
-    #         # property sample_slice  - Collect only a slice of samples from each ascan
-    #         # property sample_transform - not sure
-    #         # 
-    #         # So basically, I'm not sure what the executor's role is here. 
-    #         # But - when the Endpoint class is created, the executor is the first
-    #         # arg to the constructor. 
-
-    #         sfec = StackFormatExecutorConfig()
-    #         sfe = StackFormatExecutor()
-    #         sfe.initialize(sfec)
-    #         endpoint_storage = SpectraStackEndpoint(sfe, storage, log=get_logger('npy-spectra', self._cfg.log_level))
-
-    #         return endpoint_storage, storage

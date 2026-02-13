@@ -153,6 +153,11 @@ class OCTUi():
             # update params with ui 
             self._getAllParams()
 
+            # # HACK 
+            # from VtxEngineParams import AcquisitionType
+            # self._params.vtx.acquisition_type = AcquisitionType.FILE_ACQUISITION
+            # self._logger.warning('USING FILE ACQUISITION')
+
             # get oct engine ready
             if self._vtxengine:
                 if not self._vtxengine._engine.done:

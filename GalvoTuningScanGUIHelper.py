@@ -96,7 +96,7 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
         return super().getStrobe()
 
 
-    def createEngineComponents(self, octuiparams: OCTUiParams):
+    def createEngineComponents(self, octuiparams: OCTUiParams, samples_per_record: int):
 
         # Create engine parts for this scan
         fc = FormatPlannerConfig()
@@ -118,25 +118,24 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
         # For DISPLAYING ascans (oct-processed data), slice away half the data. 
         # This stack format executor isn't used with the other endpoints.
         sfec = StackFormatExecutorConfig()
-        sfec.sample_slice = SimpleSlice(octuiparams.acq.samples_per_ascan // 2)
+        sfec.sample_slice = SimpleSlice(samples_per_record // 2)
         samples_to_save = sfec.sample_slice.count()
         sfe = StackFormatExecutor()
         sfe.initialize(sfec)
 
         # endpoint for display of ascans
         vshape = (self.params.lines_per_volume, self.params.ascans_per_bscan, samples_to_save)
-        self._logger.info('Create StackDeviceTensorEndpointInt8 with shape {0:s}'.format(str(vshape)))
-        ascan_endpoint = StackDeviceTensorEndpointInt8(sfe, vshape, get_logger('stack', self.log_level))
+        ascan_endpoint = self._createAscanEndpoint(sfe, vshape, octuiparams.vtx, get_logger('stack', self.log_level))
 
         sfec_spectra = StackFormatExecutorConfig()
         sfe_spectra  = StackFormatExecutor()
         sfe_spectra.initialize(sfec_spectra)
-        shape_spectra = (self.params.lines_per_volume, self.params.ascans_per_bscan, octuiparams.acq.samples_per_ascan)
+        shape_spectra = (self.params.lines_per_volume, self.params.ascans_per_bscan, samples_per_record)
         self._logger.info('Create SpectraStackHostTensorEndpointUInt16 with shape {0:s}'.format(str(shape_spectra)))
         spectra_endpoint = SpectraStackHostTensorEndpointUInt16(sfe_spectra, shape_spectra, get_logger('stack', self.log_level))
 
         # make an endpoint for saving spectra data
-        shape = (self.params.lines_per_volume, self.params.ascans_per_bscan, octuiparams.acq.samples_per_ascan, 1)
+        shape = (self.params.lines_per_volume, self.params.ascans_per_bscan, samples_per_record, 1)
         spectra_storage = SimpleStackUInt16(get_logger('npy-spectra', self.log_level))
         sfec = StackFormatExecutorConfig()
         sfe = StackFormatExecutor()
