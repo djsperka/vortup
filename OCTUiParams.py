@@ -70,7 +70,7 @@ class _octui_decoder(json.JSONDecoder):
         #print('from_dict: ', d.keys())
         if d.keys() == {'min', 'max'}:
             return Range(d['min'], d['max'])
-        elif {'acquisition_type',  'galvo_delay', 'galvo_y_voltage_range', 'save_profiler_data'}.issubset(d.keys()):
+        elif {'acquisition_type',  'galvo_delay', 'galvo_slow_voltage_range', 'save_profiler_data'}.issubset(d.keys()):
             # This should be the VtxEngineParams object itself. 
             d['acquisition_type'] = AcquisitionType(d['acquisition_type'])
         elif {'vtx', 'scn'}.issubset(d.keys()):
