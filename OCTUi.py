@@ -7,7 +7,7 @@ from OCTUiParams import OCTUiParams
 from PyQt5.QtWidgets import QApplication, QMessageBox, QLabel
 from PyQt5.QtCore import QTimer,QDateTime
 from vortex.engine import Engine, EngineConfig, EngineStatus
-from vortex import get_console_logger as gcl
+from vortex import get_console_logger as gcl, __version__ as vortex_version
 from vortex.storage import SimpleStackConfig, SimpleStackHeader
 from ScanGUIHelper import ScanGUIHelper
 from scanGUIHelperFactory import scanGUIHelperFactory
@@ -17,7 +17,8 @@ import traceback
 import matplotlib as mpl
 from datetime import datetime
 from json import dumps
-
+from git import Repo
+from pathlib import Path
 class OCTUi():
     
     def __init__(self):
@@ -34,6 +35,13 @@ class OCTUi():
         self._timer=QTimer()
         self._timer.timeout.connect(self.showTime)
         self._guihelpers = []
+
+        # check git tags and dump to screen
+        repo_directory = Path(__file__).parent.resolve()
+        repo = Repo(repo_directory)
+        self._logger.info("OCTUi {0:s} starting...".format(repo.git.describe(tags=True, always=True, dirty=True, long=True)))
+        self._logger.info("Using vortex {0:s}".format(vortex_version))
+
 
         # load config file - default file only!
         # TODO - make it configurable, or be able to load a diff't config.
