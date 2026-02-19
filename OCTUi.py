@@ -205,7 +205,6 @@ class OCTUi():
 
 
         except RuntimeError as e:
-            print(self._vtxengine)
             print("RuntimeError:")
             traceback.print_exception(e)
 
