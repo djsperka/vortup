@@ -44,7 +44,7 @@ class VtxBaseEngine():
             ac.records_per_block = cfg.ascans_per_block
 
             # trigger with range - must be 5000 (2500 will err). TTL will work in config also. Discrepancy with docs
-            ac.trigger = alazar.SingleExternalTrigger(range_millivolts=cfg.trigger_range_millivolts, level_ratio=cfg.trigger_level_fraction, delay_samples=acq.trigger_delay_samples, slope=alazar.TriggerSlope.Positive)
+            ac.trigger = alazar.SingleExternalTrigger(range_millivolts=cfg.trigger_range_millivolts, level_ratio=cfg.trigger_level_fraction, delay_samples=cfg.trigger_delay_samples, slope=alazar.TriggerSlope.Positive)
 
             # only input channel A
             LOGGER.info("Using input channel {0:s} for input \"{1:s}\"".format(str(getAlazarChannel(cfg.input_channel)), cfg.input_channel))
