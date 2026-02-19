@@ -1,5 +1,6 @@
 # vscode workspace files
 *.code-workspace
+launch.json
 
 *.npy
 *.mat
