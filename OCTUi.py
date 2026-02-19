@@ -146,9 +146,6 @@ class OCTUi():
             self._params.settings = settings
 
     def startClicked(self):
-        self._octDialog.pbEtc.setEnabled(False)
-        self._octDialog.pbStart.setEnabled(False)
-        self._octDialog.pbStop.setEnabled(True)
 
         # check if profiling was requested
         if self._params.vtx.save_profiler_data:
@@ -201,11 +198,16 @@ class OCTUi():
             # status timer
             self._timer.start(1000)
 
+            # engine has started without error, so fix up buttons
+            self._octDialog.pbEtc.setEnabled(False)
+            self._octDialog.pbStart.setEnabled(False)
+            self._octDialog.pbStop.setEnabled(True)
+
 
         except RuntimeError as e:
+            print(self._vtxengine)
             print("RuntimeError:")
             traceback.print_exception(e)
-            sys.exit(-1)
 
     def connectCurrentScan(self, helper: ScanGUIHelper): 
 
