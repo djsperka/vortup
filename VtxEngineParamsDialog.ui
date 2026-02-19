@@ -344,7 +344,7 @@
             <item>
              <widget class="QLabel" name="label_4">
               <property name="text">
-               <string>X units/V</string>
+               <string>SLOW units/V</string>
               </property>
              </widget>
             </item>
@@ -358,7 +358,7 @@
             <item>
              <widget class="QLabel" name="label_2">
               <property name="text">
-               <string>X limits(V)</string>
+               <string>SLOW limits(V)</string>
               </property>
              </widget>
             </item>
@@ -379,7 +379,7 @@
             <item>
              <widget class="QLabel" name="label_5">
               <property name="text">
-               <string>Y units/V</string>
+               <string>FAST units/V</string>
               </property>
              </widget>
             </item>
@@ -393,7 +393,7 @@
             <item>
              <widget class="QLabel" name="label_3">
               <property name="text">
-               <string>X limits(V)</string>
+               <string>FAST limits(V)</string>
               </property>
              </widget>
             </item>
