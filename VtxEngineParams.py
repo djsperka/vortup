@@ -26,12 +26,12 @@ class VtxEngineParams:
     # other galvo stuff
     galvo_enabled: bool = True
     galvo_clock_source: str = "pfi12"
-    galvo_x_voltage_range: Range = field(default_factory=Range)
-    galvo_y_voltage_range: Range = field(default_factory=Range)
-    galvo_x_units_per_volt: float = 1.5
-    galvo_y_units_per_volt: float = 1.5
-    galvo_x_device_channel: str = "Dev1/ao0"
-    galvo_y_device_channel: str = "Dev1/ao1"
+    galvo_slow_voltage_range: Range = field(default_factory=Range)
+    galvo_fast_voltage_range: Range = field(default_factory=Range)
+    galvo_slow_units_per_volt: float = 1.5
+    galvo_fast_units_per_volt: float = 1.5
+    galvo_slow_device_channel: str = "Dev1/ao0"
+    galvo_fast_device_channel: str = "Dev1/ao1"
 
     # strobe stuff
     strobe_enabled: bool = True
@@ -80,12 +80,12 @@ DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
     galvo_delay=0.0,
     galvo_enabled=True,
     galvo_clock_source='pfi12',
-    galvo_x_voltage_range=Range(-3,3),
-    galvo_y_voltage_range=Range(-3,3),
-    galvo_x_units_per_volt=1.5,
-    galvo_y_units_per_volt=1.5,
-    galvo_x_device_channel='Dev1/ao0',
-    galvo_y_device_channel='Dev1/ao1',
+    galvo_slow_voltage_range=Range(-3,3),
+    galvo_fast_voltage_range=Range(-3,3),
+    galvo_slow_units_per_volt=1.5,
+    galvo_fast_units_per_volt=1.5,
+    galvo_slow_device_channel='Dev1/ao0',
+    galvo_fast_device_channel='Dev1/ao1',
 
     # strobe
     strobe_enabled=True,

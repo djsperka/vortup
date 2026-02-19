@@ -117,8 +117,8 @@ class RasterScanConfigWidget(QWidget, Ui_RasterScanConfigWidget, ScanTypeConfigW
         # validators
         self.leAperB.setValidator(QIntValidator(1,5000))
         self.leBperV.setValidator(QIntValidator(1,5000))
-        self.leXextent.setValidator(QRegExpValidator(RegexForExtents))
-        self.leYextent.setValidator(QRegExpValidator(RegexForExtents))
+        self.leSLOWextent.setValidator(QRegExpValidator(RegexForExtents))
+        self.leFASTextent.setValidator(QRegExpValidator(RegexForExtents))
 
 
     def getParams(self):
@@ -132,8 +132,8 @@ class RasterScanConfigWidget(QWidget, Ui_RasterScanConfigWidget, ScanTypeConfigW
         params.ascans_per_bscan = int(self.leAperB.text())
         params.bscans_per_volume = int(self.leBperV.text())
         params.bidirectional_segments = self.cbBidirectional.isChecked()
-        params.segment_extent = getRangeFromTextEntry(self.leXextent.text())
-        params.volume_extent = getRangeFromTextEntry(self.leYextent.text())
+        params.segment_extent = getRangeFromTextEntry(self.leFASTextent.text())
+        params.volume_extent = getRangeFromTextEntry(self.leSLOWextent.text())
         params.angle = self.dsbAngle.value()
         return params
 
@@ -141,8 +141,8 @@ class RasterScanConfigWidget(QWidget, Ui_RasterScanConfigWidget, ScanTypeConfigW
         self.leAperB.setText("{0:d}".format(params.ascans_per_bscan))
         self.leBperV.setText("{0:d}".format(params.bscans_per_volume))
         self.cbBidirectional.setChecked(params.bidirectional_segments)
-        self.leXextent.setText("{0:.2f},{1:.2f}".format(params.segment_extent.min, params.segment_extent.max))
-        self.leYextent.setText("{0:.2f},{1:.2f}".format(params.volume_extent.min, params.volume_extent.max))
+        self.leFASTextent.setText("{0:.2f},{1:.2f}".format(params.segment_extent.min, params.segment_extent.max))
+        self.leSLOWextent.setText("{0:.2f},{1:.2f}".format(params.volume_extent.min, params.volume_extent.max))
         self.dsbAngle.setValue(params.angle)
 
 
@@ -196,7 +196,7 @@ class LineScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_LineScanConfigWidge
         # validators
         self.leAperB.setValidator(QIntValidator(1,5000))
         self.leLperV.setValidator(QIntValidator(1,5000))
-        self.leXextent.setValidator(QRegExpValidator(RegexForExtents))
+        self.leLINEextent.setValidator(QRegExpValidator(RegexForExtents))
         self.leBscanTriggerIndex.setValidator(QIntValidator(1,500)) # TODO This must be less than BperV
         self.leOutputLine.setValidator(QIntValidator(0,7))
 
@@ -211,7 +211,7 @@ class LineScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_LineScanConfigWidge
         params.ascans_per_bscan = int(self.leAperB.text())
         params.lines_per_volume = int(self.leLperV.text())
         params.bidirectional_segments = self.cbBidirectional.isChecked()
-        params.line_extent = getRangeFromTextEntry(self.leXextent.text())
+        params.line_extent = getRangeFromTextEntry(self.leLINEextent.text())
         params.angle = self.dsbAngle.value()
         params.strobe_enabled = self.gbStrobeOutput.isChecked()
         params.strobe_bscan_index = int(self.leBscanTriggerIndex.text())
@@ -221,7 +221,7 @@ class LineScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_LineScanConfigWidge
     def setLineScanParams(self, params: LineScanParams):
         self.leAperB.setText("{0:d}".format(params.ascans_per_bscan))
         self.cbBidirectional.setChecked(params.bidirectional_segments)
-        self.leXextent.setText("{0:.2f},{1:.2f}".format(params.line_extent.min, params.line_extent.max))
+        self.leLINEextent.setText("{0:.2f},{1:.2f}".format(params.line_extent.min, params.line_extent.max))
         self.leLperV.setText("{0:d}".format(params.lines_per_volume))
         self.dsbAngle.setValue(params.angle)
         self.gbStrobeOutput.setChecked(params.strobe_enabled)

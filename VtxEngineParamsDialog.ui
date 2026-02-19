@@ -349,7 +349,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEditXUnitsPerVolt"/>
+             <widget class="QLineEdit" name="lineEditSLOWUnitsPerVolt"/>
             </item>
            </layout>
           </item>
@@ -365,10 +365,10 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,1">
               <item>
-               <widget class="QLineEdit" name="lineEditGalvoXmin"/>
+               <widget class="QLineEdit" name="lineEditGalvoSLOWmin"/>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEditGalvoXmax"/>
+               <widget class="QLineEdit" name="lineEditGalvoSLOWmax"/>
               </item>
              </layout>
             </item>
@@ -384,7 +384,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEditYUnitsPerVolt"/>
+             <widget class="QLineEdit" name="lineEditFASTUnitsPerVolt"/>
             </item>
            </layout>
           </item>
@@ -400,14 +400,14 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1,1">
               <item>
-               <widget class="QLineEdit" name="lineEditGalvoYmin">
+               <widget class="QLineEdit" name="lineEditGalvoFASTmin">
                 <property name="text">
                  <string/>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEditGalvoYmax">
+               <widget class="QLineEdit" name="lineEditGalvoFASTmax">
                 <property name="text">
                  <string/>
                 </property>
@@ -436,12 +436,12 @@
             <item>
              <widget class="QLabel" name="label_8">
               <property name="text">
-               <string>X device</string>
+               <string>SLOW axis device</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEditGalvoXDevice"/>
+             <widget class="QLineEdit" name="lineEditGalvoSLOWDevice"/>
             </item>
            </layout>
           </item>
@@ -450,12 +450,12 @@
             <item>
              <widget class="QLabel" name="label_9">
               <property name="text">
-               <string>Y device</string>
+               <string>FAST axis device</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEditGalvoYDevice"/>
+             <widget class="QLineEdit" name="lineEditGalvoFASTDevice"/>
             </item>
            </layout>
           </item>

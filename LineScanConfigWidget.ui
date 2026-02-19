@@ -22,7 +22,7 @@
     </widget>
    </item>
    <item row="0" column="2">
-    <widget class="QLineEdit" name="leXextent">
+    <widget class="QLineEdit" name="leLINEextent">
      <property name="minimumSize">
       <size>
        <width>40</width>

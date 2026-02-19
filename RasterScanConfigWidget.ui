@@ -17,12 +17,12 @@
    <item row="0" column="0" colspan="2">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>X extent</string>
+      <string>fast extent</string>
      </property>
     </widget>
    </item>
    <item row="0" column="2">
-    <widget class="QLineEdit" name="leXextent">
+    <widget class="QLineEdit" name="leFASTextent">
      <property name="minimumSize">
       <size>
        <width>40</width>
@@ -43,12 +43,12 @@
    <item row="1" column="0" colspan="2">
     <widget class="QLabel" name="label_5">
      <property name="text">
-      <string>Y extent</string>
+      <string>slow extent</string>
      </property>
     </widget>
    </item>
    <item row="1" column="2">
-    <widget class="QLineEdit" name="leYextent">
+    <widget class="QLineEdit" name="leSLOWextent">
      <property name="minimumSize">
       <size>
        <width>40</width>

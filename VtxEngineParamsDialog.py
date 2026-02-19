@@ -33,18 +33,18 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
 
         # plain double validators
         v = QDoubleValidator(-10,10,3)
-        self.lineEditGalvoXmin.setValidator(v)
+        self.lineEditGalvoSLOWmin.setValidator(v)
         v = QDoubleValidator(-10,10,3)
-        self.lineEditGalvoXmax.setValidator(v)
+        self.lineEditGalvoSLOWmax.setValidator(v)
         v = QDoubleValidator(-10,10,3)
-        self.lineEditGalvoYmin.setValidator(v)
+        self.lineEditGalvoFASTmin.setValidator(v)
         v = QDoubleValidator(-10,10,3)
-        self.lineEditGalvoYmax.setValidator(v)
+        self.lineEditGalvoFASTmax.setValidator(v)
         
         v = QDoubleValidator(0,2,3)
-        self.lineEditXUnitsPerVolt.setValidator(v)
+        self.lineEditSLOWUnitsPerVolt.setValidator(v)
         v = QDoubleValidator(0,2,3)
-        self.lineEditYUnitsPerVolt.setValidator(v)
+        self.lineEditFASTUnitsPerVolt.setValidator(v)
 
         self.lineEditBlocksToAllocate.setValidator(v)
         v = QIntValidator(1, 1000)
@@ -103,12 +103,12 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.leTriggerDelay.setText(str(cfg.trigger_delay_samples))
 
         self.lineEditGalvoDelay.setText(str(cfg.galvo_delay))
-        self.lineEditGalvoXmin.setText(str(cfg.galvo_x_voltage_range.min))
-        self.lineEditGalvoXmax.setText(str(cfg.galvo_x_voltage_range.max))
-        self.lineEditGalvoYmin.setText(str(cfg.galvo_y_voltage_range.min))
-        self.lineEditGalvoYmax.setText(str(cfg.galvo_y_voltage_range.max))
-        self.lineEditXUnitsPerVolt.setText(str(cfg.galvo_x_units_per_volt))
-        self.lineEditYUnitsPerVolt.setText(str(cfg.galvo_y_units_per_volt))
+        self.lineEditGalvoSLOWmin.setText(str(cfg.galvo_slow_voltage_range.min))
+        self.lineEditGalvoSLOWmax.setText(str(cfg.galvo_slow_voltage_range.max))
+        self.lineEditGalvoFASTmin.setText(str(cfg.galvo_fast_voltage_range.min))
+        self.lineEditGalvoFASTmax.setText(str(cfg.galvo_fast_voltage_range.max))
+        self.lineEditSLOWUnitsPerVolt.setText(str(cfg.galvo_slow_units_per_volt))
+        self.lineEditFASTUnitsPerVolt.setText(str(cfg.galvo_fast_units_per_volt))
 
         self.lineEditTriggersPerSecond.setText(str(cfg.ssrc_triggers_per_second))
         self.lineEditClockRisingEdgesPerTrigger.setText(str(cfg.ssrc_clock_rising_edges_per_trigger))
@@ -134,8 +134,8 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
 
         # clock and device sources
         self.lineEditGalvoClockSource.setText(cfg.galvo_clock_source)
-        self.lineEditGalvoXDevice.setText(cfg.galvo_x_device_channel)
-        self.lineEditGalvoYDevice.setText(cfg.galvo_y_device_channel)
+        self.lineEditGalvoSLOWDevice.setText(cfg.galvo_slow_device_channel)
+        self.lineEditGalvoFASTDevice.setText(cfg.galvo_fast_device_channel)
         self.lineEditStrobeClockSource.setText(cfg.strobe_clock_source)
         self.lineEditStrobeDevice.setText(cfg.strobe_device_channel)
 
@@ -152,10 +152,10 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         s.trigger_delay_samples = int(self.leTriggerDelay.text())
 
         s.galvo_delay = float(self.lineEditGalvoDelay.text())
-        s.galvo_x_voltage_range = Range(float(self.lineEditGalvoXmin.text()), float(self.lineEditGalvoXmax.text()))
-        s.galvo_y_voltage_range = Range(float(self.lineEditGalvoYmin.text()), float(self.lineEditGalvoYmax.text()))
-        s.galvo_x_units_per_volt = float(self.lineEditXUnitsPerVolt.text())
-        s.galvo_y_units_per_volt = float(self.lineEditYUnitsPerVolt.text())
+        s.galvo_slow_voltage_range = Range(float(self.lineEditGalvoSLOWmin.text()), float(self.lineEditGalvoSLOWmax.text()))
+        s.galvo_fast_voltage_range = Range(float(self.lineEditGalvoFASTmin.text()), float(self.lineEditGalvoFASTmax.text()))
+        s.galvo_slow_units_per_volt = float(self.lineEditSLOWUnitsPerVolt.text())
+        s.galvo_fast_units_per_volt = float(self.lineEditFASTUnitsPerVolt.text())
 
         s.clock_samples_per_second = int(self.lineEditInternalClockRate.text())
         s.ssrc_triggers_per_second = int(self.lineEditTriggersPerSecond.text())
@@ -182,8 +182,8 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
 
         # clock source stuff added
         s.galvo_clock_source = self.lineEditGalvoClockSource.text()
-        s.galvo_x_device_channel = self.lineEditGalvoXDevice.text()
-        s.galvo_y_device_channel = self.lineEditGalvoYDevice.text()
+        s.galvo_slow_device_channel = self.lineEditGalvoSLOWDevice.text()
+        s.galvo_fast_device_channel = self.lineEditGalvoFASTDevice.text()
         s.strobe_clock_source = self.lineEditStrobeClockSource.text()
         s.strobe_device_channel = self.lineEditStrobeDevice.text()
         return s

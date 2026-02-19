@@ -145,6 +145,10 @@ class VtxBaseEngine():
             self._processor = CPUProcessor(get_logger('process', cfg.log_level))
             self._processor.initialize(self._processor_config)
 
+        else:
+            print(cfg.acquisition_type)
+            raise RuntimeError("Unknown acquisition type")
+
 
 
 
@@ -170,13 +174,13 @@ class VtxBaseEngine():
             ioc_out.name = 'output'
 
             # channel 0, will be
-            LOGGER.info("Galvo slow axis output on \"{0:s}\", {1:f} units/volt".format(cfg.galvo_x_device_channel, cfg.galvo_x_units_per_volt))
-            xAVO = daqmx.AnalogVoltageOutput(cfg.galvo_x_device_channel, cfg.galvo_x_units_per_volt, Block.StreamIndex.GalvoTarget, 0)
-            xAVO.limits = cfg.galvo_x_voltage_range
+            LOGGER.info("Galvo slow axis output on \"{0:s}\", {1:f} units/volt".format(cfg.galvo_slow_device_channel, cfg.galvo_slow_units_per_volt))
+            xAVO = daqmx.AnalogVoltageOutput(cfg.galvo_slow_device_channel, cfg.galvo_slow_units_per_volt, Block.StreamIndex.GalvoTarget, 0)
+            xAVO.limits = cfg.galvo_slow_voltage_range
             ioc_out.channels.append(xAVO)
-            LOGGER.info("Galvo fast axis output on \"{0:s}\", {1:f} units/volt".format(cfg.galvo_y_device_channel, cfg.galvo_y_units_per_volt))
-            yAVO = daqmx.AnalogVoltageOutput(cfg.galvo_y_device_channel, cfg.galvo_y_units_per_volt, Block.StreamIndex.GalvoTarget, 1)
-            yAVO.limits = cfg.galvo_y_voltage_range
+            LOGGER.info("Galvo fast axis output on \"{0:s}\", {1:f} units/volt".format(cfg.galvo_fast_device_channel, cfg.galvo_fast_units_per_volt))
+            yAVO = daqmx.AnalogVoltageOutput(cfg.galvo_fast_device_channel, cfg.galvo_fast_units_per_volt, Block.StreamIndex.GalvoTarget, 1)
+            yAVO.limits = cfg.galvo_fast_voltage_range
             ioc_out.channels.append(yAVO)
 
             io_out = DAQmxIO(get_logger(ioc_out.name, cfg.log_level))
