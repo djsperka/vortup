@@ -37,7 +37,7 @@ class VtxBaseEngine():
                 # ac.samples_per_record = board.info.smallest_aligned_samples_per_record(resampling.max())
 
             else:
-                ac.clock = alazar.ExternalClock(level_ratio=cfg.external_clock_level_pct, coupling=alazar.Coupling.AC, edge=alazar.ClockEdge.Rising, dual=False)
+                ac.clock = alazar.ExternalClock(level_ratio=cfg.external_clock_level_pct/100, coupling=alazar.Coupling.AC, edge=alazar.ClockEdge.Rising, dual=False)
 
             board = alazar.Board(ac.device.system_index, ac.device.board_index)
             ac.samples_per_record = board.info.smallest_aligned_samples_per_record(cfg.ssrc_clock_rising_edges_per_trigger)
