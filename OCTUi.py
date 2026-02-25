@@ -286,6 +286,10 @@ class OCTUi():
         # For an aiming scan, each "cross" consists of 2 b-scans
 
         helper = self._guihelpers[self._params.scn.current_index]
+
+        # call helper's volume method
+        helper.volume(arg0, arg1, arg2)
+        
         shape = helper.components.spectra_endpoint.tensor.shape
         #self._logger.info("volumeCallback({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
         if self._savingVolumesRequested:
