@@ -12,7 +12,7 @@ from qtpy.QtWidgets import QWidget
 
 
 from vortex import get_console_logger as get_logger
-import logging
+#import logging
 
 
 class ScanGUIHelperComponents:
@@ -83,7 +83,7 @@ class ScanGUIHelper(ABC):
         self.params = params
         self.settings = settings
         self.log_level = log_level
-        self._logger = logging.getLogger('GUIHelper({0:s})'.format(self.name))
+        self._logger = get_console_logger('GUIHelper({0:s})'.format(self.name))
         self._components = None
 
     def has_components(self) -> bool:
@@ -96,50 +96,6 @@ class ScanGUIHelper(ABC):
         else:
             return self._components
 
-    # @property 
-    # def format_planner(self) -> FormatPlanner:
-    #     '''
-    #     Returns format planner for this scan
-        
-    #     :param self: Should be a FormatPlaner, which can be used in EngineConfig.add_processor. Subclasses should set value.
-
-    #     '''
-    #     return self._format_planner
-
-    # @property
-    # def endpoints(self) -> List[Any]:
-    #     return [self._null_endpoint, self._storage_endpoint, self._spectra_endpoint, self.ascan_endpoint]
-
-    # @property
-    # def null_endpoint(self) -> NullEndpoint:
-    #     return self._null_endpoint
-
-    # @property 
-    # def storage(self):
-    #     return self._spectra_storage
-        
-    # @property
-    # def storage_endpoint(self) -> NullEndpoint:
-    #     return self._storage_endpoint
-    
-    # @property
-    # def ascan_endpoint(self):
-    #     return self._ascan_endpoint
-    
-    # @property
-    # def spectra_endpoint(self):
-    #     return self._spectra_endpoint
-
-
-    # @property
-    # def plot_widget(self):
-    #     '''
-    #     Widget displayed in the plotting widget - QStackedWidget. Subclasses should set this.
-        
-    #     :param self: Description
-    #     '''
-    #     return self._plot_widget
-
     @property
     def edit_widget(self):
         '''
@@ -149,18 +105,8 @@ class ScanGUIHelper(ABC):
         '''
         return self._edit_widget
 
-    # @abstractmethod
-    # def getPlotWidget(self, components: ScanGUIHelperComponents) -> QWidget:
-    #     '''
-    #     Docstring for getPlotWidget
-        
-    #     :param self: Description
-    #     :param components: Description
-    #     :type components: ScanGUIHelperComponents
-    #     :return: Description
-    #     :rtype: QWidget
-    #     '''
-    #     pass
+    def volume(self, arg0: int, arg1: int, arg2: int) -> None: 
+        pass
 
 
     @abstractmethod

@@ -17,6 +17,8 @@ from vortex.storage import SimpleStackUInt16
 from vortex.marker import Flags, Event
 from vortex import get_console_logger as get_logger
 
+from MultiPlotSelectWidget import MPSW
+
 
 class LineScanGUIHelper(ScanGUIHelper):
     '''
@@ -49,20 +51,28 @@ class LineScanGUIHelper(ScanGUIHelper):
             self._cross_widget_2.notify_segments(v)
         self._linescan_trace_widget.update_trace(v)
 
-    # def cb_spectra(self, v):
-    #         self._spectra_trace_widget.update_trace(v)
-
-    def cb_volume(self, sample_idx, scan_idx, volume_idx):
-        """volume callback that is (should be) called prior to other volume callbacks. 
-        Because of that arrangement, this callback will open storage. Same storage is closed 
-        in volumeCallback2
+    def volume(self, sample_idx, scan_idx, volume_idx):
+        """volume callback for managing plots
 
         Args:
             sample_idx (int): sample index
             scan_idx (int): scan index
             volume_idx (int): volume index
         """
-        pass
+        self._logger.info("LineScanGUIHelper::volume({0:d}, {1:d}, {2:d})".format(sample_idx, scan_idx, volume_idx))
+        # check shape of spectra volume
+        with self.components.spectra_endpoint.tensor as volume:
+            shape = volume.shape
+            #self._logger.info("spectra shape {0:d} x {1:d} x {2:d}, type: {3:s}".format(shape[0], shape[1], shape[2], str(type(volume))))
+            spectra_data = volume.copy()
+            #self._logger.info("spectra nbytes: {0:d}".format(spectra_data.nbytes))
+
+        with self.components.ascan_endpoint.tensor as volume:
+            shape = volume.shape
+            #self._logger.info("ascan shape {0:d} x {1:d} x {2:d}, type {3:s}".format(shape[0], shape[1], shape[2], str(type(volume))))
+            ascan_data = volume.mean(axis=0).transpose().copy().get()
+            #self._logger.info("ascan nbytes: {0:d}".format(ascan_data.nbytes))
+        self._mpsw.add_data(ascan_data=ascan_data, spectra_data=spectra_data)
 
 
 
@@ -75,9 +85,9 @@ class LineScanGUIHelper(ScanGUIHelper):
 
     def getSettings(self):
         settings = {}
-        settings['cross1.range'] = self._cross_widget_1._range
-        settings['cross2.range'] = self._cross_widget_2._range
-        settings['linescan.ylim'] = list(self._linescan_trace_widget._axes.get_ylim())
+        # settings['cross1.range'] = self._cross_widget_1._range
+        # settings['cross2.range'] = self._cross_widget_2._range
+        # settings['linescan.ylim'] = list(self._linescan_trace_widget._axes.get_ylim())
         return settings
     
     def getScan(self):
@@ -171,33 +181,34 @@ class LineScanGUIHelper(ScanGUIHelper):
         self._components = ScanGUIHelperComponents(format_planner=format_planner, null_endpoint=null_endpoint, storage_endpoint=storage_endpoint, spectra_endpoint=spectra_endpoint, storage=spectra_storage, ascan_endpoint=ascan_endpoint, plot_widget=self.getPlotWidget(ascan_endpoint))
     
     def getPlotWidget(self, ascan_endpoint) -> QWidget:
-        self._cross_widget_1 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="one way")
-        self._cross_widget_2 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="other way")
-        self._linescan_trace_widget = LineScanTraceWidget(ascan_endpoint, title="Galvo tuning")
+        self._mpsw = MPSW()
+        # self._cross_widget_1 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="one way")
+        # self._cross_widget_2 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="other way")
+        # self._linescan_trace_widget = LineScanTraceWidget(ascan_endpoint, title="Galvo tuning")
 
-        # apply settings
-        if 'cross1.range' in self.settings:
-            self._cross_widget_1._range = self.settings['cross1.range']
+        # # apply settings
+        # if 'cross1.range' in self.settings:
+        #     self._cross_widget_1._range = self.settings['cross1.range']
 
-        if 'cross2.range' in self.settings:
-            self._cross_widget_2._range = self.settings['cross2.range']
+        # if 'cross2.range' in self.settings:
+        #     self._cross_widget_2._range = self.settings['cross2.range']
 
-        if 'linescan.ylim' in self.settings:
-            self._linescan_trace_widget.set_ylim(self.settings['linescan.ylim'])
+        # if 'linescan.ylim' in self.settings:
+        #     self._linescan_trace_widget.set_ylim(self.settings['linescan.ylim'])
 
-        # callbacks
-        ascan_endpoint.aggregate_segment_callback = self.cb_ascan
+        # # callbacks
+        # ascan_endpoint.aggregate_segment_callback = self.cb_ascan
 
-        # 
-        hbox = QHBoxLayout()
-        vbox_left = QVBoxLayout()
-        vbox_left.addWidget(self._cross_widget_1)
-        vbox_left.addWidget(self._cross_widget_2)
-        vbox_right = QVBoxLayout()
-        vbox_right.addWidget(self._linescan_trace_widget)
-        hbox.addLayout(vbox_left)
-        hbox.addLayout(vbox_right)
-        w = QWidget()
-        w.setLayout(hbox)
-        return w
+        # # 
+        # hbox = QHBoxLayout()
+        # vbox_left = QVBoxLayout()
+        # vbox_left.addWidget(self._cross_widget_1)
+        # vbox_left.addWidget(self._cross_widget_2)
+        # vbox_right = QVBoxLayout()
+        # vbox_right.addWidget(self._linescan_trace_widget)
+        # hbox.addLayout(vbox_left)
+        # hbox.addLayout(vbox_right)
+        # w = QWidget()
+        # w.setLayout(hbox)
+        return self._mpsw
 
