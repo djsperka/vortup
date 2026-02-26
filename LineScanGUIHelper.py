@@ -8,6 +8,8 @@ from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
 from vortex_tools.ui.display import CrossSectionImageWidget
 from LineScanTraceWidget import LineScanTraceWidget
 import matplotlib as mpl
+import numpy as np
+
 
 from vortex import Range
 from vortex.scan import RasterScanConfig, FreeformScan, FreeformScanConfig
@@ -63,15 +65,19 @@ class LineScanGUIHelper(ScanGUIHelper):
         # check shape of spectra volume
         with self.components.spectra_endpoint.tensor as volume:
             shape = volume.shape
-            #self._logger.info("spectra shape {0:d} x {1:d} x {2:d}, type: {3:s}".format(shape[0], shape[1], shape[2], str(type(volume))))
-            spectra_data = volume.copy()
+            if isinstance(volume, np.ndarray):
+                spectra_data = volume.copy()
+            else:
+                spectra_data = volume.copy().get()
             #self._logger.info("spectra nbytes: {0:d}".format(spectra_data.nbytes))
 
         with self.components.ascan_endpoint.tensor as volume:
             shape = volume.shape
-            #self._logger.info("ascan shape {0:d} x {1:d} x {2:d}, type {3:s}".format(shape[0], shape[1], shape[2], str(type(volume))))
-            ascan_data = volume.mean(axis=0).transpose().copy().get()
-            #self._logger.info("ascan nbytes: {0:d}".format(ascan_data.nbytes))
+            self._logger.info("ascan shape {0:d} x {1:d} x {2:d}, type {3:s}".format(shape[0], shape[1], shape[2], str(type(volume))))
+            if isinstance(volume, np.ndarray):
+                ascan_data = volume.mean(axis=0).transpose().copy()
+            else:
+                ascan_data = volume.mean(axis=0).transpose().copy().get()
         self._mpsw.add_data(ascan_data=ascan_data, spectra_data=spectra_data)
 
 
