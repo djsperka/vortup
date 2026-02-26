@@ -46,7 +46,25 @@ INFO:OCTUiParams:Done.
 
 ![OCTUiMainWindowDialog](doc/maindialog-annotated.png) 
 
-On startup, the application reads its configuration file and opens the main dialog. Parameters for each of the scan types are specified here. OCT engine parameters are specified by clicking the __Engine Configuration__  button. The __Start__ and __Stop__ buttons start and stop scanning.
+On startup, the application reads its configuration file and opens the main dialog. Parameters for each of the scan types are specified here (1). OCT engine parameters are specified by clicking the __Engine Configuration__  button(2). The __Start__ and __Stop__ buttons start and stop scanning(3). Live
+plots for the current scan are created when the engine is started. 
+
+### Scan Configuration
+
+Scan parameters can be configured here, but only when the engine is stopped. Switch between scan types with the *Scan Type* drop-down. When the engine is running, the scanner will automatically switch to the selected type.
+
+#### Raster
+
+- **X extent**
+: 
+
+#### Aiming
+
+#### Galvonometer I/O Correction Tuning
+
+#### Line Scan, with/without flash
+
+This code is under construction. 
 
 ### Engine Configuration
 
@@ -91,7 +109,8 @@ Dispersion parameters used to correct for wavelength-dependent phase distortion.
 
 #### Memory/processing
 
-These parameters can be used to optimize resource usage (GPU and system memory). Ascans are collected and processed in *blocks*. Blocks are filled with newly-acquired data, passed to the GPU for OCT processing (if any), then formatted and passed to endpoints for plotting (and maybe saving to disk). The size of a block will affect the time it takes for CUDA processing. Ideally, a rate of 50-200 blocks per second should be processed. The size of a block (in ascans) can be raised or lowered to optimize the rate. 
+These parameters can be used to optimize resource usage (GPU and system memory). Ascans are collected and processed in *blocks*. Blocks are filled with newly-acquired data, passed to the GPU for OCT processing (if any), then formatted and passed to endpoints for plotting (and maybe saving to disk). The size of a block and the type of processing will affect the time it takes for OCT processing on a block. Ideally, a rate of 50-200 blocks per second should be processed. The size of a block (in ascans) can be raised or lowered to optimize the rate. Rate can be checked with profiler - save profiler data, [then run the profiler with the `--statistics` flag](https://www.vortex-oct.dev/rel/v0.5.1/doc/develop/profiler/#statistics).
+
 
 - **Ascan/block**
 : number of ascans per block
@@ -143,7 +162,7 @@ The strobes are digital signals that the engine can generate for synchronization
 
 ## Known issues and limitations
 
-None are known at this time.
+None are in the list at this time; 
 
 
 ## Getting help
