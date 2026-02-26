@@ -9,10 +9,7 @@ from vortex.engine import StackDeviceTensorEndpointInt8, StackHostTensorEndpoint
 from vortex.format import FormatPlanner, StackFormatExecutor
 from vortex.storage import SimpleStackUInt16
 from qtpy.QtWidgets import QWidget
-
-
-from vortex import get_console_logger as get_logger
-#import logging
+from vortex import get_console_logger
 
 
 class ScanGUIHelperComponents:
