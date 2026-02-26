@@ -509,6 +509,13 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
+           <widget class="QCheckBox" name="cbSaveProfilerData">
+            <property name="text">
+             <string>Save profiler data</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <layout class="QHBoxLayout" name="horizontalLayout_28">
             <item>
              <widget class="QLabel" name="label_28">
@@ -523,9 +530,9 @@
            </layout>
           </item>
           <item>
-           <widget class="QCheckBox" name="cbSaveProfilerData">
+           <widget class="QCheckBox" name="cbFileAcquisition">
             <property name="text">
-             <string>Save profiler data</string>
+             <string>Use file acquisition</string>
             </property>
            </widget>
           </item>

@@ -71,30 +71,6 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self._cfg = self.getEngineParameters()        
         self.accept()
 
-    # def getAcqParams(self) -> AcqParams: 
-    #     cfg = AcqParams()
-    #     cfg.ascans_per_block = int(self.leAperBlock.text())
-    #     cfg.samples_per_ascan = int(self.leSperA.text())
-    #     cfg.blocks_to_acquire = int(self.leNBlocks.text())
-    #     cfg.trigger_delay_samples = int(self.leTriggerDelay.text())
-    #     return cfg
-    
-    # def setAcqParams(self, cfg: AcqParams):
-    #     self.leAperBlock.setText(str(cfg.ascans_per_block))
-    #     self.leSperA.setText(str(cfg.samples_per_ascan))
-    #     self.leNBlocks.setText(str(cfg.blocks_to_acquire))
-    #     self.leTriggerDelay.setText(str(cfg.trigger_delay_samples))
-
-
-    # def getDispersion(self) -> Tuple[float, float]:
-    #     return (float(self.dsbDispersion0.value) * self.c2multiplier, float(self.dsbDispersion1.value) * self.c3multiplier)
-    
-    # def setDispersion(self, d: Tuple[float, float]):
-    #     self.dsbDispersion0.setValue(d[0]/self.c2multiplier)
-    #     self.dsbDispersion1.setValue(d[1]/self.c3multiplier)
-
-
-
     def initializeDialog(self, cfg: VtxEngineParams):
         self._cfg = cfg
 
@@ -128,6 +104,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.lineEditProcessSlots.setText(str(cfg.process_slots))
         self.lineEditLogLevel.setText(str(cfg.log_level))
         self.cbSaveProfilerData.setChecked(cfg.save_profiler_data)
+        self.cbFileAcquisition.setChecked(cfg.acquisition_type == AcquisitionType.FILE_ACQUISITION)
 
         # enum-using combo boxes....
         self.comboBoxInputRange.initialize(ATS9350InputRange, cfg.input_channel_range_millivolts)
@@ -175,6 +152,10 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         #s.dispersion = (float(self.lineEditDispersion0.text()), float(self.lineEditDispersion1.text()))
         s.log_level = int(self.lineEditLogLevel.text())
         s.save_profiler_data = self.cbSaveProfilerData.isChecked()
+        if self.cbFileAcquisition.isChecked():
+            s.acquisition_type = AcquisitionType.FILE_ACQUISITION
+        else:
+            s.acquisition_type = AcquisitionType.ALAZAR_ACQUISITION
 
         # enable/disable
         s.galvo_enabled = self.groupBoxGalvo.isChecked()

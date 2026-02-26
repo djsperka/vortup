@@ -360,6 +360,9 @@ class Ui_VtxEngineParamsDialog(object):
         self.groupBox_2.setObjectName("groupBox_2")
         self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.groupBox_2)
         self.verticalLayout_5.setObjectName("verticalLayout_5")
+        self.cbSaveProfilerData = QtWidgets.QCheckBox(self.groupBox_2)
+        self.cbSaveProfilerData.setObjectName("cbSaveProfilerData")
+        self.verticalLayout_5.addWidget(self.cbSaveProfilerData)
         self.horizontalLayout_28 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_28.setObjectName("horizontalLayout_28")
         self.label_28 = QtWidgets.QLabel(self.groupBox_2)
@@ -369,9 +372,9 @@ class Ui_VtxEngineParamsDialog(object):
         self.lineEditLogLevel.setObjectName("lineEditLogLevel")
         self.horizontalLayout_28.addWidget(self.lineEditLogLevel)
         self.verticalLayout_5.addLayout(self.horizontalLayout_28)
-        self.cbSaveProfilerData = QtWidgets.QCheckBox(self.groupBox_2)
-        self.cbSaveProfilerData.setObjectName("cbSaveProfilerData")
-        self.verticalLayout_5.addWidget(self.cbSaveProfilerData)
+        self.cbFileAcquisition = QtWidgets.QCheckBox(self.groupBox_2)
+        self.cbFileAcquisition.setObjectName("cbFileAcquisition")
+        self.verticalLayout_5.addWidget(self.cbFileAcquisition)
         self.verticalLayout_8.addWidget(self.groupBox_2)
         self.horizontalLayout_29.addLayout(self.verticalLayout_8)
         self.horizontalLayout_29.setStretch(0, 1)
@@ -432,8 +435,9 @@ class Ui_VtxEngineParamsDialog(object):
         self.label_19.setText(_translate("VtxEngineParamsDialog", "clock source"))
         self.label_20.setText(_translate("VtxEngineParamsDialog", "out device"))
         self.groupBox_2.setTitle(_translate("VtxEngineParamsDialog", "Other"))
-        self.label_28.setText(_translate("VtxEngineParamsDialog", "log level"))
         self.cbSaveProfilerData.setText(_translate("VtxEngineParamsDialog", "Save profiler data"))
+        self.label_28.setText(_translate("VtxEngineParamsDialog", "log level"))
+        self.cbFileAcquisition.setText(_translate("VtxEngineParamsDialog", "Use file acquisition"))
 from DispersionWidget import DispersionWidget
 from EnumComboBox import EnumComboBox
 
