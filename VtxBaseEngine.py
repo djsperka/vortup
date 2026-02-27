@@ -92,7 +92,14 @@ class VtxBaseEngine():
             #spectrum = 2**15 + 2**14 * np.sin(2*np.pi * (8) * np.linspace(0, 1, cfg.samples_per_ascan))
             #spectrum = 2**14 + 2**13 * 0.5*(np.sin(2*np.pi * (8) * np.linspace(0, 1, cfg.samples_per_ascan)) + np.sin(2*np.pi * (3) * np.linspace(0, 1, cfg.samples_per_ascan)))
             rng = np.random.default_rng()
-            spectrum = rng.integers(0, 2**14, cfg.samples_per_ascan)
+            noise = rng.integers(0, 2**13, cfg.samples_per_ascan)
+
+            #spectrum = 2**15 + 2**14 * np.sin(2*np.pi * (8) * np.linspace(0, 1, cfg.samples_per_ascan))
+            s1 = np.sin(2*np.pi * (8) * np.linspace(0, 1, cfg.samples_per_ascan))
+            s2 = np.sin(2*np.pi * (19) * np.linspace(0, 1, cfg.samples_per_ascan))
+            s3 = np.sin(2*np.pi * (100) * np.linspace(0, 1, cfg.samples_per_ascan))
+            s4 = np.sin(2*np.pi * (1871) * np.linspace(0, 1, cfg.samples_per_ascan))
+            spectrum = 2**10 + 2**9 * (0.25 * (s1+s2+s3+s4))
             spectra = np.repeat(spectrum[None, ...], cfg.ascans_per_block, axis=0)
 
             import os
