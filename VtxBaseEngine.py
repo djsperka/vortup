@@ -87,33 +87,34 @@ class VtxBaseEngine():
 
         elif cfg.acquisition_type == AcquisitionType.FILE_ACQUISITION:
 
-            # create a temporary file with a pure sinusoid for tutorial purposes only
-            #spectrum = 2**15 + 2**14 * np.sin(2*np.pi * (cfg.samples_per_ascan / 4) * np.linspace(0, 1, cfg.samples_per_ascan))
-            #spectrum = 2**15 + 2**14 * np.sin(2*np.pi * (8) * np.linspace(0, 1, cfg.samples_per_ascan))
-            #spectrum = 2**14 + 2**13 * 0.5*(np.sin(2*np.pi * (8) * np.linspace(0, 1, cfg.samples_per_ascan)) + np.sin(2*np.pi * (3) * np.linspace(0, 1, cfg.samples_per_ascan)))
-            rng = np.random.default_rng()
-            noise = rng.integers(0, 2**13, cfg.samples_per_ascan)
+            # Create a single block (as defined in acq settings) of ascans. 
+            # 
+            # rng = np.random.default_rng()
+            # noise = rng.integers(0, 2**13, cfg.samples_per_ascan)
 
-            #spectrum = 2**15 + 2**14 * np.sin(2*np.pi * (8) * np.linspace(0, 1, cfg.samples_per_ascan))
-            s1 = np.sin(2*np.pi * (8) * np.linspace(0, 1, cfg.samples_per_ascan))
-            s2 = np.sin(2*np.pi * (19) * np.linspace(0, 1, cfg.samples_per_ascan))
-            s3 = np.sin(2*np.pi * (100) * np.linspace(0, 1, cfg.samples_per_ascan))
-            s4 = np.sin(2*np.pi * (1871) * np.linspace(0, 1, cfg.samples_per_ascan))
-            spectrum = 2**10 + 2**9 * (0.25 * (s1+s2+s3+s4))
-            spectra = np.repeat(spectrum[None, ...], cfg.ascans_per_block, axis=0)
+            # #spectrum = 2**15 + 2**14 * np.sin(2*np.pi * (8) * np.linspace(0, 1, cfg.samples_per_ascan))
+            # s1 = np.sin(2*np.pi * (8) * np.linspace(0, 1, cfg.samples_per_ascan))
+            # s2 = np.sin(2*np.pi * (19) * np.linspace(0, 1, cfg.samples_per_ascan))
+            # s3 = np.sin(2*np.pi * (100) * np.linspace(0, 1, cfg.samples_per_ascan))
+            # s4 = np.sin(2*np.pi * (1871) * np.linspace(0, 1, cfg.samples_per_ascan))
+            # spectrum = 2**9 * (s1+s2+s3+s4)
+            # spectra = np.repeat(spectrum[None, ...], cfg.ascans_per_block, axis=0)
 
-            import os
-            from tempfile import mkstemp
-            (fd, test_file_path) = mkstemp()
-            # NOTE: the Python bindings are restricted to the uint16 data type
-            open(test_file_path, 'wb').write(spectra.astype(np.uint16).tobytes())
-            os.close(fd)
-            print(test_file_path)
+            # import os
+            # from tempfile import mkstemp
+            # (fd, test_file_path) = mkstemp()
+            # # NOTE: the Python bindings are restricted to the uint16 data type
+            # open(test_file_path, 'wb').write(spectra.astype(np.uint16).tobytes())
+            # os.close(fd)
+
+
+            # test_file_path='/home/dan/work/oct/data/Volumes-2025-09-12/2025-09-12-102925.npy'
+            # print(test_file_path)
 
 
             # produce blocks ready from a file
             ac = FileAcquisitionConfig()
-            ac.path = test_file_path
+            ac.path = cfg.input_file
             ac.samples_per_record = cfg.samples_per_ascan
             ac.records_per_block = cfg.ascans_per_block
             ac.loop = True # repeat the file indefinitely

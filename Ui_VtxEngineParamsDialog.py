@@ -372,9 +372,24 @@ class Ui_VtxEngineParamsDialog(object):
         self.lineEditLogLevel.setObjectName("lineEditLogLevel")
         self.horizontalLayout_28.addWidget(self.lineEditLogLevel)
         self.verticalLayout_5.addLayout(self.horizontalLayout_28)
+        self.horizontalLayout_31 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_31.setObjectName("horizontalLayout_31")
         self.cbFileAcquisition = QtWidgets.QCheckBox(self.groupBox_2)
         self.cbFileAcquisition.setObjectName("cbFileAcquisition")
-        self.verticalLayout_5.addWidget(self.cbFileAcquisition)
+        self.horizontalLayout_31.addWidget(self.cbFileAcquisition)
+        self.pbSelectFile = QtWidgets.QPushButton(self.groupBox_2)
+        self.pbSelectFile.setObjectName("pbSelectFile")
+        self.horizontalLayout_31.addWidget(self.pbSelectFile)
+        self.verticalLayout_5.addLayout(self.horizontalLayout_31)
+        self.horizontalLayout_32 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_32.setObjectName("horizontalLayout_32")
+        self.label_14 = QtWidgets.QLabel(self.groupBox_2)
+        self.label_14.setObjectName("label_14")
+        self.horizontalLayout_32.addWidget(self.label_14)
+        self.labelFileName = QtWidgets.QLabel(self.groupBox_2)
+        self.labelFileName.setObjectName("labelFileName")
+        self.horizontalLayout_32.addWidget(self.labelFileName)
+        self.verticalLayout_5.addLayout(self.horizontalLayout_32)
         self.verticalLayout_8.addWidget(self.groupBox_2)
         self.horizontalLayout_29.addLayout(self.verticalLayout_8)
         self.horizontalLayout_29.setStretch(0, 1)
@@ -395,6 +410,7 @@ class Ui_VtxEngineParamsDialog(object):
         self.checkBoxInternalClock.toggled['bool'].connect(self.lineEditInternalClockRate.setEnabled) # type: ignore
         self.checkBoxInternalClock.toggled['bool'].connect(self.leSperA.setEnabled) # type: ignore
         self.checkBoxInternalClock.toggled['bool'].connect(self.lineEditExternalClockLevelPct.setDisabled) # type: ignore
+        self.cbFileAcquisition.toggled['bool'].connect(self.pbSelectFile.setEnabled) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(VtxEngineParamsDialog)
 
     def retranslateUi(self, VtxEngineParamsDialog):
@@ -438,6 +454,9 @@ class Ui_VtxEngineParamsDialog(object):
         self.cbSaveProfilerData.setText(_translate("VtxEngineParamsDialog", "Save profiler data"))
         self.label_28.setText(_translate("VtxEngineParamsDialog", "log level"))
         self.cbFileAcquisition.setText(_translate("VtxEngineParamsDialog", "Use file acquisition"))
+        self.pbSelectFile.setText(_translate("VtxEngineParamsDialog", "Select"))
+        self.label_14.setText(_translate("VtxEngineParamsDialog", "File:"))
+        self.labelFileName.setText(_translate("VtxEngineParamsDialog", "TextLabel"))
 from DispersionWidget import DispersionWidget
 from EnumComboBox import EnumComboBox
 

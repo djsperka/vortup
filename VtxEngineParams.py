@@ -64,6 +64,9 @@ class VtxEngineParams:
     # logging
     log_level: int = 1
 
+    # only when FILE_ACQUISITION is used
+    input_file: str=""
+
     # other
     save_profiler_data: bool = False
 
@@ -118,6 +121,9 @@ DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
 
     # logging
     log_level=1,                        # 1 is normal, 0 is debug-level
+
+    # only when FILE_ACQUISITION is used
+    input_file='',
 
     # other
     save_profiler_data=False

@@ -530,11 +530,40 @@
            </layout>
           </item>
           <item>
-           <widget class="QCheckBox" name="cbFileAcquisition">
-            <property name="text">
-             <string>Use file acquisition</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_31">
+            <item>
+             <widget class="QCheckBox" name="cbFileAcquisition">
+              <property name="text">
+               <string>Use file acquisition</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pbSelectFile">
+              <property name="text">
+               <string>Select</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_32">
+            <item>
+             <widget class="QLabel" name="label_14">
+              <property name="text">
+               <string>File:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="labelFileName">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
@@ -632,6 +661,22 @@
     <hint type="destinationlabel">
      <x>191</x>
      <y>337</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbFileAcquisition</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>pbSelectFile</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>335</x>
+     <y>628</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>453</x>
+     <y>628</y>
     </hint>
    </hints>
   </connection>

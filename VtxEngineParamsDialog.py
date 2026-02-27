@@ -1,11 +1,9 @@
 import sys
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
-from PyQt5.QtWidgets import QDialog, QApplication
-from DispersionWidget import DispersionWidget
+from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog
 from DAQConst import ATS9350InputRange
 from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, AcquisitionType
 from Ui_VtxEngineParamsDialog import Ui_VtxEngineParamsDialog
-from vortex.engine import source, Source
 from vortex import Range
 
 class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
@@ -63,9 +61,22 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
 
         self.initializeDialog(cfg)        # takes whatever is in cfg and inits dlg
 
+        # slot for pb to select file
+        self.pbSelectFile.clicked.connect(self._selectFileClicked)
+
         # slots for accept and cancel
         self.buttonBoxMain.accepted.connect(self._accepted)
         self.buttonBoxMain.rejected.connect(self.reject)
+
+    def _selectFileClicked(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fname, _ = QFileDialog.getOpenFileName(self,"Select input file", "","numpy files (*.npy)", options=options)
+        if fname:
+            print(fname)
+            self.labelFileName.setText(fname)
+        else:
+            print("None selected")
 
     def _accepted(self) -> None:
         self._cfg = self.getEngineParameters()        
@@ -105,6 +116,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.lineEditLogLevel.setText(str(cfg.log_level))
         self.cbSaveProfilerData.setChecked(cfg.save_profiler_data)
         self.cbFileAcquisition.setChecked(cfg.acquisition_type == AcquisitionType.FILE_ACQUISITION)
+        self.labelFileName.setText(cfg.input_file)
 
         # enum-using combo boxes....
         self.comboBoxInputRange.initialize(ATS9350InputRange, cfg.input_channel_range_millivolts)
@@ -156,6 +168,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
             s.acquisition_type = AcquisitionType.FILE_ACQUISITION
         else:
             s.acquisition_type = AcquisitionType.ALAZAR_ACQUISITION
+        s.input_file = self.labelFileName.text()
 
         # enable/disable
         s.galvo_enabled = self.groupBoxGalvo.isChecked()
