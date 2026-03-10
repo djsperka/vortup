@@ -24,7 +24,8 @@ class TestPlotWidget(BackendImageWidget):
             elif e.type()==QEvent.Type.MouseButtonDblClick:
                 print("QEvent.Type.MouseButtonDblClick")
             elif e.type()==QEvent.Type.MouseMove:
-                print("QEvent.Type.MouseMove local {0:f},{1:f} global {2:f},{3:f}".format(e.x(), e.y(), e.globalX(), e.globalY()))
+                window_mouse = self._map_window_to_data(e.localPos())
+                print("QEvent.Type.MouseMove local {0:f},{1:f} data {2:f},{3:f}".format(e.x(), e.y(), window_mouse[0], window_mouse[1]))
             else:
                 print("unknown event type")
         #super().mouseMoveEvent(e)
