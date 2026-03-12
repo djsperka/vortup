@@ -12,6 +12,46 @@ class TestPlotWidget(BackendImageWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._state = 0 # 0 unpressed, 1 pressed
+        self._ty = -1
+
+    def paintEvent(self, e: QPaintEvent) -> None:
+
+        # background
+        super().paintEvent(e)
+
+        #draw line
+        if self._state == 1 and self._ty > -1:
+            painter = QPainter()
+            painter.begin(self)
+            painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Exclusion)
+            pen = QPen(QColor(255, 0, 0))
+            painter.setPen(pen)
+            print("paintEvent", self._ty)
+            painter.drawLine(QPointF(0, self._ty), QPointF(self.width(), self._ty))
+            painter.end()
+
+
+        # # foreground
+        # if self.pixmap:
+        #     self._draw_image(painter)
+
+        # if self._centerlines:
+        #     self._draw_inverted_lines(painter, QPointF(self.width() / 2, self.height() / 2), Qt.PenStyle.DashLine)
+
+        # if self._crosshairs and self.rect().contains(mouse) and self.pixmap:
+        #     self._draw_inverted_lines(painter, QPointF(mouse))
+
+        # self._draw_extra_lines(painter)
+
+        # if self.pixmap and self._probe:
+        #     self._draw_probe(painter, QPointF(mouse))
+
+        # if self._debug or self._statistics:
+        #     self._draw_stats(painter)
+
+    
+
+
 
     def mouseMoveEvent(self, e: QMouseEvent) -> None:
         if self._state == 0:
@@ -25,7 +65,9 @@ class TestPlotWidget(BackendImageWidget):
                 print("QEvent.Type.MouseButtonDblClick")
             elif e.type()==QEvent.Type.MouseMove:
                 window_mouse = self._map_window_to_data(e.localPos())
-                print("QEvent.Type.MouseMove local {0:f},{1:f} data {2:f},{3:f}".format(e.x(), e.y(), window_mouse[0], window_mouse[1]))
+                #print("QEvent.Type.MouseMove local {0:f},{1:f} data {2:f},{3:f}".format(e.x(), e.y(), window_mouse[0], window_mouse[1]))
+                self._ty = e.y()
+                self.update()
             else:
                 print("unknown event type")
         #super().mouseMoveEvent(e)
@@ -41,6 +83,8 @@ class TestPlotWidget(BackendImageWidget):
                 print("mousePressEvent = left")
             if e.buttons() & qt.MouseButton.RightButton:
                 print("mousePressEvent = right")
+        elif self._state == 1:
+            self._state = 0
         e.accept()
 
         #super().mousePressEvent(e)
