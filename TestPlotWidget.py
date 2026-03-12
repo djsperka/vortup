@@ -1,103 +1,154 @@
 from vortex_tools.ui.display import BackendImageWidget
 from qtpy.QtWidgets import QMainWindow, QApplication
 from qtpy.QtGui import QCursor, QMouseEvent, QEnterEvent, QWheelEvent, QKeyEvent, QPainter, QTransform, QImage, QPixmap, QPaintEvent, QPen, QColor
-from qtpy.QtCore import QEvent, Qt as qt, QPoint, QPointF
+from qtpy.QtCore import QEvent, Qt as qt, QPoint, QPointF, Signal
 import sys
 import skimage as ski
 from typing import Iterable, List, Set, Optional
 from math import floor, ceil
 
 
+from enum import Enum
+
+class PlotCmdStates(Enum):
+    NOTHING = 1
+    PLACING_FIRST_SLICE = 2
+    PLACING_SECOND_SLICE = 3
+
+
 class TestPlotWidget(BackendImageWidget):
+
+    __new_slice_signal = Signal(float, float, name='new_slice')
+
+
     def __init__(self, *args, **kwargs):
+
+        # clobber args 
+        kwargs['probe'] = True
+        kwargs['crosshairs'] = False
+        kwargs['centerlines'] = False
+        kwargs['statistics'] = False
+
+        # now init superclass
         super().__init__(*args, **kwargs)
-        self._state = 0 # 0 unpressed, 1 pressed
-        self._ty = -1
+
+        self._cmdstate = PlotCmdStates.NOTHING
+        self._slice_y = []
+        self._has_slice = False
+        self._maybe_slice_first_y = 0
+        self._placing_slice_color = QColor(255, 0, 0)
+        self._placed_slice_color = QColor(0, 255, 0)
+
+        print("responsive? {0:s}", self._mouse_responsive)
+        self.setMouseTracking(True)
+        self.update(safe=True)
+        print("responsive? {0:s}", self._mouse_responsive)
+
+
+    def keyPressEvent(self, e: QKeyEvent) -> None:
+        needsUpdate = False
+        if e.key() == qt.Key.Key_S:
+            if self._cmdstate == PlotCmdStates.NOTHING:
+                self._cmdstate = PlotCmdStates.PLACING_FIRST_SLICE
+                print("keyPress - cmd started")
+            bUpdate = True
+
+        if needsUpdate: self.update(True)
 
     def paintEvent(self, e: QPaintEvent) -> None:
 
-        # background
+        mouse: QPoint = QPoint(self.mapFromGlobal(QCursor.pos()))
+
+        # draw image
         super().paintEvent(e)
 
-        #draw line
-        if self._state == 1 and self._ty > -1:
-            painter = QPainter()
-            painter.begin(self)
-            painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Exclusion)
-            pen = QPen(QColor(255, 0, 0))
-            painter.setPen(pen)
-            print("paintEvent", self._ty)
-            painter.drawLine(QPointF(0, self._ty), QPointF(self.width(), self._ty))
-            painter.end()
+        painter = QPainter()
+        painter.begin(self)
+
+        # slice lines? 
+        if self._has_slice:
+            # draw existing slice
+            painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Source)
+            painter.setPen(QPen(self._placed_slice_color))
+            painter.drawLine(QPointF(0, self._slice_y[0]), QPointF(self.width(), self._slice_y[0]))
+            painter.drawLine(QPointF(0, self._slice_y[1]), QPointF(self.width(), self._slice_y[1]))
+
+        if self._cmdstate == PlotCmdStates.PLACING_FIRST_SLICE:
+            painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Source)
+            painter.setPen(QPen(self._placing_slice_color))
+            painter.drawLine(QPointF(0, mouse.y()), QPointF(self.width(), mouse.y()))
+        elif self._cmdstate == PlotCmdStates.PLACING_SECOND_SLICE:
+            painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Source)
+            painter.setPen(QPen(self._placing_slice_color))
+            painter.drawLine(QPointF(0, mouse.y()), QPointF(self.width(), mouse.y()))
+            painter.drawLine(QPointF(0, self._maybe_slice_first_y), QPointF(self.width(), self._maybe_slice_first_y))
+
+        painter.end()
 
 
-        # # foreground
-        # if self.pixmap:
-        #     self._draw_image(painter)
+    def enterEvent(self, e: QEnterEvent) -> None:
+        if self._cmdstate is not PlotCmdStates.NOTHING:
+            self.update(safe=True)
 
-        # if self._centerlines:
-        #     self._draw_inverted_lines(painter, QPointF(self.width() / 2, self.height() / 2), Qt.PenStyle.DashLine)
+        super().enterEvent(e)
 
-        # if self._crosshairs and self.rect().contains(mouse) and self.pixmap:
-        #     self._draw_inverted_lines(painter, QPointF(mouse))
+    def leaveEvent(self, e: QEvent) -> None:
+        if self._cmdstate is not PlotCmdStates.NOTHING:
+            self.update(safe=True)
 
-        # self._draw_extra_lines(painter)
-
-        # if self.pixmap and self._probe:
-        #     self._draw_probe(painter, QPointF(mouse))
-
-        # if self._debug or self._statistics:
-        #     self._draw_stats(painter)
-
-    
-
-
+        super().leaveEvent(e)
 
     def mouseMoveEvent(self, e: QMouseEvent) -> None:
-        if self._state == 0:
-            pass
-        else:
-            if e.type()==QEvent.Type.MouseButtonPress:
-                print("QEvent.Type.MouseButtonPress")
-            elif e.type()==QEvent.Type.MouseButtonRelease:
-                print("QEvent.Type.MouseButtonRelease")
-            elif e.type()==QEvent.Type.MouseButtonDblClick:
-                print("QEvent.Type.MouseButtonDblClick")
-            elif e.type()==QEvent.Type.MouseMove:
-                window_mouse = self._map_window_to_data(e.localPos())
-                #print("QEvent.Type.MouseMove local {0:f},{1:f} data {2:f},{3:f}".format(e.x(), e.y(), window_mouse[0], window_mouse[1]))
-                self._ty = e.y()
-                self.update()
-            else:
-                print("unknown event type")
-        #super().mouseMoveEvent(e)
+        self.update(safe=True)
+        # if self._state == 0:
+        #     pass
+        # else:
+        #     if e.type()==QEvent.Type.MouseButtonPress:
+        #         print("QEvent.Type.MouseButtonPress")
+        #     elif e.type()==QEvent.Type.MouseButtonRelease:
+        #         print("QEvent.Type.MouseButtonRelease")
+        #     elif e.type()==QEvent.Type.MouseButtonDblClick:
+        #         print("QEvent.Type.MouseButtonDblClick")
+        #     elif e.type()==QEvent.Type.MouseMove:
+        #         window_mouse = self._map_window_to_data(e.localPos())
+        #         #print("QEvent.Type.MouseMove local {0:f},{1:f} data {2:f},{3:f}".format(e.x(), e.y(), window_mouse[0], window_mouse[1]))
+        #         self._ty = e.y()
+        #         self.update()
+        #     else:
+        #         print("unknown event type")
+        # #super().mouseMoveEvent(e)
         e.accept()
 
     def mousePressEvent(self, e: QMouseEvent) -> None:
-        if self._state == 0:
-            self._state = 1
-            mouse = e.position()
-            window_mouse = self._map_window_to_data(mouse)
-            print("self size: {0:d}x{1:d} pos: {2:f}x{3:f} window: {4:f},{5:f}".format(self.width(), self.height(), mouse.x(), mouse.y(), window_mouse[0], window_mouse[1]))
-            if e.buttons() & qt.MouseButton.LeftButton:
-                print("mousePressEvent = left")
-            if e.buttons() & qt.MouseButton.RightButton:
-                print("mousePressEvent = right")
-        elif self._state == 1:
-            self._state = 0
+        # right button is reset/quit command
+        if e.buttons() & qt.MouseButton.RightButton:
+            print("mousePressEvent = right button")
+            self._cmdstate = PlotCmdStates.NOTHING
+        elif e.buttons() & qt.MouseButton.LeftButton:
+            if self._cmdstate == PlotCmdStates.PLACING_FIRST_SLICE:
+                print("mousePressEvent = placing first slice")
+                self._cmdstate = PlotCmdStates.PLACING_SECOND_SLICE
+                self._maybe_slice_first_y = e.position().y()
+            elif self._cmdstate == PlotCmdStates.PLACING_SECOND_SLICE:
+                # second point placed. Command done. Make sure min&max are right
+                self._slice_y = [min(self._maybe_slice_first_y, e.position().y()), max(self._maybe_slice_first_y, e.position().y())]
+                print("mousePressEvent = placing second slice at {0:f}-{1:f}".format(self._slice_y[0], self._slice_y[1]))
+                self._has_slice = True
+                self._cmdstate = PlotCmdStates.NOTHING
+                self.__new_slice_signal.emit(self._slice_y[0], self._slice_y[1])
         e.accept()
 
         #super().mousePressEvent(e)
 
-    def mouseReleaseEvent(self, e: QMouseEvent) -> None:
-        if self._state == 1:
-            self._state = 0
-            # if e.buttons() & qt.MouseButton.LeftButton:
-            #     print("mouseReleaseEvent = left")
-            # elif e.buttons() & qt.MouseButton.RightButton:
-            #     print("mouseReleaseEvent = right")
-            # else:
-            #     print("mouseReleaseEvent, unknown button")
+    # def mouseReleaseEvent(self, e: QMouseEvent) -> None:
+    #     if self._state == 1:
+    #         self._state = 0
+    #         # if e.buttons() & qt.MouseButton.LeftButton:
+    #         #     print("mouseReleaseEvent = left")
+    #         # elif e.buttons() & qt.MouseButton.RightButton:
+    #         #     print("mouseReleaseEvent = right")
+    #         # else:
+    #         #     print("mouseReleaseEvent, unknown button")
 
     def _make_draw_transform(self, shape: Optional[Iterable[int]]=None) -> QTransform:
         if shape is None:
@@ -142,6 +193,10 @@ class Window(QMainWindow):
         self.plot = TestPlotWidget(self)
         self.setCentralWidget(self.plot)
 
+        self.plot.new_slice.connect(self.slice)
+
+    def slice(self, y0, y1):
+        print("Got slice signal {0:f}-{1:f}".format(y0, y1))
 
 if __name__ == "__main__":
     App = QApplication(sys.argv)
