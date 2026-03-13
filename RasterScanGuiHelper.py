@@ -6,6 +6,7 @@ from OCTUiParams import OCTUiParams
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
 from TraceWidget import TraceWidget
+from CrossSectionDrawingWidget import CrossSectionDrawingWidget
 import matplotlib as mpl
 from math import radians
 
