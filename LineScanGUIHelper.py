@@ -78,7 +78,7 @@ class LineScanGUIHelper(ScanGUIHelper):
                 ascan_data = volume.mean(axis=0).transpose().copy()
             else:
                 ascan_data = volume.mean(axis=0).transpose().copy().get()
-        self._mpsw.add_data(ascan_data=ascan_data, spectra_data=spectra_data)
+        #self._mpsw.add_data(ascan_data=ascan_data, spectra_data=spectra_data)
 
 
 
@@ -187,34 +187,35 @@ class LineScanGUIHelper(ScanGUIHelper):
         self._components = ScanGUIHelperComponents(format_planner=format_planner, null_endpoint=null_endpoint, storage_endpoint=storage_endpoint, spectra_endpoint=spectra_endpoint, storage=spectra_storage, ascan_endpoint=ascan_endpoint, plot_widget=self.getPlotWidget(ascan_endpoint))
     
     def getPlotWidget(self, ascan_endpoint) -> QWidget:
-        self._mpsw = MPSW()
-        # self._cross_widget_1 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="one way")
-        # self._cross_widget_2 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="other way")
-        # self._linescan_trace_widget = LineScanTraceWidget(ascan_endpoint, title="Galvo tuning")
+        #self._mpsw = MPSW()
+        self._cross_widget_1 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="one way")
+        self._cross_widget_2 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="other way")
+        self._linescan_trace_widget = LineScanTraceWidget(ascan_endpoint, title="Galvo tuning")
 
-        # # apply settings
-        # if 'cross1.range' in self.settings:
-        #     self._cross_widget_1._range = self.settings['cross1.range']
+        # apply settings
+        if 'cross1.range' in self.settings:
+            self._cross_widget_1._range = self.settings['cross1.range']
 
-        # if 'cross2.range' in self.settings:
-        #     self._cross_widget_2._range = self.settings['cross2.range']
+        if 'cross2.range' in self.settings:
+            self._cross_widget_2._range = self.settings['cross2.range']
 
-        # if 'linescan.ylim' in self.settings:
-        #     self._linescan_trace_widget.set_ylim(self.settings['linescan.ylim'])
+        if 'linescan.ylim' in self.settings:
+            self._linescan_trace_widget.set_ylim(self.settings['linescan.ylim'])
 
-        # # callbacks
-        # ascan_endpoint.aggregate_segment_callback = self.cb_ascan
+        # callbacks
+        ascan_endpoint.aggregate_segment_callback = self.cb_ascan
 
-        # # 
-        # hbox = QHBoxLayout()
-        # vbox_left = QVBoxLayout()
-        # vbox_left.addWidget(self._cross_widget_1)
-        # vbox_left.addWidget(self._cross_widget_2)
-        # vbox_right = QVBoxLayout()
-        # vbox_right.addWidget(self._linescan_trace_widget)
-        # hbox.addLayout(vbox_left)
-        # hbox.addLayout(vbox_right)
-        # w = QWidget()
-        # w.setLayout(hbox)
-        return self._mpsw
+        # 
+        hbox = QHBoxLayout()
+        vbox_left = QVBoxLayout()
+        vbox_left.addWidget(self._cross_widget_1)
+        vbox_left.addWidget(self._cross_widget_2)
+        vbox_right = QVBoxLayout()
+        vbox_right.addWidget(self._linescan_trace_widget)
+        hbox.addLayout(vbox_left)
+        hbox.addLayout(vbox_right)
+        w = QWidget()
+        w.setLayout(hbox)
+        #return self._mpsw
+        return w
 
