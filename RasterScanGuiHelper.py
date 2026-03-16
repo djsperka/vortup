@@ -5,7 +5,7 @@ from ScanParams import RasterScanParams
 from OCTUiParams import OCTUiParams
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
-from TraceWidget import TraceWidget
+from TraceWidget import AscanTraceWidget, SpectraTraceWidget
 from CrossSectionDrawingWidget import CrossSectionDrawingWidget
 import matplotlib as mpl
 from math import radians
@@ -144,8 +144,8 @@ class RasterScanGUIHelper(ScanGUIHelper):
     def getPlotWidget(self, ascan_endpoint, spectra_endpoint) -> QWidget:
         self._raster_widget = RasterEnFaceWidget(ascan_endpoint, cmap=mpl.colormaps['gray'])
         self._cross_widget = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'])
-        self._ascan_trace_widget = TraceWidget(ascan_endpoint, title="ascan")
-        self._spectra_trace_widget = TraceWidget(spectra_endpoint, title="raw spectra")
+        self._ascan_trace_widget = AscanTraceWidget(ascan_endpoint, title="ascan")
+        self._spectra_trace_widget = SpectraTraceWidget(spectra_endpoint, title="raw spectra")
 
         # apply settings
         if 'enface.range' in self.settings:

@@ -61,7 +61,7 @@ class LineScanGUIHelper(ScanGUIHelper):
             scan_idx (int): scan index
             volume_idx (int): volume index
         """
-        self._logger.info("LineScanGUIHelper::volume({0:d}, {1:d}, {2:d})".format(sample_idx, scan_idx, volume_idx))
+        #self._logger.info("LineScanGUIHelper::volume({0:d}, {1:d}, {2:d})".format(sample_idx, scan_idx, volume_idx))
         # check shape of spectra volume
         with self.components.spectra_endpoint.tensor as volume:
             shape = volume.shape
@@ -73,7 +73,7 @@ class LineScanGUIHelper(ScanGUIHelper):
 
         with self.components.ascan_endpoint.tensor as volume:
             shape = volume.shape
-            self._logger.info("ascan shape {0:d} x {1:d} x {2:d}, type {3:s}".format(shape[0], shape[1], shape[2], str(type(volume))))
+            #self._logger.info("ascan shape {0:d} x {1:d} x {2:d}, type {3:s}".format(shape[0], shape[1], shape[2], str(type(volume))))
             if isinstance(volume, np.ndarray):
                 ascan_data = volume.mean(axis=0).transpose().copy()
             else:

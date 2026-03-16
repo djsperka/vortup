@@ -6,7 +6,7 @@ from AcqParams import AcqParams
 from OCTUiParams import OCTUiParams
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
 from vortex_tools.ui.display import CrossSectionImageWidget
-from TraceWidget import TraceWidget
+from TraceWidget import AscanTraceWidget, SpectraTraceWidget
 import matplotlib as mpl
 from math import radians
 
@@ -134,8 +134,8 @@ class AimingScanGUIHelper(ScanGUIHelper):
     def getPlotWidget(self, ascan_endpoint, spectra_endpoint) -> QWidget:
         self._cross_widget_1 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="horiz")
         self._cross_widget_2 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="vert")
-        self._ascan_trace_widget = TraceWidget(ascan_endpoint, title="ascan")
-        self._spectra_trace_widget = TraceWidget(spectra_endpoint, title="raw spectra")
+        self._ascan_trace_widget = AscanTraceWidget(ascan_endpoint, title="ascan")
+        self._spectra_trace_widget = SpectraTraceWidget(spectra_endpoint, title="raw spectra")
 
         # apply settings
         if 'cross1.range' in self.settings:
