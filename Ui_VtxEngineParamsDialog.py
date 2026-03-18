@@ -156,14 +156,6 @@ class Ui_VtxEngineParamsDialog(object):
         self.horizontalLayout_26.setStretch(1, 1)
         self.verticalLayout_4.addLayout(self.horizontalLayout_26)
         self.verticalLayout_7.addWidget(self.groupBox_3)
-        self.groupBox = QtWidgets.QGroupBox(VtxEngineParamsDialog)
-        self.groupBox.setObjectName("groupBox")
-        self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.groupBox)
-        self.verticalLayout_6.setObjectName("verticalLayout_6")
-        self.widgetDispersion = DispersionWidget(self.groupBox)
-        self.widgetDispersion.setObjectName("widgetDispersion")
-        self.verticalLayout_6.addWidget(self.widgetDispersion)
-        self.verticalLayout_7.addWidget(self.groupBox)
         self.groupBox_5 = QtWidgets.QGroupBox(VtxEngineParamsDialog)
         self.groupBox_5.setObjectName("groupBox_5")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.groupBox_5)
@@ -432,7 +424,6 @@ class Ui_VtxEngineParamsDialog(object):
         self.comboBoxInputChannel.setItemText(2, _translate("VtxEngineParamsDialog", "C"))
         self.comboBoxInputChannel.setItemText(3, _translate("VtxEngineParamsDialog", "D"))
         self.label_6.setText(_translate("VtxEngineParamsDialog", "input range (mV)"))
-        self.groupBox.setTitle(_translate("VtxEngineParamsDialog", "Dispersion"))
         self.groupBox_5.setTitle(_translate("VtxEngineParamsDialog", "Memory/processing"))
         self.label_13.setText(_translate("VtxEngineParamsDialog", "Ascan/block"))
         self.label_23.setText(_translate("VtxEngineParamsDialog", "blocks to allocate"))
@@ -457,7 +448,6 @@ class Ui_VtxEngineParamsDialog(object):
         self.pbSelectFile.setText(_translate("VtxEngineParamsDialog", "Select"))
         self.label_14.setText(_translate("VtxEngineParamsDialog", "File:"))
         self.labelFileName.setText(_translate("VtxEngineParamsDialog", "TextLabel"))
-from DispersionWidget import DispersionWidget
 from EnumComboBox import EnumComboBox
 
 

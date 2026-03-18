@@ -236,18 +236,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox">
-         <property name="title">
-          <string>Dispersion</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_6">
-          <item>
-           <widget class="DispersionWidget" name="widgetDispersion" native="true"/>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
         <widget class="QGroupBox" name="groupBox_5">
          <property name="title">
           <string>Memory/processing</string>
@@ -602,12 +590,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>DispersionWidget</class>
-   <extends>QWidget</extends>
-   <header>DispersionWidget</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>EnumComboBox</class>
    <extends>QComboBox</extends>

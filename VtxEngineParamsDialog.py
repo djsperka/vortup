@@ -108,7 +108,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.lineEditTriggerRange.setText(str(cfg.trigger_range_millivolts))
         self.lineEditTriggerLevelFraction.setText(str(cfg.trigger_level_fraction))
 
-        self.widgetDispersion.setDispersion(cfg.dispersion)
+        # self.widgetDispersion.setDispersion(cfg.dispersion)
 
         self.lineEditBlocksToAllocate.setText(str(cfg.blocks_to_allocate))
         self.lineEditPreloadCount.setText(str(cfg.preload_count))
@@ -150,7 +150,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         s.ssrc_triggers_per_second = int(self.lineEditTriggersPerSecond.text())
         s.ssrc_clock_rising_edges_per_trigger = int(self.lineEditClockRisingEdgesPerTrigger.text())
 
-        s.dispersion = self.widgetDispersion.getDispersion()
+        # s.dispersion = self.widgetDispersion.getDispersion()
 
         s.internal_clock = bool(self.checkBoxInternalClock.isChecked())
         s.external_clock_level_pct = int(self.lineEditExternalClockLevelPct.text())
@@ -161,7 +161,6 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         s.blocks_to_allocate = int(self.lineEditBlocksToAllocate.text())
         s.preload_count = int(self.lineEditPreloadCount.text())
         s.process_slots = int(self.lineEditProcessSlots.text())
-        #s.dispersion = (float(self.lineEditDispersion0.text()), float(self.lineEditDispersion1.text()))
         s.log_level = int(self.lineEditLogLevel.text())
         s.save_profiler_data = self.cbSaveProfilerData.isChecked()
         if self.cbFileAcquisition.isChecked():

@@ -123,6 +123,21 @@ class OCTUiParams():
             self._isdirty = True
             self._vtx = value
 
+    # dispersion setter is explicit to ensure isdirty gets set. 
+    # This value has a widget independent of the VtxEngineParametersDialog
+    # When it is updated we must directly access the contents of self._vtx, 
+    # which bypasses the isdirty business. 
+    
+    @property
+    def dispersion(self):
+        return self._vtx.dispersion
+    
+    @dispersion.setter
+    def dispersion(self, value):
+        if not self._vtx.dispersion == value:
+            self._isdirty = True
+            self._vtx.dispersion = value
+
     @property
     def scn(self):
         return self._scn

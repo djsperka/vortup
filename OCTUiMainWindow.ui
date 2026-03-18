@@ -14,82 +14,98 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_5">
+   <layout class="QVBoxLayout" name="verticalLayout_3">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
+       <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="ScanConfigWidget" name="widgetScanConfig" native="true">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>80</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pbEtc">
-          <property name="text">
-           <string>Engine Configuration</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <layout class="QVBoxLayout" name="verticalLayout">
           <item>
-           <widget class="QPushButton" name="pbStart">
-            <property name="text">
-             <string>Start</string>
+           <widget class="ScanConfigWidget" name="widgetScanConfig" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>80</height>
+             </size>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pbStop">
+           <widget class="QPushButton" name="pbEtc">
             <property name="text">
-             <string>Stop</string>
+             <string>Engine Configuration</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QPushButton" name="pbStart">
+              <property name="text">
+               <string>Start</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pbStop">
+              <property name="text">
+               <string>Stop</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox">
+            <property name="title">
+             <string>Dispersion</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_6">
+             <item>
+              <widget class="DispersionWidget" name="widgetDispersion" native="true"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </item>
         <item>
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
+         <widget class="QStackedWidget" name="stackedWidgetDummy">
+          <property name="minimumSize">
            <size>
-            <width>20</width>
-            <height>40</height>
+            <width>800</width>
+            <height>800</height>
            </size>
           </property>
-         </spacer>
+          <widget class="QWidget" name="stackedWidgetDummyPage1"/>
+         </widget>
         </item>
        </layout>
       </item>
       <item>
-       <widget class="QStackedWidget" name="stackedWidgetDummy">
-        <property name="minimumSize">
-         <size>
-          <width>800</width>
-          <height>800</height>
-         </size>
-        </property>
-        <widget class="QWidget" name="stackedWidgetDummyPage1"/>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
-      <item>
-       <widget class="SaveVolumeGroupBox" name="gbSaveVolumes">
-        <property name="title">
-         <string>Saving Volume Data</string>
-        </property>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="SaveVolumeGroupBox" name="gbSaveVolumes">
+          <property name="title">
+           <string>Saving Volume Data</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
@@ -101,13 +117,19 @@
      <x>0</x>
      <y>0</y>
      <width>996</width>
-     <height>24</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>DispersionWidget</class>
+   <extends>QWidget</extends>
+   <header>DispersionWidget</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>ScanConfigWidget</class>
    <extends>QWidget</extends>

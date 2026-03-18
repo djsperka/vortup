@@ -70,13 +70,14 @@ class OCTUi():
 
             self._guihelpers.append(scanGUIHelperFactory(name, flag, cfg, s))
             self._octDialog.widgetScanConfig.addScanType(name, self._guihelpers[-1].edit_widget)
-            #self._octDialog.stackedWidgetDummy.addWidget(self._guihelpers[-1].plot_widget)
 
         self._octDialog.widgetScanConfig.setCurrentIndex(self._params.scn.current_index)
-        #self._octDialog.stackedWidgetDummy.setCurrentIndex(self._params.scn.current_index)
+
+        # must initialize dispersion widget. Scan config widgets are initialized on creation 
+        self._octDialog.widgetDispersion.setDispersion(self._params.vtx.dispersion)
 
         # connections. 
-        #self._octDialog.widgetDispersion.valueChanged.connect(self.dispersionChanged)
+        self._octDialog.widgetDispersion.valueChanged.connect(self.dispersionChanged)
         self._octDialog.widgetScanConfig.scanTypeChanged.connect(self.scanTypeChanged)
         self._octDialog.gbSaveVolumes.saveNVolumes.connect(self.saveNVolumes)
         self._octDialog.gbSaveVolumes.saveContVolumes.connect(self.saveContVolumes)
@@ -102,8 +103,13 @@ class OCTUi():
 
     def dispersionChanged(self, dispersion: Tuple[float, float]):
         if self._vtxengine is not None:
+            # set updated value in parameters
+            # must do this here so the change will trigger "want to save?"
+            self._params.dispersion = self._octDialog.widgetDispersion.getDispersion()
+
+            # separately tell engine to update
             self._vtxengine.update_dispersion(dispersion)   
-            print("Updated dispersion ", dispersion)
+            self._logger.info("Updated dispersion to ({:e},{:e})".format(*dispersion))
 
     def dialogClosing(self):
         self.stopClicked()
@@ -134,6 +140,9 @@ class OCTUi():
         # in the engineConfig are updated when that dlg is accepted, so no 
         # fetch here.
         self._params.scn = self._octDialog.widgetScanConfig.getScanParams()
+
+        # get current dispersion parameters
+        self._params.vtx.dispersion = self._octDialog.widgetDispersion.getDispersion()
 
     def _getPlotSettings(self):
 
