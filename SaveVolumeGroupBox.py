@@ -77,7 +77,7 @@ class SaveVolumeGroupBox(QGroupBox, Ui_SaveVolumeGroupBox):
     def __updateLabels(self):
         self.labelFolder.setText(str(self.pathDataRoot))
         self.pathDataActual = self.pathDataRoot / datetime.today().strftime('%Y-%m-%d')
-        self.labelStatus.setText("Data will be saved to folder {0:s}".format(str(self.pathDataActual)))
+        #self.labelStatus.setText("Data will be saved to folder {0:s}".format(str(self.pathDataActual)))
 
     def enableSaving(self, bEnable: bool=True, bEnableStop = False):
         self.sbN.setEnabled(bEnable)
