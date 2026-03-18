@@ -18,9 +18,12 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,5">
+       <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
         <item>
          <layout class="QVBoxLayout" name="verticalLayout">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetDefaultConstraint</enum>
+          </property>
           <item>
            <widget class="ScanConfigWidget" name="widgetScanConfig" native="true">
             <property name="minimumSize">
@@ -33,6 +36,12 @@
           </item>
           <item>
            <widget class="QPushButton" name="pbEtc">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="text">
              <string>Engine Configuration</string>
             </property>
@@ -40,8 +49,17 @@
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetMaximumSize</enum>
+            </property>
             <item>
              <widget class="QPushButton" name="pbStart">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
               <property name="text">
                <string>Start</string>
               </property>
@@ -49,6 +67,12 @@
             </item>
             <item>
              <widget class="QPushButton" name="pbStop">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
               <property name="text">
                <string>Stop</string>
               </property>
@@ -58,12 +82,25 @@
           </item>
           <item>
            <widget class="QGroupBox" name="groupBox">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="title">
              <string>Dispersion</string>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_6">
              <item>
-              <widget class="DispersionWidget" name="widgetDispersion" native="true"/>
+              <widget class="DispersionWidget" name="widgetDispersion" native="true">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
