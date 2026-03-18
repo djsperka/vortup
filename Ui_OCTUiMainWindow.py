@@ -59,6 +59,8 @@ class Ui_OCTUiMainWindow(object):
         self.stackedWidgetDummyPage1.setObjectName("stackedWidgetDummyPage1")
         self.stackedWidgetDummy.addWidget(self.stackedWidgetDummyPage1)
         self.horizontalLayout.addWidget(self.stackedWidgetDummy)
+        self.horizontalLayout.setStretch(0, 1)
+        self.horizontalLayout.setStretch(1, 5)
         self.verticalLayout_2.addLayout(self.horizontalLayout)
         self.verticalLayout_4 = QtWidgets.QVBoxLayout()
         self.verticalLayout_4.setObjectName("verticalLayout_4")
