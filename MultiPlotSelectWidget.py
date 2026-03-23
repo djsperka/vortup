@@ -1,6 +1,6 @@
-from qtpy.QtWidgets import QApplication, QMainWindow, QWidget, QGridLayout, QLabel, QPushButton
+from qtpy.QtWidgets import QApplication, QMainWindow, QWidget, QGridLayout, QLabel
 from qtpy.QtCore import QTimer, Signal
-from qtpy.QtGui import QPixmap, QImage
+from qtpy.QtGui import QPixmap, QImage, QPen, QColor, QPainter
 from image_display import ImageDisplay
 from PIL import Image
 
@@ -13,12 +13,16 @@ from dataclasses import dataclass
 class MyImageWidget(QLabel):
 
     __clicked_signal = Signal(int, int, name='clicked')
+ #  __selected_color = QColor(102, 255, 51)
+    __selected_color = QColor(51, 204, 255)
+    __selected_width = 8
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setScaledContents(True)
         self.setMinimumSize(256, 256)
         self._userdata = None
+        self._selected = False
 
     @property
     def userdata(self):
@@ -38,12 +42,35 @@ class MyImageWidget(QLabel):
         qpix = QPixmap(QImage(img))
         self.setPixmap(qpix)
 
-    def mouseReleaseEvent(self, ev):
-        if self.userdata is None:
-            d=(-1,-1)
-        else:
-            d=self.userdata
+    def mousePressEvent(self, ev):
+        d = self.userdata
         self.__clicked_signal.emit(*d)
+
+    def mouseDoubleClickEvent(self, ev):
+        d = self.userdata
+        print("double click at {:d},{:d}".format(*d))
+
+    def paintEvent(self, ev):
+
+        super().paintEvent(ev)
+
+        painter = QPainter()
+        painter.begin(self)
+        if self._selected:
+            # draw box at edge
+            self._drawOutlineBox(painter)
+        painter.end()
+
+
+    def _drawOutlineBox(self, painter: QPainter):
+        painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Source)
+        pen = QPen(self.__selected_color)
+        pen.setWidth(self.__selected_width)
+        painter.setPen(pen)
+        painter.drawRect(0, 0, self.width(), self.height())
+
+
+
 
 
 @dataclass
@@ -59,103 +86,63 @@ class MPSW(QWidget):
         self._rows = rows
         self._columns = columns
 
-        # we will make a QGridLayout 
-        # Make it have rowsx(2*columns)
-        # Left side rxc populate with image widgets
-        # right side is a single widget
         layout = QGridLayout()
 
-
         # a word of warning: the widgets in QGridLayout are specified (0-based) ROW,COL
-
         self._data = [[None for _ in range(self._columns)] for _ in range(self._rows)]
-        self._l = [[0 for _ in range(self._columns)] for _ in range(self._rows)]
+        self._widgets = [[0 for _ in range(self._columns)] for _ in range(self._rows)]
+        self._count = -1     # this will keep track of the next position to be replaced
         for i in range(self._columns):
             for j in range(self._rows):
-                self._l[j][i] = MyImageWidget()
-                self._l[j][i].userdata = (j,i)
-                self._l[j][i].clicked.connect(self.image_clicked)
-                layout.addWidget(self._l[j][i], j, i)
-        self._r = MyImageWidget()
-        layout.addWidget(self._r, 0, self._columns, self._columns, self._rows)
+                self._widgets[j][i] = MyImageWidget()
+                self._widgets[j][i].userdata = (j,i)
+                self._widgets[j][i].clicked.connect(self.image_clicked)
+                layout.addWidget(self._widgets[j][i], j, i)
 
         self.setLayout(layout)
 
-    def image_clicked(self, c, r):
-        print("Image clicked c={:d} r={:d}".format(c, r))
-
-    def add_data(self, ascan_data, spectra_data):
-        # find first empty slot, save it there
+    def _update_selected(self, r, c):
         for i in range(self._columns):
             for j in range(self._rows):
-                if self._data[j][i] is None:
-                    self._data[j][i] = MPSWData(ascan_data, spectra_data)
-                    self._l[j][i].set_image(ascan_data)
-                    break
-            else:
-                # The else here is executed ONLY IF THERE WAS NO BREAK!
-                # In other words, this is executed when the loop runs to completion.
-                continue
-            break
+                if self._widgets[j][i]._selected:
+                    self._widgets[j][i]._selected = False
+                    self._widgets[j][i].update()
+        self._widgets[r][c]._selected = True
+        self._widgets[r][c].update()
 
+    def image_clicked(self, r, c):
+        self._update_selected(r, c)
+        print("Image clicked r={:d} c={:d}, width={:d} height={:d}".format(r, c, self._widgets[r][c].width(), self._widgets[c][r].height()))
 
+    def _ind2sub(self, ind):
+        i = ind % (self._rows * self._columns)
+        r = i // self._columns
+        c = i % self._columns
+        return (r, c)
 
-# class MPSW(QWidget):
+    def _next_position(self):
+        while True:
+            self._count+=1
+            (r,c) = self._ind2sub(self._count)
+            if self._data[r][c] is None or not self._widgets[r][c]._selected:
+                return (r,c)
 
-#     def __init__(self, parent=None):
-#         super().__init__(parent)
-
-#         self._rows = 2
-#         self._cols = 2
-#         self._data = [[None for _ in range(self._cols)] for _ in range(self._rows)]
-#         self._plots = [[None for _ in range(self._cols)] for _ in range(self._rows)]
-
-
-#         grid_layout = QGridLayout()
-#         for i in range(self._cols):
-#             for j in range(self._rows):
-#                 self._data[i][j] = None
-#                 self._plots[i][j] = NumpyImageViewer()
-#                 grid_layout.addWidget(self._plots[i][j], i, j)
-#         self._bigplot = NumpyImageViewer()
-#         hbox_layout = QHBoxLayout()
-#         hbox_layout.addLayout(grid_layout)
-#         hbox_layout.addWidget(self._bigplot)
-#         self.setLayout(hbox_layout)
-
-#     def add_data(self, ascan_data, spectra_data):
-#         # find first empty slot, save it there
-#         for i in range(self._cols):
-#             for j in range(self._rows):
-#                 if self._data[i][j] is None:
-
-#                     self._data[i][j] = MPSWData(ascan_data, spectra_data)
-#                     self._plots[i][j].data = self._data[i][j].ascan_data
-#                     self._plots[i][j].invalidate()
-#                     print("Saved at ", i, j, np.shape(ascan_data))
-#                     break
-#             else:
-#                 # The else here is executed ONLY IF THERE WAS NO BREAK!
-#                 # In other words, this is executed when the loop runs to completion.
-#                 continue
-#             break
-
-
-# class MultiPlotSelectWidget(FigureCanvas):
-
-#     def __init__(self, parent=None, rows=4, cols=2, width=5, height=4, dpi=100, title=None):
-#         fig = Figure(figsize=(width, height), dpi=dpi)
-#         axs = fig.subplots(nrows=rows, ncols=cols*2)
-#         gs = axs[0, cols].get_gridspec()
-#         for i in range(rows):
-#              for j in range(cols, cols*2):
-#                   axs[i,j].remove()
-#         axbig = fig.add_subplot(gs[0:,cols:])
-#         axbig.annotate('Big Axes \nGridSpec[0:, {0:d}:]'.format(cols), (0.1, 0.5), xycoords='axes fraction', va='center')
-#         fig.tight_layout()
-#         super().__init__(fig)
-#         self.setParent(parent)
-
+    def add_data(self, ascan_data, spectra_data):
+        (r, c) = self._next_position()
+        self._data[r][c] = MPSWData(ascan_data, spectra_data)
+        self._widgets[r][c].set_image(ascan_data)
+        # find first empty slot, save it there
+        # for i in range(self._columns):
+        #     for j in range(self._rows):
+        #         if self._data[j][i] is None:
+        #             self._data[j][i] = MPSWData(ascan_data, spectra_data)
+        #             self._widgets[j][i].set_image(ascan_data)
+        #             break
+        #     else:
+        #         # The else here is executed ONLY IF THERE WAS NO BREAK!
+        #         # In other words, this is executed when the loop runs to completion.
+        #         continue
+        #     break
 
 
 
@@ -165,7 +152,7 @@ class MainWindow(QMainWindow):
         self._image_list = list
         self._image_index = 0
         self.setWindowTitle("PyQt5 Matplotlib 2D Image Example")
-        self.plot = MPSW(self, rows=3, columns=3)
+        self.plot = MPSW(self, rows=3, columns=5)
         self.setCentralWidget(self.plot)
         self.timer = QTimer()
         self.timer.timeout.connect(self.timeout)
