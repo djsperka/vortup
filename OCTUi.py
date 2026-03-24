@@ -5,7 +5,7 @@ from VtxEngine import VtxEngine
 from OCTUiMainWindow import OCTUiMainWindow
 from OCTUiParams import OCTUiParams
 from PyQt5.QtWidgets import QApplication, QMessageBox, QLabel
-from PyQt5.QtCore import QTimer,QDateTime
+from PyQt5.QtCore import QTimer,QDateTime, pyqtSignal, Qt, QObject
 from vortex.engine import Engine, EngineConfig, EngineStatus
 from vortex import get_console_logger as gcl, __version__ as vortex_version
 from vortex.storage import SimpleStackConfig, SimpleStackHeader
@@ -19,8 +19,10 @@ from datetime import datetime
 from json import dumps
 from git import Repo
 from pathlib import Path
-class OCTUi():
+class OCTUi(QObject):
     
+    stopengine = pyqtSignal()
+
     def __init__(self):
         super().__init__() # Call the inherited class' __init__ method
         self._logger = logging.getLogger('OCTUi')
@@ -179,6 +181,7 @@ class OCTUi():
             self._logger.info('Setting up OCT engine...')
             self._vtxengine = VtxEngine(self._params, self._guihelpers)
             self._vtxengine._engine.event_callback = self.engineEventCallback
+            self.stopengine.connect(self._engineErrorCallback, Qt.QueuedConnection)
 
             # Clear out widgets previously located in the stacked widget, then add
             # newly-created plots. 
@@ -250,20 +253,27 @@ class OCTUi():
             self._octDialog.gbSaveVolumes.enableSaving(False)
         elif event == Engine.Event.Error:
             self._logger.error("Error event from engine.")
-            #self.stopClicked()
+            self.stopengine.emit()
 
     def printStatus(self, s):
         if self._vtxengine is not None:
             status = self._vtxengine._engine.status()
             self._logger.info(s + "\nactive? {0:d}\nblock_utilization {1:f}\ndispatch_completion {2:f}\ndispatched_blocks {3:d}\ninflight_blocks {4:d}\n".format(status.active, status.block_utilization, status.dispatch_completion, status.dispatched_blocks, status.inflight_blocks))
 
-    def stopClicked(self):
+    def _stopGUI(self, bStopEngineToo):
         self._timer.stop()
         if self._vtxengine is not None:
             self._octDialog.pbEtc.setEnabled(True)
             self._octDialog.pbStart.setEnabled(True)
             self._octDialog.pbStop.setEnabled(False)
-            self._vtxengine.stop()
+            if bStopEngineToo:
+                self._vtxengine.stop()
+
+    def _engineErrorCallback(self):
+        self._stopGUI(False)
+
+    def stopClicked(self):
+        self._stopGUI(True)
 
     def scanCallback(self, arg0, arg1):
         self._logger.info("scanCallback({0:d}, {1:d}, {2:d}, {3:d})".format(arg0, arg1))
