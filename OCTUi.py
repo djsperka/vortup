@@ -7,11 +7,11 @@ from OCTUiParams import OCTUiParams
 from PyQt5.QtWidgets import QApplication, QMessageBox, QLabel
 from PyQt5.QtCore import QTimer,QDateTime, pyqtSignal, Qt, QObject
 from vortex.engine import Engine, EngineConfig, EngineStatus
-from vortex import get_console_logger as gcl, __version__ as vortex_version
+from vortex import get_console_logger, __version__ as vortex_version
 from vortex.storage import SimpleStackConfig, SimpleStackHeader
+from vortex.log import Logger
 from ScanGUIHelper import ScanGUIHelper
 from scanGUIHelperFactory import scanGUIHelperFactory
-import logging
 from typing import Tuple
 import traceback
 import matplotlib as mpl
@@ -19,13 +19,17 @@ from datetime import datetime
 from json import dumps
 from git import Repo
 from pathlib import Path
+import logging
+
 class OCTUi(QObject):
     
     stopengine = pyqtSignal()
 
     def __init__(self):
         super().__init__() # Call the inherited class' __init__ method
-        self._logger = logging.getLogger('OCTUi')
+
+        #self._testlogger = get_console_logger("OCTUI-Main")
+        self._logger = get_console_logger('OCTUi')
         self._vtxengine = None
         self._cross_widget = None
         self._trace_widget = None
@@ -400,6 +404,8 @@ def setup_logging():
 
     # This was in  the examples, not sure why.
     logging.getLogger("matplotlib").setLevel(logging.WARNING)
+    logging.getLogger("git.util").setLevel(logging.WARNING)
+    logging.getLogger("git.cmd").setLevel(logging.WARNING)
 
 
     # # set up colored logging to console

@@ -6,13 +6,13 @@ import json
 import logging
 from dataclasses import asdict, dataclass, field
 import copyreg
-from vortex import Range
+from vortex import Range, get_console_logger
 from vortex.acquire import alazar
 from typing import Tuple, Any, Dict
 import os
 import sys
 
-local_logger = logging.getLogger('OCTUiParams')
+local_logger = get_console_logger('OCTUiParams')
 
 # default location and name for config file
 default_config_base = 'octui.conf'

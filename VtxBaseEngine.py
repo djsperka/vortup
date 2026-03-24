@@ -1,4 +1,4 @@
-from vortex import Range, get_console_logger as get_logger
+from vortex import Range, get_console_logger
 from vortex.engine import Block, dispersion_phasor
 from vortex.acquire import AlazarConfig, AlazarAcquisition, alazar, FileAcquisitionConfig, FileAcquisition
 from vortex.process import CUDAProcessor, CUDAProcessorConfig, NullProcessor, NullProcessorConfig, CPUProcessor, CPUProcessorConfig
@@ -7,9 +7,8 @@ from VtxEngineParams import VtxEngineParams, AcquisitionType
 from DAQConst import getAlazarChannel
 import numpy as np
 from typing import Tuple
-import logging
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_console_logger(__name__)
 class VtxBaseEngine():
     def __init__(self, cfg: VtxEngineParams):
 
@@ -58,7 +57,7 @@ class VtxBaseEngine():
             # AuxIO
             ac.options.append(alazar.AuxIOTriggerOut())
 
-            acquire = AlazarAcquisition(get_logger('acquire', cfg.log_level))
+            acquire = AlazarAcquisition(get_console_logger('acquire', cfg.log_level))
             acquire.initialize(ac)
             self._acquire = acquire
 
@@ -82,7 +81,7 @@ class VtxBaseEngine():
             # DC subtraction per block
             self._processor_config.average_window = 2 * self._processor_config.ascans_per_block
 
-            self._processor = CUDAProcessor(get_logger('process', cfg.log_level))
+            self._processor = CUDAProcessor(get_console_logger('process', cfg.log_level))
             self._processor.initialize(self._processor_config)
 
         elif cfg.acquisition_type == AcquisitionType.FILE_ACQUISITION:
@@ -119,7 +118,7 @@ class VtxBaseEngine():
             ac.records_per_block = cfg.ascans_per_block
             ac.loop = True # repeat the file indefinitely
 
-            acquire = FileAcquisition(get_logger('acquire', cfg.log_level))
+            acquire = FileAcquisition(get_console_logger('acquire', cfg.log_level))
             acquire.initialize(ac)
             self._acquire = acquire
 
@@ -150,7 +149,7 @@ class VtxBaseEngine():
             # DC subtraction per block
             self._processor_config.average_window = 2 * self._processor_config.ascans_per_block
 
-            self._processor = CPUProcessor(get_logger('process', cfg.log_level))
+            self._processor = CPUProcessor(get_console_logger('process', cfg.log_level))
             self._processor.initialize(self._processor_config)
 
         else:
@@ -191,7 +190,7 @@ class VtxBaseEngine():
             yAVO.limits = cfg.galvo_fast_voltage_range
             ioc_out.channels.append(yAVO)
 
-            io_out = DAQmxIO(get_logger(ioc_out.name, cfg.log_level))
+            io_out = DAQmxIO(get_console_logger(ioc_out.name, cfg.log_level))
             io_out.initialize(ioc_out)
             self._io_out = io_out
         else:

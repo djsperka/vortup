@@ -1,11 +1,10 @@
 from VtxBaseEngine import VtxBaseEngine
 from VtxEngineParams import AcquisitionType
-from vortex import get_console_logger as get_logger
+from vortex import get_console_logger
 from vortex.engine import Engine, EngineConfig, SpectraStackEndpoint, VolumeStrobe, Block, EventStrobe
 from vortex.io import DAQmxIO, DAQmxConfig, daqmx
 from vortex.format import StackFormatExecutorConfig, StackFormatExecutor
 from vortex.storage import SimpleStackUInt16
-import logging
 from typing import Tuple, Any, List
 from OCTUiParams import OCTUiParams
 from ScanGUIHelper import ScanGUIHelper
@@ -17,7 +16,7 @@ class VtxEngine(VtxBaseEngine):
 
         # base class 
         super().__init__(params.vtx)
-        self._logger = logging.getLogger(__name__)
+        self._logger = get_console_logger(__name__)
         # Base class has stuff made, but no engine constructed:
         # self._acquire
         # self._octprocess  - CUDA based processing
@@ -59,7 +58,7 @@ class VtxEngine(VtxBaseEngine):
                 strobec.name = 'strobe'
                 self._logger.info("Adding DigitalOutput channel for strobes on device {0:s}".format(cfg.strobe_device_channel))
                 strobec.channels.append(daqmx.DigitalOutput(cfg.strobe_device_channel, Block.StreamIndex.Strobes))
-                strobe = DAQmxIO(get_logger(strobec.name, cfg.log_level))
+                strobe = DAQmxIO(get_console_logger(strobec.name, cfg.log_level))
                 strobe.initialize(strobec)
                 self._strobe = strobe
             else:
@@ -87,7 +86,7 @@ class VtxEngine(VtxBaseEngine):
         ec.blocks_to_allocate = cfg.blocks_to_allocate
         ec.blocks_to_acquire = cfg.blocks_to_acquire
 
-        engine = Engine(get_logger('engine', cfg.log_level))
+        engine = Engine(get_console_logger('engine', cfg.log_level))
         engine.initialize(ec)
         engine.prepare()
         self._engine = engine
