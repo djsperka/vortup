@@ -13,6 +13,7 @@ from dataclasses import dataclass
 class MyImageWidget(QLabel):
 
     __clicked_signal = Signal(int, int, name='clicked')
+    __doubleclicked_signal = Signal(int, int, name='doubleclicked')
  #  __selected_color = QColor(102, 255, 51)
     __selected_color = QColor(51, 204, 255)
     __selected_width = 8
@@ -47,8 +48,9 @@ class MyImageWidget(QLabel):
         self.__clicked_signal.emit(*d)
 
     def mouseDoubleClickEvent(self, ev):
-        d = self.userdata
-        print("double click at {:d},{:d}".format(*d))
+        (r, c) = self.userdata
+        print("double click at {:d},{:d}".format(r, c))
+        self.__doubleclicked_signal.emit(r, c)
 
     def paintEvent(self, ev):
 
@@ -80,6 +82,14 @@ class MPSWData:
 
 
 class MPSW(QWidget):
+    '''
+    This is a widget that will display images in an MxN grid. After images fill the grid, new images replace the oldest ones. 
+    User can select an image with a mouse click - the image is outlined, and will not be replaced while it is outlined. A double-click on an image
+    causes the save(row,col) signal to be emitted. Calling get_data(row,col) will get the data passed when the image was added. The first
+    object returned is the image that was displayed. The second is the data passed along with the image - presumaby the data you want to save.
+    '''
+
+    __save_signal = Signal(int, int, name='save')
 
     def __init__(self, parent=None, columns=2, rows=2):
         super().__init__(parent)
@@ -89,6 +99,7 @@ class MPSW(QWidget):
         layout = QGridLayout()
 
         # a word of warning: the widgets in QGridLayout are specified (0-based) ROW,COL
+        # Naming of each element in _data and _widgets
         self._data = [[None for _ in range(self._columns)] for _ in range(self._rows)]
         self._widgets = [[0 for _ in range(self._columns)] for _ in range(self._rows)]
         self._count = -1     # this will keep track of the next position to be replaced
@@ -97,9 +108,17 @@ class MPSW(QWidget):
                 self._widgets[j][i] = MyImageWidget()
                 self._widgets[j][i].userdata = (j,i)
                 self._widgets[j][i].clicked.connect(self.image_clicked)
+                self._widgets[j][i].doubleclicked.connect(self.image_doubleclicked)
                 layout.addWidget(self._widgets[j][i], j, i)
 
         self.setLayout(layout)
+
+    def get_data(self, r, c):
+        if r<self._rows and c < self._columns:
+            return self._data[r][c]
+        else:
+            raise RuntimeError("Indices out of range for this widget.")
+
 
     def _update_selected(self, r, c):
         for i in range(self._columns):
@@ -112,7 +131,11 @@ class MPSW(QWidget):
 
     def image_clicked(self, r, c):
         self._update_selected(r, c)
-        print("Image clicked r={:d} c={:d}, width={:d} height={:d}".format(r, c, self._widgets[r][c].width(), self._widgets[c][r].height()))
+        print("Image clicked r={:d} c={:d}, width={:d} height={:d}".format(r, c, self._widgets[r][c].width(), self._widgets[r][c].height()))
+
+    def image_doubleclicked(self, r, c):
+        print("Image doubleclicked r={:d} c={:d}, width={:d} height={:d}".format(r, c, self._widgets[r][c].width(), self._widgets[r][c].height()))
+        self.__save_signal.emit(r, c)
 
     def _ind2sub(self, ind):
         i = ind % (self._rows * self._columns)
@@ -153,10 +176,14 @@ class MainWindow(QMainWindow):
         self._image_index = 0
         self.setWindowTitle("PyQt5 Matplotlib 2D Image Example")
         self.plot = MPSW(self, rows=3, columns=5)
+        self.plot.save.connect(self.savedata)
         self.setCentralWidget(self.plot)
         self.timer = QTimer()
         self.timer.timeout.connect(self.timeout)
         self.timer.start(1000)  # might not actually start until event loop starts
+
+    def savedata(self, r, c):
+        print("save data {:d},{:d}".format(r, c))
 
     def timeout(self):
         if len(self._image_list) > 0:
