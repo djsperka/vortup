@@ -1,6 +1,6 @@
 from qtpy.QtWidgets import QApplication, QMainWindow, QWidget, QGridLayout, QLabel
-from qtpy.QtCore import QTimer, Signal
-from qtpy.QtGui import QPixmap, QImage, QPen, QColor, QPainter
+from qtpy.QtCore import QTimer, Signal, Qt
+from qtpy.QtGui import QPixmap, QImage, QPen, QColor, QPainter, QKeyEvent
 from image_display import ImageDisplay
 from PIL import Image
 
@@ -24,6 +24,9 @@ class MyImageWidget(QLabel):
         self.setMinimumSize(256, 256)
         self._userdata = None
         self._selected = False
+        self._keyboard_enabled = True
+        self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+
 
     @property
     def userdata(self):
@@ -51,6 +54,17 @@ class MyImageWidget(QLabel):
         (r, c) = self.userdata
         print("double click at {:d},{:d}".format(r, c))
         self.__doubleclicked_signal.emit(r, c)
+
+    def keyPressEvent(self, e: QKeyEvent) -> None:
+        if self._keyboard_enabled:
+            if e.key() == Qt.Key.Key_H:
+                # get min and max of image
+                pixmap = self.pixmap()
+                image = pixmap.toImage()
+                bits = image.bits()
+                print(bits)
+                print(type(bits))
+
 
     def paintEvent(self, ev):
 
