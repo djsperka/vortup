@@ -3,13 +3,14 @@ from typing import Any, Dict
 from ScanConfigWidget import RasterScanConfigWidget
 from ScanParams import RasterScanParams
 from OCTUiParams import OCTUiParams
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QTabWidget
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
 from TraceWidget import AscanTraceWidget, SpectraTraceWidget
 from CrossSectionDrawingWidget import CrossSectionDrawingWidget
+from MultiPlotSelectWidget import MPSW
 import matplotlib as mpl
 from math import radians
-
+import numpy as np
 from vortex.scan import RasterScan, RasterScanConfig
 from vortex.engine import StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, SpectraStackEndpoint, NullEndpoint
 from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, SimpleSlice
@@ -65,12 +66,14 @@ class RasterScanGUIHelper(ScanGUIHelper):
         self._spectra_trace_widget.flush()
 
     def cb_ascan(self, v):
-        self._cross_widget.notify_segments(v)
-        self._raster_widget.notify_segments(v)
-        self._ascan_trace_widget.update_trace(v)
+        if self._tabwidget.currentIndex() == 0:
+            self._cross_widget.notify_segments(v)
+            self._raster_widget.notify_segments(v)
+            self._ascan_trace_widget.update_trace(v)
 
     def cb_spectra(self, v):
-        self._spectra_trace_widget.update_trace(v)
+        if self._tabwidget.currentIndex() == 0:
+            self._spectra_trace_widget.update_trace(v)
 
     def cb_volume(self, sample_idx, scan_idx, volume_idx):
         """volume callback that is (should be) called prior to other volume callbacks. 
@@ -82,8 +85,29 @@ class RasterScanGUIHelper(ScanGUIHelper):
             scan_idx (int): scan index
             volume_idx (int): volume index
         """
-        #print("raster cb_volume({0:d},{1:d},{2:d})".format(sample_idx, scan_idx, volume_idx))
-        pass
+
+        # we only care if we are at index 1
+        if self._tabwidget.currentIndex() == 1:
+            print("raster cb_volume({0:d},{1:d},{2:d})".format(sample_idx, scan_idx, volume_idx))
+            with self.components.spectra_endpoint.tensor as volume:
+                shape = volume.shape
+                if isinstance(volume, np.ndarray):
+                    spectra_data = volume.copy()
+                else:
+                    spectra_data = volume.copy().get()
+                #self._logger.info("spectra nbytes: {0:d}".format(spectra_data.nbytes))
+
+            # ascan_data is a current en face image
+            with self.components.ascan_endpoint.tensor as volume:
+                shape = volume.shape
+                #self._logger.info("ascan shape {0:d} x {1:d} x {2:d}, type {3:s}".format(shape[0], shape[1], shape[2], str(type(volume))))
+                if isinstance(volume, np.ndarray):
+                    ascan_data = volume.max(axis=2).transpose().copy()
+                else:
+                    ascan_data = volume.max(axis=2).transpose().copy().get()
+                    self.components.ascan_endpoint.stream.synchronize()
+            print("volume cb_volume() spectra shape ", spectra_data.shape, " ascan shape ", ascan_data.shape)
+            self._mpsw.add_data(ascan_data, spectra_data)
 
     def getStrobe(self):
         return super().getStrobe()
@@ -142,10 +166,20 @@ class RasterScanGUIHelper(ScanGUIHelper):
 
 
     def getPlotWidget(self, ascan_endpoint, spectra_endpoint) -> QWidget:
+
+        # callbacks
+        ascan_endpoint.aggregate_segment_callback = self.cb_ascan
+        spectra_endpoint.aggregate_segment_callback = self.cb_spectra
+        spectra_endpoint.volume_callback = self.cb_volume
+
+
+        # make all widgets
+        self._tabwidget = QTabWidget()
         self._raster_widget = RasterEnFaceWidget(ascan_endpoint, cmap=mpl.colormaps['gray'])
         self._cross_widget = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'])
         self._ascan_trace_widget = AscanTraceWidget(ascan_endpoint, title="ascan")
         self._spectra_trace_widget = SpectraTraceWidget(spectra_endpoint, title="raw spectra")
+        self._mpsw = MPSW(parent=None, columns = 3, rows=3)
 
         # apply settings
         if 'enface.range' in self.settings:
@@ -160,13 +194,14 @@ class RasterScanGUIHelper(ScanGUIHelper):
         if 'spectra.ylim' in self.settings:
             self._spectra_trace_widget.set_ylim(self.settings['spectra.ylim'])
 
-        
-        # callbacks
-        ascan_endpoint.aggregate_segment_callback = self.cb_ascan
-        spectra_endpoint.aggregate_segment_callback = self.cb_spectra
-        spectra_endpoint.volume_callback = self.cb_volume
+        # tab widget
+        self._tabwidget.currentChanged.connect(self._tabCurrentChanged)
 
-        # 
+
+
+
+        # make first tab page
+        tab0 = QWidget()
         vbox = QVBoxLayout()
         hbox_upper = QHBoxLayout()
         hbox_upper.addWidget(self._raster_widget)
@@ -176,7 +211,21 @@ class RasterScanGUIHelper(ScanGUIHelper):
         hbox_lower.addWidget(self._ascan_trace_widget)
         vbox.addLayout(hbox_upper)
         vbox.addLayout(hbox_lower)
-        w = QWidget()
-        w.setLayout(vbox)
-        return w
+        tab0.setLayout(vbox)
 
+        tab0_index = self._tabwidget.addTab(tab0, "default")
+        self._logger.info("tab 0 has index {:d}".format(tab0_index))
+
+        # make second tab page
+        tab1 = QWidget()
+        hbox1 = QHBoxLayout()
+        hbox1.addWidget(self._mpsw)
+        tab1.setLayout(hbox1)
+        tab1_index = self._tabwidget.addTab(tab1, "DAQ")
+        self._logger.info("tab 1 has index {:d}".format(tab1_index))
+
+        return self._tabwidget
+
+    def _tabCurrentChanged(self, newindex):
+        self._logger.info("tabCurrentChanged to {:d}".format(newindex))
+        self._logger.info("current is {:d}".format(self._tabwidget.currentIndex()))
