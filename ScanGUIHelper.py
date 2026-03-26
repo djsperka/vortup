@@ -121,6 +121,16 @@ class ScanGUIHelper(ABC):
         pass
 
     @abstractmethod
+    def getSettings(self) -> dict:
+        """Gets settings for plots. Each subclass can decide for itself what settings to save. 
+
+        Returns:
+            dict: 
+        """
+        pass
+
+
+    @abstractmethod
     def clear(self):
         """Clear plots and any internal data
         Returns:
