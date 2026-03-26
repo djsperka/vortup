@@ -313,7 +313,7 @@ class AscanTraceWidget(FigureCanvas):
             self._axes.grid(which="minor", color="0.5")            
             self._axes.grid(which="major", color="0.5")            
             #self._axes.set_ylim(10**-1, 10**2)
-            self._axes.set_ylim(1, 100)
+            self._axes.set_ylim(10, 100)
             self._axes.set_ylabel('dB')
             
             self._line2d = line2ds[0]
