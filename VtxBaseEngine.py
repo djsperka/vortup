@@ -24,7 +24,7 @@ class VtxBaseEngine():
             ac = AlazarConfig()
 
             if cfg.internal_clock:
-                LOGGER.warning("alazar internal clock not tested in this program!")
+                LOGGER.warn("alazar internal clock not tested in this program!")
                 ac.clock = alazar.InternalClock(cfg.clock_samples_per_second)
 
 

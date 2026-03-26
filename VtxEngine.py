@@ -62,7 +62,7 @@ class VtxEngine(VtxBaseEngine):
                 strobe.initialize(strobec)
                 self._strobe = strobe
             else:
-                self._logger.warning('Strobe is enabled, but no strobe outputs are configured.')
+                self._logger.warn('Strobe is enabled, but no strobe outputs are configured.')
                 self._strobe = None
         else:
             self._strobe = None
@@ -100,5 +100,5 @@ class VtxEngine(VtxBaseEngine):
             self._engine.wait()
             self._logger.info('stopped.')
         else:
-            self._logger.warning('engine is not running')
+            self._logger.warn('engine is not running')
             

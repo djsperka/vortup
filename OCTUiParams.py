@@ -97,7 +97,7 @@ class OCTUiParams():
         if len(config_file):
             maybepath = Path(config_file)
             if not maybepath.exists():
-                local_logger.warning('Config file {0:s} not found.'.format(config_file))
+                local_logger.warn('Config file {0:s} not found.'.format(config_file))
             self.__cfgpath = maybepath
         else:
             self.__cfgpath = default_config_path
