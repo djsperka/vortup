@@ -176,7 +176,7 @@ class OCTUi(QObject):
             # get oct engine ready
             if self._vtxengine:
                 if not self._vtxengine._engine.done:
-                    self._logger.warning('engine is not stopped')
+                    self._logger.warn('engine is not stopped')
                     return
                 del self._vtxengine
             self._vtxengine = None
@@ -331,7 +331,7 @@ class OCTUi(QObject):
                 self._savingVolumesThisManySaved = 0
                 self._octDialog.gbSaveVolumes.enableSaving(False, self._savingVolumesThisMany==0)
             else:
-                self._logger.warning("Cannot open file {0:s} for saving.".format(filename))
+                self._logger.warn("Cannot open file {0:s} for saving.".format(filename))
                 self._savingVolumesRequested = False
 
     def volumeCallback2(self, arg0, arg1, arg2):
