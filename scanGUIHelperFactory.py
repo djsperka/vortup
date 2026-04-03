@@ -5,8 +5,6 @@ from AimingScanGUIHelper import AimingScanGUIHelper
 from GalvoTuningScanGUIHelper import GalvoTuningScanGUIHelper
 from typing import Any, Dict
 from ScanParams import RasterScanParams, AimingScanParams, LineScanParams, GalvoTuningScanParams
-from AcqParams import AcqParams
-from vortex import get_console_logger as get_logger
 
 
 def scanGUIHelperFactory(name: str, number: int, params: RasterScanParams|AimingScanParams|LineScanParams|GalvoTuningScanParams, settings: Dict[str, Any]) -> ScanGUIHelper:
