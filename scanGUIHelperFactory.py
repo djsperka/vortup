@@ -17,5 +17,5 @@ def scanGUIHelperFactory(name: str, number: int, params: RasterScanParams|Aiming
     elif isinstance(params, GalvoTuningScanParams):
         g=GalvoTuningScanGUIHelper(name, number, params, settings)
     else:
-        raise TypeError('Must pass one of these: RasterScanParams|AimingScanParams|LineScanParams')
+        raise TypeError('Must pass one of these: RasterScanParams|AimingScanParams|LineScanParams|GalvoTuningScanGUIHelper')
     return g
