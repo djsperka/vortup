@@ -1,6 +1,6 @@
 from qtpy.QtWidgets import QApplication, QMainWindow, QWidget, QGridLayout, QLabel
 from qtpy.QtCore import QTimer, Signal, Qt
-from qtpy.QtGui import QPixmap, QImage, QPen, QColor, QPainter, QKeyEvent
+from qtpy.QtGui import QPixmap, QImage, QPen, QColor, QPainter
 from image_display import ImageDisplay
 from PIL import Image
 
@@ -15,18 +15,23 @@ class MyImageWidget(QLabel):
     __clicked_signal = Signal(int, int, name='clicked')
     __doubleclicked_signal = Signal(int, int, name='doubleclicked')
  #  __selected_color = QColor(102, 255, 51)
-    __selected_color = QColor(51, 204, 255)
+    __selected_color = QColor(0, 255, 0)
     __selected_width = 8
+    __latest_color = QColor(255, 0, 0)
+    __latest_width = 8
+
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setScaledContents(True)
+        #self.setStyleSheet("background-color: gray;")
+        self.setScaledContents(False)
+        self.setAlignment(Qt.AlignCenter)
         self.setMinimumSize(256, 256)
         self._userdata = None
         self._selected = False
-        self._keyboard_enabled = True
-        self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
-
+        self._latest = False
+        self._original_pixmap = None
+        self._first_show = False
 
     @property
     def userdata(self):
@@ -36,6 +41,14 @@ class MyImageWidget(QLabel):
     def userdata(self, value):
         self._userdata = value
 
+    @property
+    def latest(self):
+        return self._latest
+
+    @latest.setter
+    def latest(self, value: bool):
+        self._latest = bool(value)
+
     def set_image(self, data: np.ndarray):
         #        qrgb_dict = {'r': lambda x: QtGui.qRgb(x, 0, 0),
         #              'g': lambda x: QtGui.qRgb(0, x, 0),
@@ -44,7 +57,10 @@ class MyImageWidget(QLabel):
         s=data.shape
         img = QImage(data, s[1], s[0], s[1], QImage.Format_Indexed8)
         qpix = QPixmap(QImage(img))
-        self.setPixmap(qpix)
+        self._original_pixmap = qpix
+        self._scaleAndSetPixmap()
+        self.update()
+
 
     def mousePressEvent(self, ev):
         d = self.userdata
@@ -55,35 +71,46 @@ class MyImageWidget(QLabel):
         print("double click at {:d},{:d}".format(r, c))
         self.__doubleclicked_signal.emit(r, c)
 
-    def keyPressEvent(self, e: QKeyEvent) -> None:
-        if self._keyboard_enabled:
-            if e.key() == Qt.Key.Key_H:
-                # get min and max of image
-                pixmap = self.pixmap()
-                image = pixmap.toImage()
-                bits = image.bits()
-                print(bits)
-                print(type(bits))
-
-
     def paintEvent(self, ev):
-
         super().paintEvent(ev)
 
         painter = QPainter()
         painter.begin(self)
         if self._selected:
             # draw box at edge
-            self._drawOutlineBox(painter)
+            self._drawOutlineBox(painter, self.__selected_color, self.__selected_width)
+        elif self._latest:
+            self._drawOutlineBox(painter, self.__latest_color, self.__latest_width)
         painter.end()
 
 
-    def _drawOutlineBox(self, painter: QPainter):
+    def _drawOutlineBox(self, painter: QPainter, color: QColor = QColor(255, 255, 255), width: int = 8):
         painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Source)
-        pen = QPen(self.__selected_color)
-        pen.setWidth(self.__selected_width)
+        pen = QPen(color)
+        pen.setWidth(width)
         painter.setPen(pen)
-        painter.drawRect(0, 0, self.width(), self.height())
+        W=self.pixmap().width()
+        H=self.pixmap().height()
+        hpw = width//2          # half pen width
+        x0 = (self.width() - W) // 2
+        y0 = (self.height() - H) // 2
+        painter.drawRect(x0, y0, W - hpw+1, H - hpw+1)
+
+    def _scaleAndSetPixmap(self):
+        if self._original_pixmap:
+            scaled = self._original_pixmap.scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.setPixmap(scaled)
+
+    def showEvent(self, event):
+        if not self._first_show:
+            self._first_show = True
+            self._scaleAndSetPixmap()
+        super().showEvent(event)
+
+    def resizeEvent(self, event):
+        self._scaleAndSetPixmap()
+        super().resizeEvent(event)
+
 
 
 
@@ -109,6 +136,7 @@ class MPSW(QWidget):
         super().__init__(parent)
         self._rows = rows
         self._columns = columns
+        self._last_position = (0, 0)   # this will keep track of the last position that was updated
 
         layout = QGridLayout()
 
@@ -118,7 +146,10 @@ class MPSW(QWidget):
         self._widgets = [[0 for _ in range(self._columns)] for _ in range(self._rows)]
         self._count = -1     # this will keep track of the next position to be replaced
         for i in range(self._columns):
+            layout.setColumnStretch(i, 1)   # add column stretch once to each column
             for j in range(self._rows):
+                if i == 0:
+                    layout.setRowStretch(j, 1)   # add row stretch to each row, only at column 0
                 self._widgets[j][i] = MyImageWidget()
                 self._widgets[j][i].userdata = (j,i)
                 self._widgets[j][i].clicked.connect(self.image_clicked)
@@ -168,18 +199,9 @@ class MPSW(QWidget):
         (r, c) = self._next_position()
         self._data[r][c] = MPSWData(ascan_data, spectra_data)
         self._widgets[r][c].set_image(ascan_data)
-        # find first empty slot, save it there
-        # for i in range(self._columns):
-        #     for j in range(self._rows):
-        #         if self._data[j][i] is None:
-        #             self._data[j][i] = MPSWData(ascan_data, spectra_data)
-        #             self._widgets[j][i].set_image(ascan_data)
-        #             break
-        #     else:
-        #         # The else here is executed ONLY IF THERE WAS NO BREAK!
-        #         # In other words, this is executed when the loop runs to completion.
-        #         continue
-        #     break
+        self._widgets[self._last_position[0]][self._last_position[1]].latest = False
+        self._widgets[r][c].latest = True
+        self._last_position = (r, c)
 
 
 
