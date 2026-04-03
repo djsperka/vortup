@@ -63,8 +63,9 @@ class MyImageWidget(QLabel):
 
 
     def mousePressEvent(self, ev):
-        d = self.userdata
-        self.__clicked_signal.emit(*d)
+        if self._original_pixmap is not None:
+            d = self.userdata
+            self.__clicked_signal.emit(*d)
 
     def mouseDoubleClickEvent(self, ev):
         (r, c) = self.userdata
