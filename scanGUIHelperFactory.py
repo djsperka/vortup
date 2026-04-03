@@ -7,15 +7,15 @@ from typing import Any, Dict
 from ScanParams import RasterScanParams, AimingScanParams, LineScanParams, GalvoTuningScanParams
 
 
-def scanGUIHelperFactory(name: str, number: int, params: RasterScanParams|AimingScanParams|LineScanParams|GalvoTuningScanParams, settings: Dict[str, Any]) -> ScanGUIHelper:
+def scanGUIHelperFactory(name: str, number: int, params: RasterScanParams|AimingScanParams|LineScanParams|GalvoTuningScanParams, settings: Dict[str, Any], octui) -> ScanGUIHelper:
     if isinstance(params, RasterScanParams): 
-        g=RasterScanGUIHelper(name, number, params, settings)
+        g=RasterScanGUIHelper(name, number, params, settings, octui)
     elif isinstance(params, AimingScanParams):
-        g=AimingScanGUIHelper(name, number, params, settings)
+        g=AimingScanGUIHelper(name, number, params, settings, octui)
     elif isinstance(params, LineScanParams):
-        g=LineScanGUIHelper(name, number, params, settings)
+        g=LineScanGUIHelper(name, number, params, settings, octui)
     elif isinstance(params, GalvoTuningScanParams):
-        g=GalvoTuningScanGUIHelper(name, number, params, settings)
+        g=GalvoTuningScanGUIHelper(name, number, params, settings, octui)
     else:
         raise TypeError('Must pass one of these: RasterScanParams|AimingScanParams|LineScanParams|GalvoTuningScanGUIHelper')
     return g

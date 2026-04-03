@@ -68,7 +68,7 @@ class MyImageWidget(QLabel):
 
     def mouseDoubleClickEvent(self, ev):
         (r, c) = self.userdata
-        print("double click at {:d},{:d}".format(r, c))
+        #print("double click at {:d},{:d}".format(r, c))
         self.__doubleclicked_signal.emit(r, c)
 
     def paintEvent(self, ev):
@@ -158,7 +158,7 @@ class MPSW(QWidget):
 
         self.setLayout(layout)
 
-    def get_data(self, r, c):
+    def get_data(self, r, c) -> MPSWData:
         if r<self._rows and c < self._columns:
             return self._data[r][c]
         else:
@@ -176,10 +176,10 @@ class MPSW(QWidget):
 
     def image_clicked(self, r, c):
         self._update_selected(r, c)
-        print("Image clicked r={:d} c={:d}, width={:d} height={:d}".format(r, c, self._widgets[r][c].width(), self._widgets[r][c].height()))
+        #print("Image clicked r={:d} c={:d}, width={:d} height={:d}".format(r, c, self._widgets[r][c].width(), self._widgets[r][c].height()))
 
     def image_doubleclicked(self, r, c):
-        print("Image doubleclicked r={:d} c={:d}, width={:d} height={:d}".format(r, c, self._widgets[r][c].width(), self._widgets[r][c].height()))
+        #print("Image doubleclicked r={:d} c={:d}, width={:d} height={:d}".format(r, c, self._widgets[r][c].width(), self._widgets[r][c].height()))
         self.__save_signal.emit(r, c)
 
     def _ind2sub(self, ind):

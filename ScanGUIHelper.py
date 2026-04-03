@@ -3,6 +3,7 @@ from typing import Union
 from abc import ABC, abstractmethod
 from typing import List, Any, Dict, Tuple
 from OCTUiParams import OCTUiParams
+#from OCTUi import OCTUi
 from VtxEngineParams import VtxEngineParams, AcquisitionType
 from vortex.engine import NullEndpoint, VolumeStrobe, SegmentStrobe, SampleStrobe, EventStrobe
 from vortex.engine import StackDeviceTensorEndpointInt8, StackHostTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, SpectraStackEndpoint, NullEndpoint, EventStrobe
@@ -64,7 +65,7 @@ class ScanGUIHelper(ABC):
     The edit widget should be created in the constructor, but the components will not be created until createComponents() is called, 
     with the latest engine parameters as an argument. 
     '''
-    def __init__(self, name, flags, params, settings, log_level=1):
+    def __init__(self, name, flags, params, settings, octui, log_level=1):
         '''
         Docstring for __init__
         
@@ -73,12 +74,14 @@ class ScanGUIHelper(ABC):
         :param flags: Bit pattern, will be arg for vortex.marker.Flags()
         :param params: Parameters for the helper's edit dialog
         :param settings: Settings for this helper's plots (saved range, etc)
+        :param octui: OCTUi object
         :param log_level: Log level for vortex loggers
         '''
         self.name = name
         self.flags = flags
         self.params = params
         self.settings = settings
+        self.octui = octui
         self.log_level = log_level
         self._logger = get_console_logger('GUIHelper({0:s})'.format(self.name))
         self._components = None

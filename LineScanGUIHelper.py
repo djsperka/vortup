@@ -26,8 +26,8 @@ class LineScanGUIHelper(ScanGUIHelper):
     '''
     GUIHelper for a line scan.
     '''
-    def __init__(self, name: str, number: int, params: LineScanParams, settings: Dict[str, Any]):
-        super().__init__(name, number, params, settings)
+    def __init__(self, name: str, number: int, params: LineScanParams, settings: Dict[str, Any], octui):
+        super().__init__(name, number, params, settings, octui)
 
         self._edit_widget = LineScanConfigWidget()
         self._edit_widget.setLineScanParams(self.params)
@@ -113,7 +113,7 @@ class LineScanGUIHelper(ScanGUIHelper):
         # if strobe needed, put marker into correct segment
         if params.strobe_enabled:
             if params.strobe_bscan_index < 0 or params.strobe_bscan_index>(params.lines_per_volume-1):
-                self._logger.warning("Cannot add strobe trigger at bscan index {0:d}: must be in less than lines per volume ({1:d})".format(params.strobe_bscan_index, params.lines_per_volume))
+                self._logger.warn("Cannot add strobe trigger at bscan index {0:d}: must be in less than lines per volume ({1:d})".format(params.strobe_bscan_index, params.lines_per_volume))
             else:
                 e = Event()
                 e.flags = Flags(self.flags)

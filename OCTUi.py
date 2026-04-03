@@ -74,7 +74,7 @@ class OCTUi(QObject):
             else:
                 s = {}
 
-            self._guihelpers.append(scanGUIHelperFactory(name, flag, cfg, s))
+            self._guihelpers.append(scanGUIHelperFactory(name, flag, cfg, s, self))
             self._octDialog.widgetScanConfig.addScanType(name, self._guihelpers[-1].edit_widget)
 
         self._octDialog.widgetScanConfig.setCurrentIndex(self._params.scn.current_index)
@@ -311,7 +311,7 @@ class OCTUi(QObject):
         shape = helper.components.spectra_endpoint.tensor.shape
         #self._logger.info("volumeCallback({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
         if self._savingVolumesRequested:
-            (bOK, filename) = self.checkFileSaveStuff()
+            (bOK, baseFilename) = self.checkFileSaveStuff()
             if bOK:
                 # Create SimpleStackConfig to config storage
                 npsc = SimpleStackConfig()
@@ -322,7 +322,7 @@ class OCTUi(QObject):
                 self._logger.info("volumeCallback:({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
                 npsc.shape = (shape[0], shape[1], shape[2], 1)
                 npsc.header = SimpleStackHeader.NumPy
-                npsc.path = filename
+                npsc.path = baseFilename + ".npy"
                 self._logger.info('Open storage.')
                 helper.components.storage.open(npsc)
                 self._savingVolumesNow = True
@@ -331,7 +331,7 @@ class OCTUi(QObject):
                 self._savingVolumesThisManySaved = 0
                 self._octDialog.gbSaveVolumes.enableSaving(False, self._savingVolumesThisMany==0)
             else:
-                self._logger.warn("Cannot open file {0:s} for saving.".format(filename))
+                self._logger.warn("Cannot open file {0:s} for saving.".format(baseFilename))
                 self._savingVolumesRequested = False
 
     def volumeCallback2(self, arg0, arg1, arg2):
@@ -364,16 +364,16 @@ class OCTUi(QObject):
     def checkFileSaveStuff(self) -> Tuple[bool, str]:
         """This function will verify that the file save root folder is accessible. If so, 
         a new folder with the name yyyy-MM-dd is created (if it doesn't already exist). A new 
-        filename is generated and returned. 
+        filename WITHOUT EXTENSION is generated and returned. 
         """
 
         # Try to create new folder
         now = datetime.now()
         sFolder = now.strftime('%Y-%m-%d')
-        sFile = now.strftime('%Y-%m-%d-%H%M%S.npy')
+        sFileBase = now.strftime('%Y-%m-%d-%H%M%S')
         p = self._octDialog.gbSaveVolumes.pathDataRoot / sFolder
         p.mkdir(parents=True, exist_ok=True)
-        return (True, str(p / sFile))
+        return (True, str(p / sFileBase))
 
     def saveNVolumes(self, n: int):
         self._savingVolumesRequested = True

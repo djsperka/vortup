@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QTabWidget
 from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
 from TraceWidget import AscanTraceWidget, SpectraTraceWidget
 from CrossSectionDrawingWidget import CrossSectionDrawingWidget
-from MultiPlotSelectWidget import MPSW
+from MultiPlotSelectWidget import MPSW, MPSWData
 import matplotlib as mpl
 from math import radians
 import numpy as np
@@ -20,8 +20,8 @@ from vortex import get_console_logger as get_logger
 
 
 class RasterScanGUIHelper(ScanGUIHelper):
-    def __init__(self, name: str, flags: int, params: RasterScanParams, settings: Dict[str, Any]):
-        super().__init__(name, flags, params, settings)
+    def __init__(self, name: str, flags: int, params: RasterScanParams, settings: Dict[str, Any], octui):
+        super().__init__(name, flags, params, settings, octui)
 
         self._edit_widget = RasterScanConfigWidget()
         self._edit_widget.setRasterScanParams(self.params)
@@ -29,6 +29,7 @@ class RasterScanGUIHelper(ScanGUIHelper):
         self._cross_widget = None
         self._ascan_trace_widget = None
         self._spectra_trace_widget = None
+        self._mpsw = None
         #self._plot_widget = self.rasterPlotWidget()
 
     def getSettings(self):
@@ -88,7 +89,7 @@ class RasterScanGUIHelper(ScanGUIHelper):
 
         # we only care if we are at index 1
         if self._tabwidget.currentIndex() == 1:
-            print("raster cb_volume({0:d},{1:d},{2:d})".format(sample_idx, scan_idx, volume_idx))
+            #print("raster cb_volume({0:d},{1:d},{2:d})".format(sample_idx, scan_idx, volume_idx))
             with self.components.spectra_endpoint.tensor as volume:
                 shape = volume.shape
                 if isinstance(volume, np.ndarray):
@@ -106,7 +107,7 @@ class RasterScanGUIHelper(ScanGUIHelper):
                 else:
                     ascan_data = volume.max(axis=2).transpose().copy().get()
                     self.components.ascan_endpoint.stream.synchronize()
-            print("volume cb_volume() spectra shape ", spectra_data.shape, " ascan shape ", ascan_data.shape)
+            #print("volume cb_volume() spectra shape ", spectra_data.shape, " ascan shape ", ascan_data.shape)
             self._mpsw.add_data(ascan_data, spectra_data)
 
     def getStrobe(self):
@@ -180,6 +181,7 @@ class RasterScanGUIHelper(ScanGUIHelper):
         self._ascan_trace_widget = AscanTraceWidget(ascan_endpoint, title="ascan")
         self._spectra_trace_widget = SpectraTraceWidget(spectra_endpoint, title="raw spectra")
         self._mpsw = MPSW(parent=None, columns = 3, rows=3)
+        self._mpsw.save.connect(self._savedata)
 
         # apply settings
         if 'enface.range' in self.settings:
@@ -226,6 +228,19 @@ class RasterScanGUIHelper(ScanGUIHelper):
 
         return self._tabwidget
 
+    def _savedata(self, r, c):
+        self._logger.info("save data at r={:d} c={:d}".format(r, c))
+        data = self._mpsw.get_data(r, c)
+        self._logger.info("ASCAN shape {:s}, dtype {:s}".format(str(data.ascan_data.shape), str(data.ascan_data.dtype)))
+        self._logger.info("SPECTRA shape {:s}, dtype {:s}".format(str(data.spectra_data.shape), str(data.spectra_data.dtype)))
+        (bOK, baseFilename) = self.octui.checkFileSaveStuff()
+        if bOK:
+            self._logger.info("saving to {0:s}".format(baseFilename))
+            np.savez(baseFilename+".npz", ascan=data.ascan_data, spectra=data.spectra_data)
+
+        #self.components.storage.save(data)
+
     def _tabCurrentChanged(self, newindex):
-        self._logger.info("tabCurrentChanged to {:d}".format(newindex))
-        self._logger.info("current is {:d}".format(self._tabwidget.currentIndex()))
+        #self._logger.info("tabCurrentChanged to {:d}".format(newindex))
+        #self._logger.info("current is {:d}".format(self._tabwidget.currentIndex()))
+        pass

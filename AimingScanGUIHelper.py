@@ -22,8 +22,8 @@ class AimingScanGUIHelper(ScanGUIHelper):
     '''
     GUIHelper for an aiming scan. The config for an aiming scan 
     '''
-    def __init__(self, name: str, flags: int, params: AimingScanParams, settings: Dict[str, Any]):
-        super().__init__(name, flags, params, settings)
+    def __init__(self, name: str, flags: int, params: AimingScanParams, settings: Dict[str, Any], octui):
+        super().__init__(name, flags, params, settings, octui)
 
         self._edit_widget = AimingScanConfigWidget()
         self._edit_widget.setAimingScanParams(self.params)
