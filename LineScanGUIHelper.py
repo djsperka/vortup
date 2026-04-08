@@ -6,7 +6,7 @@ from AcqParams import AcqParams
 from OCTUiParams import OCTUiParams
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
 from vortex_tools.ui.display import CrossSectionImageWidget
-from LineScanTraceWidget import LineScanTraceWidget
+from TraceWidget import AscanTraceWidget
 import matplotlib as mpl
 import numpy as np
 
@@ -34,9 +34,8 @@ class LineScanGUIHelper(ScanGUIHelper):
 
         # These are saved here (they are also in _components, as part of the plot_widget)
         # for convenience
-        self._cross_widget_1 = None
-        self._cross_widget_2 = None
-        self._linescan_trace_widget = None
+        self._cross_widget = None
+        self._ascan_trace_widget = None
         
         #self._plot_widget = self.linePlotWidget()
 
@@ -44,14 +43,8 @@ class LineScanGUIHelper(ScanGUIHelper):
         # with self.spectra_endpoint.tensor as volume:
         #     print("{0:d}, ({1:d},{2:d},{3:d})".format(v[-1], volume.shape[0], volume.shape[1], volume.shape[2]))
         if v:
-            if v[-1]%2:
-                self._cross_widget_1.notify_segments(v)
-            else:
-                self._cross_widget_2.notify_segments(v)
-        else:
-            self._cross_widget_1.notify_segments(v)
-            self._cross_widget_2.notify_segments(v)
-        self._linescan_trace_widget.update_trace(v)
+            self._cross_widget.notify_segments(v)
+            self._ascan_trace_widget.update_trace(v)
 
     def volume(self, sample_idx, scan_idx, volume_idx):
         """volume callback for managing plots
@@ -188,32 +181,30 @@ class LineScanGUIHelper(ScanGUIHelper):
     
     def getPlotWidget(self, ascan_endpoint) -> QWidget:
         #self._mpsw = MPSW()
-        self._cross_widget_1 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="one way")
-        self._cross_widget_2 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="other way")
-        self._linescan_trace_widget = LineScanTraceWidget(ascan_endpoint, title="Galvo tuning")
+        self._cross_widget = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="Cross section")
+        self._ascan_trace_widget = AscanTraceWidget(ascan_endpoint, title="Ascan")
 
         # apply settings
-        if 'cross1.range' in self.settings:
-            self._cross_widget_1._range = self.settings['cross1.range']
+        if 'cross.range' in self.settings:
+            self._cross_widget._range = self.settings['cross.range']
 
-        if 'cross2.range' in self.settings:
-            self._cross_widget_2._range = self.settings['cross2.range']
-
-        if 'linescan.ylim' in self.settings:
-            self._linescan_trace_widget.set_ylim(self.settings['linescan.ylim'])
+        if 'ascan.ylim' in self.settings:
+            self._ascan_trace_widget.set_ylim(self.settings['ascan.ylim'])
 
         # callbacks
         ascan_endpoint.aggregate_segment_callback = self.cb_ascan
 
         # 
         hbox = QHBoxLayout()
-        vbox_left = QVBoxLayout()
-        vbox_left.addWidget(self._cross_widget_1)
-        vbox_left.addWidget(self._cross_widget_2)
-        vbox_right = QVBoxLayout()
-        vbox_right.addWidget(self._linescan_trace_widget)
-        hbox.addLayout(vbox_left)
-        hbox.addLayout(vbox_right)
+        hbox.addWidget(self._cross_widget)
+        hbox.addWidget(self._ascan_trace_widget)
+        # vbox_left = QVBoxLayout()
+        # vbox_left.addWidget(self._cross_widget_1)
+        # vbox_left.addWidget(self._cross_widget_2)
+        # vbox_right = QVBoxLayout()
+        # vbox_right.addWidget(self._linescan_trace_widget)
+        # hbox.addLayout(vbox_left)
+        # hbox.addLayout(vbox_right)
         w = QWidget()
         w.setLayout(hbox)
         #return self._mpsw
