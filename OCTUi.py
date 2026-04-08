@@ -94,7 +94,7 @@ class OCTUi(QObject):
         self._octDialog.pbStop.clicked.connect(self.stopClicked)
         self._octDialog.pbStart.enabled = True  
         self._octDialog.pbStop.enabled = False  
-        self._octDialog.resize(1000,800)              
+        self._octDialog.resize(1600,1200)              
         self._octDialog.show()
 
     def scanTypeChanged(self, index: int):
