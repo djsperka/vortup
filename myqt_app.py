@@ -1,14 +1,20 @@
 import sys
+import math
+import random
 from pathlib import Path
 
 import numpy as np
 from qtpy.QtGui import QImage
 from qtpy.QtWidgets import QApplication, QDialog, QVBoxLayout
+from qtpy.QtCore import QTimer, Qt
+from qtpy.QtGui import QPen, QBrush, QColor
+from QCustomPlot_PyQt5 import QCustomPlot, QCP
 
 from myqt import MyNumpyImageWidget
 
 IMAGE_PATH = Path('/home/dan/work/oct/vortup/pattern.tiff')
-
+customPlot = None
+graph0 = None
 
 def make_gradient_image(width: int, height: int) -> np.ndarray:
     x = np.linspace(0, 1, width)
@@ -47,8 +53,39 @@ def qimage_to_numpy(image: QImage) -> np.ndarray:
     return img
 
 
+def makeRandomPlotData(num_points: int) -> (list, list):
+    x = list(range(num_points))
+    y = random.sample(range(1, 100), num_points)
+    return (x, y)
+
+def makePlotWidget():
+    customPlot = QCustomPlot()
+    graph0 = customPlot.addGraph()
+    graph0.setPen(QPen(Qt.blue))
+    graph0.setBrush(QBrush(QColor(0, 0, 255, 20)))
+
+    (x, y) = makeRandomPlotData(50)
+
+    graph0.setData(x, y)
+
+    customPlot.rescaleAxes()
+    customPlot.setInteraction(QCP.iRangeDrag)
+    customPlot.setInteraction(QCP.iRangeZoom)
+    customPlot.setInteraction(QCP.iSelectPlottables)
+    return customPlot
+
+
+def timeout():
+    if graph0 is not None:
+        (x, y) = makeRandomPlotData(50)
+        graph0.setData(x, y)
+        graph0.replot()
+
 def main() -> int:
     app = QApplication(sys.argv)
+    timer = QTimer()
+    timer.timeout.connect(timeout)  # Connect to the timeout function
+    timer.start(1000)  # Call timeout every 1000 ms (1 second)  
 
     data = make_gradient_image(256, 256)
     widget = MyNumpyImageWidget(
@@ -61,6 +98,9 @@ def main() -> int:
     dialog.setWindowTitle('MyNumpyImageWidget Viewer')
     layout = QVBoxLayout(dialog)
     layout.addWidget(widget)
+
+    layout.addWidget(makePlotWidget())
+
     dialog.resize(900, 700)
     dialog.show()
 
