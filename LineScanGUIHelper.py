@@ -13,7 +13,7 @@ import numpy as np
 
 from vortex import Range
 from vortex.scan import RasterScanConfig, FreeformScan, FreeformScanConfig
-from vortex.engine import StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, SpectraStackEndpoint, NullEndpoint, EventStrobe
+from vortex.engine import StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, SpectraStackEndpoint, NullEndpoint, EventStrobe, ScanQueue
 from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, SimpleSlice
 from vortex.storage import SimpleStackUInt16
 from vortex.marker import Flags, Event
@@ -31,6 +31,7 @@ class LineScanGUIHelper(ScanGUIHelper):
 
         self._edit_widget = LineScanConfigWidget()
         self._edit_widget.setLineScanParams(self.params)
+        self._edit_widget.pbTriggerAndSave.clicked.connect(self.triggerAndSave) 
 
         # These are saved here (they are also in _components, as part of the plot_widget)
         # for convenience
@@ -39,6 +40,22 @@ class LineScanGUIHelper(ScanGUIHelper):
         
         #self._plot_widget = self.linePlotWidget()
 
+    def cbScan1(self, i, scanEvent):
+        self._logger.info("LineScanGUIHelper::cbScan1: scanEvent {0:d}, {1:s}".format(i, str(scanEvent)))
+        if scanEvent == ScanQueue.Event.Start:
+            self._logger.info("LineScanGUIHelper::cbScan1: scan started, trigger storage open")
+            self.octui.saveNVolumes(1)
+
+    def cbScan2(self, i, scanEvent):
+        self._logger.info("LineScanGUIHelper::cbScan2: scanEvent {0:d}, {1:s}".format(i, str(scanEvent)))
+
+    def triggerAndSave(self):
+        self._logger.info("LineScanGUIHelper::triggerAndSave")
+        scan1 = self.getScan(doStrobe=True)
+        scan2 = self.getScan(doStrobe=False)
+        self.octui._vtxengine._engine.scan_queue.interrupt(scan1, callback=self.cbScan1)
+        self.octui._vtxengine._engine.scan_queue.append(scan2, callback=self.cbScan2)
+            
     def cb_ascan(self, v):
         # with self.spectra_endpoint.tensor as volume:
         #     print("{0:d}, ({1:d},{2:d},{3:d})".format(v[-1], volume.shape[0], volume.shape[1], volume.shape[2]))
@@ -54,26 +71,7 @@ class LineScanGUIHelper(ScanGUIHelper):
             scan_idx (int): scan index
             volume_idx (int): volume index
         """
-        #self._logger.info("LineScanGUIHelper::volume({0:d}, {1:d}, {2:d})".format(sample_idx, scan_idx, volume_idx))
-        # check shape of spectra volume
-        with self.components.spectra_endpoint.tensor as volume:
-            shape = volume.shape
-            if isinstance(volume, np.ndarray):
-                spectra_data = volume.copy()
-            else:
-                spectra_data = volume.copy().get()
-            #self._logger.info("spectra nbytes: {0:d}".format(spectra_data.nbytes))
-
-        with self.components.ascan_endpoint.tensor as volume:
-            shape = volume.shape
-            #self._logger.info("ascan shape {0:d} x {1:d} x {2:d}, type {3:s}".format(shape[0], shape[1], shape[2], str(type(volume))))
-            if isinstance(volume, np.ndarray):
-                ascan_data = volume.mean(axis=0).transpose().copy()
-            else:
-                ascan_data = volume.mean(axis=0).transpose().copy().get()
-        #self._mpsw.add_data(ascan_data=ascan_data, spectra_data=spectra_data)
-
-
+        pass
 
     def getParams(self):
         params = self._edit_widget.getLineScanParams()
@@ -89,23 +87,30 @@ class LineScanGUIHelper(ScanGUIHelper):
         # settings['linescan.ylim'] = list(self._linescan_trace_widget._axes.get_ylim())
         return settings
     
-    def getScan(self):
+    def getScan(self, doStrobe=False):
         params = self.getParams()
         cfg = RasterScanConfig()
         cfg.bscans_per_volume = params.lines_per_volume
         cfg.ascans_per_bscan = params.ascans_per_bscan
         cfg.bscan_extent = params.line_extent
+        cfg.angle = params.angle
         cfg.volume_extent = Range(0, 0)
         cfg.bidirectional_segments = params.bidirectional_segments
-        cfg.loop = True
+
+        # not sure what loop means here, as we are only fetching the segments.
+        if doStrobe:
+            cfg.loop = False
+        else:
+            cfg.loop = True
         cfg.flags = Flags(self.flags)
 
         # now, for grins, let's get the segments for this scan
         segments = cfg.to_segments()
 
         # if strobe needed, put marker into correct segment
-        if params.strobe_enabled:
-            if params.strobe_bscan_index < 0 or params.strobe_bscan_index>(params.lines_per_volume-1):
+        if doStrobe:
+            if params.strobe_bscan_index < 0 or params.strobe_bscan_index > (params.lines_per_volume - 1):
+                # TODO: should do this check in the edit widget, and disallow setting strobe index to an invalid value
                 self._logger.warn("Cannot add strobe trigger at bscan index {0:d}: must be in less than lines per volume ({1:d})".format(params.strobe_bscan_index, params.lines_per_volume))
             else:
                 e = Event()
@@ -114,15 +119,17 @@ class LineScanGUIHelper(ScanGUIHelper):
                 e.sample = 0
                 segments[params.strobe_bscan_index].markers.append(e)
 
+
         # now make scan
         ffsc = FreeformScanConfig()
         ffsc.pattern = segments
-        ffsc.loop = True
+        if doStrobe:
+            ffsc.loop = False
+        else:
+            ffsc.loop = True
 
         scan = FreeformScan()
         scan.initialize(ffsc)
-        # scan = RasterScan()
-        # scan.initialize(cfg)
         return scan
 
     def getStrobe(self):
