@@ -1,6 +1,7 @@
 import sys
 import math
 import random
+import time
 from pathlib import Path
 
 import numpy as np
@@ -8,7 +9,7 @@ from qtpy.QtGui import QImage
 from qtpy.QtWidgets import QApplication, QDialog, QVBoxLayout, QHBoxLayout
 from qtpy.QtCore import QTimer, Qt
 from qtpy.QtGui import QPen, QBrush, QColor
-from QCustomPlot_PyQt5 import QCustomPlot, QCP, QCPAxisRect, QCPAxisTickerLog, QCPColorMap, QCPColorScale, QCPMarginGroup, QCPRange, QCPColorGradient
+from QCustomPlot_PyQt5 import QCustomPlot, QCP, QCPAxisRect, QCPAxis, QCPAxisTickerLog, QCPColorMap, QCPColorMapData, QCPColorScale, QCPMarginGroup, QCPRange, QCPColorGradient, QCPGraph
 
 from myqt import MyNumpyImageWidget
 
@@ -65,17 +66,40 @@ def makeImageWidget():
         debug=False,
     )
 
-def makeCMImageWidget():
+def makeQCustomPlot():
     customPlot = QCustomPlot()
 
-    # configure axis rect:
-    customPlot.setInteractions(QCP.Interaction.iRangeDrag | QCP.Interaction.iRangeZoom) # this will also allow rescaling the color scale by dragging/zooming
-    customPlot.axisRect().setupFullAxesBox(True)
-    customPlot.xAxis.setLabel("x")
-    customPlot.yAxis.setLabel("y")
-        
+    # clear axes
+    customPlot.plotLayout().clear() # clear everything in the plot layout (axes, color scales, etc.)
+
+    # make axis rect for color map:
+    axisRectCM = QCPAxisRect(customPlot)
+    axisRectCM.setupFullAxesBox(True) # make left and bottom axes visible, but hide top and right axes
+    customPlot.plotLayout().addElement(0, 0, axisRectCM)
+
+    # axes for plot to the right of the color map:
+    axisRectPlot = QCPAxisRect(customPlot)
+    axisRectPlot.setupFullAxesBox(True) # make left and bottom axes visible, but
+    axisRectPlot.axis(QCPAxis.atLeft).setScaleType(QCPAxis.stLogarithmic)
+    logTicker = QCPAxisTickerLog()
+    axisRectPlot.axis(QCPAxis.atLeft).setTicker(logTicker)
+    axisRectPlot.axis(QCPAxis.atLeft).setNumberFormat("eb") # e = exponential, b = beautiful decimal powers
+    axisRectPlot.axis(QCPAxis.atLeft).setNumberPrecision(0)  #
+    axisRectPlot.axis(QCPAxis.atLeft).setRange(1e-2, 1e10)
+    customPlot.plotLayout().addElement(0, 1, axisRectPlot)
+
+    # axes for plot below the color map:
+    axisRectPlot2 = QCPAxisRect(customPlot)
+    axisRectPlot2.setupFullAxesBox(True) # make left and bottom axes visible, but
+    customPlot.plotLayout().addElement(1, 0, axisRectPlot2)
+
+    # axes for other plot below the color map:
+    axisRectPlot3 = QCPAxisRect(customPlot)
+    axisRectPlot3.setupFullAxesBox(True) # make left and bottom axes visible, but
+    customPlot.plotLayout().addElement(1, 1, axisRectPlot3)
+
     # set up the QCPColorMap:
-    colorMap = QCPColorMap(customPlot.xAxis, customPlot.yAxis)
+    colorMap = QCPColorMap(axisRectCM.axis(QCPAxis.atBottom), axisRectCM.axis(QCPAxis.atLeft))
     nx = 200
     ny = 200
     colorMap.data().setSize(nx, ny) # we want the color map to have nx * ny data points
@@ -88,26 +112,34 @@ def makeCMImageWidget():
             z = 2*x*(math.cos(r+2)/r-math.sin(r+2)/r) # the B field strength of dipole radiation (modulo physical constants)
             colorMap.data().setCell(xIndex, yIndex, z)
     
-    # add a color scale:
-    colorScale = QCPColorScale(customPlot)
-    customPlot.plotLayout().addElement(0, 1, colorScale) # add it to the right of the main axis rect
-    colorScale.setType(QCPAxis.AxisType.atRight) # scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
-    colorMap.setColorScale(colorScale) # associate the color map with the color scale
-    colorScale.axis().setLabel("Magnetic Field Strength")
-    
     # set the color gradient of the color map to one of the presets:
     colorMap.setGradient(QCPColorGradient(QCPColorGradient.GradientPreset.gpPolar))
     # we could have also created a QCPColorGradient instance and added own colors to
     # the gradient, see the documentation of QCPColorGradient for what's possible.
     
     # rescale the data dimension (color) such that all data points lie in the span visualized by the color gradient:
-    colorMap.rescaleDataRange()
-    
-    # make sure the axis rect and color scale synchronize their bottom and top margins (so they line up):
-    marginGroup = QCPMarginGroup(customPlot)
-    customPlot.axisRect().setMarginGroup(QCP.MarginSide.msBottom | QCP.MarginSide.msTop, marginGroup)
-    colorScale.setMarginGroup(QCP.MarginSide.msBottom | QCP.MarginSide.msTop, marginGroup)
-    
+    colorMap.rescaleDataRange()    
+
+    # Now add a graph to the right
+    graph = customPlot.addGraph(axisRectPlot.axis(QCPAxis.atBottom), axisRectPlot.axis(QCPAxis.atLeft))
+    graph.setPen(QPen(Qt.blue))
+    graph.setBrush(QBrush(QColor(0, 0, 255, 20)))
+    (x, y) = makeRandomLogPlotData(50, -2, 10)
+    graph.setData(x, y)
+
+    # graph below the color map:
+    graph2 = customPlot.addGraph(axisRectPlot2.axis(QCPAxis.atBottom), axisRectPlot2.axis(QCPAxis.atLeft))
+    graph2.setPen(QPen(Qt.red)) 
+    graph2.setBrush(QBrush(QColor(255, 0, 0, 20)))
+    (x, y) = makeRandomPlotData(50)
+    graph2.setData(x, y)
+
+    graph3 = customPlot.addGraph(axisRectPlot3.axis(QCPAxis.atBottom), axisRectPlot3.axis(QCPAxis.atLeft))
+    graph3.setPen(QPen(Qt.green))
+    graph3.setBrush(QBrush(QColor(0, 255, 0, 20)))
+    (x, y) = makeRandomPlotData(50)
+    graph3.setData(x, y)
+
     # rescale the key (x) and value (y) axes so the whole color map is visible:
     customPlot.rescaleAxes()
     return customPlot
@@ -173,59 +205,6 @@ def makeLogPlotWidget():
 
     return (customPlot, customPlot.graph(0))
 
-def makeQCustomPlot():
-    customPlot = QCustomPlot()
-    customPlot.plotLayout().clear()  # clear default axis rect so the layout is empty
-    customPlot.setInteractions(QCP.Interaction.iRangeDrag | QCP.Interaction.iRangeZoom) # this will also allow rescaling the color scale by dragging/zooming
-    # make axis rects and add them to the layout:
-
-    axes = QCPAxisRect(customPlot)
-    axes.setupFullAxesBox(True)
-    axes.xAxis.setLabel("x")
-    axes.yAxis.setLabel("y")
-        
-    # set up the QCPColorMap:
-    colorMap = QCPColorMap(axes.xAxis, axes.yAxis)
-    nx = 200
-    ny = 200
-    colorMap.data().setSize(nx, ny) # we want the color map to have nx * ny data points
-    colorMap.data().setRange(QCPRange(-4, 4), QCPRange(-4, 4)) # and span the coordinate range -4..4 in both key (x) and value (y) dimensions
-    # now we assign some data, by accessing the QCPColorMapData instance of the color map:
-    for xIndex in range(nx):
-        for yIndex in range(ny):
-            x, y = colorMap.data().cellToCoord(xIndex, yIndex)
-            r = 3*math.sqrt(x*x+y*y)+1e-2
-            z = 2*x*(math.cos(r+2)/r-math.sin(r+2)/r) # the B field strength of dipole radiation (modulo physical constants)
-            colorMap.data().setCell(xIndex, yIndex, z)
-    
-    # add a color scale:
-    colorScale = QCPColorScale(customPlot)
-    customPlot.plotLayout().addElement(0, 1, colorScale) # add it to the right of the main axis rect
-    colorScale.setType(QCPAxis.AxisType.atRight) # scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
-    colorMap.setColorScale(colorScale) # associate the color map with the color scale
-    colorScale.axis().setLabel("Magnetic Field Strength")
-    
-    # set the color gradient of the color map to one of the presets:
-    colorMap.setGradient(QCPColorGradient(QCPColorGradient.GradientPreset.gpPolar))
-    # we could have also created a QCPColorGradient instance and added own colors to
-    # the gradient, see the documentation of QCPColorGradient for what's possible.
-    
-    # rescale the data dimension (color) such that all data points lie in the span visualized by the color gradient:
-    colorMap.rescaleDataRange()
-        
-    # make sure the axis rect and color scale synchronize their bottom and top margins (so they line up):
-    marginGroup = QCPMarginGroup(customPlot)
-    customPlot.axisRect().setMarginGroup(QCP.MarginSide.msBottom | QCP.MarginSide.msTop, marginGroup)
-    colorScale.setMarginGroup(QCP.MarginSide.msBottom | QCP.MarginSide.msTop, marginGroup)
-    
-    # rescale the key (x) and value (y) axes so the whole color map is visible:
-    customPlot.rescaleAxes()
-
-
-
-
-
-    return customPlot
 
 
 class MyDialog(QDialog):
@@ -260,23 +239,145 @@ class MyDialog(QDialog):
             self.log_plot_widget.replot()   
 
 
+class MyColorMap(QCPColorMap):
+    def __init__(self, xAxis: QCPAxis, yAxis: QCPAxis):
+        super().__init__(xAxis, yAxis)
+        self.setGradient(QCPColorGradient(QCPColorGradient.GradientPreset.gpPolar))
+        self.data().setSize(200, 200)
+        self.data().setRange(QCPRange(-4, 4), QCPRange(-4, 4))
+        for xIndex in range(200):
+            for yIndex in range(200):
+                x, y = self.data().cellToCoord(xIndex, yIndex)
+                r = 3*math.sqrt(x*x+y*y)+1e-2
+                z = 2*x*(math.cos(r+2)/r-math.sin(r+2)/r) # the B field strength of dipole radiation (modulo physical constants)
+                self.data().setCell(xIndex, yIndex, z)
+        self.rescaleDataRange()
+
+    def updateRow(self, rowIndex: int, data: np.ndarray):
+        for xIndex in range(200):
+            self.data().setCell(xIndex, rowIndex, data[xIndex])
+
+def makeQCustomPlot():
+    customPlot = QCustomPlot()
+
+    # clear axes
+    customPlot.plotLayout().clear() # clear everything in the plot layout (axes, color scales, etc.)
+
+    # make axis rect for color map:
+    axisRectCM = QCPAxisRect(customPlot)
+    axisRectCM.setupFullAxesBox(True) # make left and bottom axes visible, but hide top and right axes
+    customPlot.plotLayout().addElement(0, 0, axisRectCM)
+
+    # axes for plot to the right of the color map:
+    axisRectPlot = QCPAxisRect(customPlot)
+    axisRectPlot.setupFullAxesBox(True) # make left and bottom axes visible, but
+    axisRectPlot.axis(QCPAxis.atLeft).setScaleType(QCPAxis.stLogarithmic)
+    logTicker = QCPAxisTickerLog()
+    axisRectPlot.axis(QCPAxis.atLeft).setTicker(logTicker)
+    axisRectPlot.axis(QCPAxis.atLeft).setNumberFormat("eb") # e = exponential, b = beautiful decimal powers
+    axisRectPlot.axis(QCPAxis.atLeft).setNumberPrecision(0)  #
+    axisRectPlot.axis(QCPAxis.atLeft).setRange(1e-2, 1e10)
+    customPlot.plotLayout().addElement(0, 1, axisRectPlot)
+
+    # axes for plot below the color map:
+    axisRectPlot2 = QCPAxisRect(customPlot)
+    axisRectPlot2.setupFullAxesBox(True) # make left and bottom axes visible, but
+    customPlot.plotLayout().addElement(1, 0, axisRectPlot2)
+
+    # axes for other plot below the color map:
+    axisRectPlot3 = QCPAxisRect(customPlot)
+    axisRectPlot3.setupFullAxesBox(True) # make left and bottom axes visible, but
+    customPlot.plotLayout().addElement(1, 1, axisRectPlot3)
+
+    # set up the QCPColorMap:
+    colorMap = MyColorMap(axisRectCM.axis(QCPAxis.atBottom), axisRectCM.axis(QCPAxis.atLeft))
+    # nx = 200
+    # ny = 200
+    # colorMap.data().setSize(nx, ny) # we want the color map to have nx * ny data points
+    # colorMap.data().setRange(QCPRange(-4, 4), QCPRange(-4, 4)) # and span the coordinate range -4..4 in both key (x) and value (y) dimensions
+    # # now we assign some data, by accessing the QCPColorMapData instance of the color map:
+    # for xIndex in range(nx):
+    #     for yIndex in range(ny):
+    #         x, y = colorMap.data().cellToCoord(xIndex, yIndex)
+    #         r = 3*math.sqrt(x*x+y*y)+1e-2
+    #         z = 2*x*(math.cos(r+2)/r-math.sin(r+2)/r) # the B field strength of dipole radiation (modulo physical constants)
+    #         colorMap.data().setCell(xIndex, yIndex, z)
+    
+    # # set the color gradient of the color map to one of the presets:
+    # colorMap.setGradient(QCPColorGradient(QCPColorGradient.GradientPreset.gpPolar))
+    # we could have also created a QCPColorGradient instance and added own colors to
+    # the gradient, see the documentation of QCPColorGradient for what's possible.
+    
+    # rescale the data dimension (color) such that all data points lie in the span visualized by the color gradient:
+    #colorMap.rescaleDataRange()    
+
+    # Now add a graph to the right
+    graph = customPlot.addGraph(axisRectPlot.axis(QCPAxis.atBottom), axisRectPlot.axis(QCPAxis.atLeft))
+    graph.setPen(QPen(Qt.blue))
+    graph.setBrush(QBrush(QColor(0, 0, 255, 20)))
+    (x, y) = makeRandomLogPlotData(50, -2, 10)
+    graph.setData(x, y)
+
+    # graph below the color map:
+    graph2 = customPlot.addGraph(axisRectPlot2.axis(QCPAxis.atBottom), axisRectPlot2.axis(QCPAxis.atLeft))
+    graph2.setPen(QPen(Qt.red)) 
+    graph2.setBrush(QBrush(QColor(255, 0, 0, 20)))
+    (x, y) = makeRandomPlotData(50)
+    graph2.setData(x, y)
+
+    graph3 = customPlot.addGraph(axisRectPlot3.axis(QCPAxis.atBottom), axisRectPlot3.axis(QCPAxis.atLeft))
+    graph3.setPen(QPen(Qt.green))
+    graph3.setBrush(QBrush(QColor(0, 255, 0, 20)))
+    (x, y) = makeRandomPlotData(50)
+    graph3.setData(x, y)
+
+    # rescale the key (x) and value (y) axes so the whole color map is visible:
+    customPlot.rescaleAxes()
+    return customPlot, colorMap
+
+
+def makeCMData(width:int , height: int, noise_level: float) -> QCPColorMapData:
+    data = QCPColorMapData(width, height, QCPRange(-4, 4), QCPRange(-4, 4))
+    for xIndex in range(width):
+        for yIndex in range(height):
+            x, y = data.cellToCoord(xIndex, yIndex)
+            r = 3*math.sqrt(x*x+y*y)+1e-2
+            z = 2*x*(math.cos(r+2)/r-math.sin(r+2)/r) # the B field strength of dipole radiation (modulo physical constants)
+            z += noise_level * (random.random() - 0.5) * 2 # add some random noise
+            data.setCell(xIndex, yIndex, z)
+    return data 
+
+
 
 class MyDialog2(QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('My Dialog')
         layout = QHBoxLayout()
-        self.qcp = makeQCustomPlot()
+        self.qcp, self.colorMap = makeQCustomPlot()
         layout.addWidget(self.qcp)
         self.setLayout(layout)
+        self.nextRow = 0
 
+    def start(self):
         self.timer = QTimer()
         self.timer.timeout.connect(self.timeout)  # Connect to the timeout function
         self.timer.start(1000)  # Call timeout every 1000 ms (1 second)  
 
     def timeout(self):
         if self.qcp is not None:
+            start = time.time()
+            data = makeCMData(500, 500, noise_level=0.5)
+            self.colorMap.setData(data, True) # set the whole data at once, with copy (True)
+            self.colorMap.rescaleDataRange() # rescale the color range to fit the new data
+            # data = (np.random.rand(200) - 0.5) * 4
+
+            # self.colorMap.updateRow(self.nextRow, data)
+            # self.nextRow = (self.nextRow + 1) % 200
+
             self.qcp.replot()
+            end = time.time()
+            print(f'Updated color map and replotted in {end - start:.3f} seconds')
 
 
 
@@ -284,10 +385,14 @@ class MyDialog2(QDialog):
 def main() -> int:
     app = QApplication(sys.argv)
     dialog = MyDialog2()
+    dialog.colorMap.setData(makeCMData(500, 500, noise_level=0), True)
+    # dialog.qcp.rescaleAxes()
+    # dialog.qcp.replot()
     dialog.setWindowTitle('MyNumpyImageWidget Viewer')
 
     dialog.resize(900, 700)
     dialog.show()
+    dialog.start() # start the timer to update the color map data
 
     return app.exec_()
 
