@@ -213,9 +213,9 @@ class MyDialog(QDialog):
         self.setWindowTitle('My Dialog')
         hlayout = QHBoxLayout()
         self.image_widget = makeImageWidget()
-        self.cm_image_widget = makeCMImageWidget()
+        # self.cm_image_widget = makeCMImageWidget()
         hlayout.addWidget(self.image_widget)
-        hlayout.addWidget(self.cm_image_widget)
+        # hlayout.addWidget(self.cm_image_widget)
         layout = QVBoxLayout()
         layout.addLayout(hlayout)
         (self.plot_widget, self.graph0) = makePlotWidget()
@@ -384,15 +384,16 @@ class MyDialog2(QDialog):
 
 def main() -> int:
     app = QApplication(sys.argv)
-    dialog = MyDialog2()
-    dialog.colorMap.setData(makeCMData(500, 500, noise_level=0), True)
+    # dialog = MyDialog2()
+    # dialog.colorMap.setData(makeCMData(500, 500, noise_level=0), True)
     # dialog.qcp.rescaleAxes()
     # dialog.qcp.replot()
+    dialog = MyDialog()
     dialog.setWindowTitle('MyNumpyImageWidget Viewer')
 
     dialog.resize(900, 700)
     dialog.show()
-    dialog.start() # start the timer to update the color map data
+    # dialog.start() # start the timer to update the color map data
 
     return app.exec_()
 

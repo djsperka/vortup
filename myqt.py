@@ -254,6 +254,11 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
 
     #     super().mousePressEvent(e)
 
+    def map_data_to_window(self, x: float, y: float) -> Tuple[float, float]:
+        xform = QTransform()
+
+        pass
+
 
     def mousePressEvent(self, e: QMouseEvent) -> None:
         # right button is reset/quit command
@@ -272,9 +277,29 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
                 self._has_slice = True
                 self._cmdstate = PlotCmdStates.NOTHING
 
-                (y0, x0) = self._map_window_to_data(QPointF(0, self._slice_y[0]))
-                (y1, x1) = self._map_window_to_data(QPointF(0, self._slice_y[1]))
+                testx = 439
+                (y0, x0) = self._map_window_to_data(QPointF(testx, self._slice_y[0]))
+                (y1, x1) = self._map_window_to_data(QPointF(testx, self._slice_y[1]))
                 self.__new_slice_signal.emit(y0, y1)
+
+                print("mapped xy {0:f},{1:f} to data coordinates {2:f},{3:f}".format(testx, self._slice_y[0], x0, y0))
+                print("mapped xy {0:f},{1:f} to data coordinates {2:f},{3:f}".format(testx, self._slice_y[1], x1, y1))
+
+                xform = self._make_draw_transform()
+                p = xform.map(QPointF(testx, self._slice_y[0]))
+                print("widget size is {0:d}x{1:d}".format(self.width(), self.height()))
+                print("mapping point {0:f},{1:f} to {2:f},{3:f}".format(testx, self._slice_y[0], p.x(), p.y()))
+
+                p2 = self._map_data_to_window(QPointF(testx, self._slice_y[0]))
+                print("mapping data point {0:f},{1:f} to window coordinates {2:f},{3:f}".format(testx, self._slice_y[0], p2.x(), p2.y()))
+
+
+            elif self._cmdstate == PlotCmdStates.NOTHING:
+                # If we already have a slice, check if we're clicking near it to move it
+                if self._has_slice and abs(e.position().y() - self._slice_y[0]) < 10:
+                    print("mousePressEvent = starting slice move")
+                    self._editslice_initial_position = self._slice_y[0]
+                    self._editslice_index = 0
         e.accept()
 
 
@@ -511,6 +536,7 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
             height = s * image_height
             width = self._aspect * height
 
+        print(f'make_draw_transform: image size {image_width}x{image_height} -> draw size {width}x{height}')
         # scale up to actual display size
         xform.scale(width, height)
 
@@ -542,6 +568,13 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         row = int(floor(image_point.y()))
         col = int(floor(image_point.x()))
         return (row, col)
+    
+    def _map_data_to_window(self, data_point: QPointF) -> QPointF:
+        xform = self._make_draw_transform()
+        xform.translate(-self.data.shape[1] / 2, -self.data.shape[0] / 2)
+        window_point = xform.map(data_point)
+        return window_point
+    
 
     @property
     def flip(self) -> Flip:
