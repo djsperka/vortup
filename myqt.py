@@ -19,6 +19,7 @@ class PlotCmdStates(Enum):
     NOTHING = 1
     PLACING_FIRST_SLICE = 2
     PLACING_SECOND_SLICE = 3
+    DOING_TEST = 4
 
 
 
@@ -233,32 +234,16 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
                 if self._cmdstate == PlotCmdStates.NOTHING:
                     self._cmdstate = PlotCmdStates.PLACING_FIRST_SLICE
                     print("keyPress - cmd started")
+            
+            elif e.key() == Qt.Key.Key_T:
+                if self._cmdstate == PlotCmdStates.NOTHING:
+                    self._cmdstate = PlotCmdStates.DOING_TEST
+                    print("keyPress - doing test")
 
             e.accept()
 
         super().keyPressEvent(e)
         self.update(safe=True)
-
-    # def mousePressEvent(self, e: QMouseEvent) -> None:
-    #     if e.buttons() & (Qt.MouseButton.LeftButton | Qt.MouseButton.RightButton):
-    #         self._mouse_down_position = e.position()
-
-    #         if e.buttons() & Qt.MouseButton.LeftButton:
-    #             self._mouse_down_pan = self._pan
-    #             self._mouse_down_angle = None
-    #         if e.buttons() & Qt.MouseButton.RightButton:
-    #             self._mouse_down_pan = None
-    #             self._mouse_down_angle = self._angle
-
-    #         e.accept()
-
-    #     super().mousePressEvent(e)
-
-    def map_data_to_window(self, x: float, y: float) -> Tuple[float, float]:
-        xform = QTransform()
-
-        pass
-
 
     def mousePressEvent(self, e: QMouseEvent) -> None:
         # right button is reset/quit command
@@ -290,16 +275,20 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
                 print("widget size is {0:d}x{1:d}".format(self.width(), self.height()))
                 print("mapping point {0:f},{1:f} to {2:f},{3:f}".format(testx, self._slice_y[0], p.x(), p.y()))
 
-                p2 = self._map_data_to_window(QPointF(testx, self._slice_y[0]))
-                print("mapping data point {0:f},{1:f} to window coordinates {2:f},{3:f}".format(testx, self._slice_y[0], p2.x(), p2.y()))
-
-
             elif self._cmdstate == PlotCmdStates.NOTHING:
                 # If we already have a slice, check if we're clicking near it to move it
                 if self._has_slice and abs(e.position().y() - self._slice_y[0]) < 10:
                     print("mousePressEvent = starting slice move")
                     self._editslice_initial_position = self._slice_y[0]
                     self._editslice_index = 0
+            elif self._cmdstate == PlotCmdStates.DOING_TEST:
+                print("mousePressEvent = doing test, printing data coords")
+                (y, x) = self._map_window_to_data(e.position())
+                print("mapped xy {0:f},{1:f} to data coordinates {2:f},{3:f}".format(e.position().x(), e.position().y(), x, y))
+
+                (yw, xw) = self._map_data_to_window(QPointF(x, y))
+                print("mapping data coords {0:f},{1:f} back to window coords {2:f},{3:f}".format(x, y, xw, yw))
+
         e.accept()
 
 
@@ -486,23 +475,26 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         self.__pixmap = QPixmap.fromImage(QImage(data, data.shape[1], data.shape[0], QImage.Format_RGBA8888))
         self.__pixmap_draw_rect = QRectF(QPointF(start[1], start[0]), QPointF(end[1], end[0])).translated(-shape[1] / 2, -shape[0] / 2)
 
-    def _make_draw_transform(self, shape: Optional[Iterable[int]]=None) -> QTransform:
+
+    def _get_drawn_image_dimensions(self, shape: Optional[Iterable[int]]=None) -> Tuple[float, float]:
+        """Determine the size of the image that will be drawn, given current widget 
+        size (self.width(), self.height()), sizing mode (self._size_mode), and image aspect ratio (self._aspect).
+        If shape passed is None, then the current data shape is used.
+
+        Args:
+            shape (Optional[Iterable[int]], optional): _ription_. Defaults to None.
+
+        Raises:
+            ValueError: _description_
+            ValueError: _description_
+
+        Returns:
+            Tuple[float, float]: (width, height) dimensions of the image that will be drawn in the widget, in pixels.
+        """
+
         if shape is None:
             shape = self.data.shape
         (image_height, image_width) = shape
-
-        xform = QTransform()
-
-        def _sign(bit):
-            return -1 if (self._flip & bit) else 1
-
-        # start by drawing a 1x1 image in the widget center
-        xform.translate(self.width() / 2 + self._pan[0], self.height() / 2 + self._pan[1])
-        xform.rotate(self._angle)
-        xform.scale(
-            self._zoom * _sign(MyNumpyImageWidget.Flip.Horizontal) / image_width,
-            self._zoom * _sign(MyNumpyImageWidget.Flip.Vertical) / image_height
-        )
 
         (xs, ys) = self._size_mode
 
@@ -536,7 +528,29 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
             height = s * image_height
             width = self._aspect * height
 
-        print(f'make_draw_transform: image size {image_width}x{image_height} -> draw size {width}x{height}')
+        return (width, height)
+
+    def _make_draw_transform(self, shape: Optional[Iterable[int]]=None) -> QTransform:
+        if shape is None:
+            shape = self.data.shape
+        (image_height, image_width) = shape
+
+        xform = QTransform()
+
+        def _sign(bit):
+            return -1 if (self._flip & bit) else 1
+
+        # start by drawing a 1x1 image in the widget center
+        xform.translate(self.width() / 2 + self._pan[0], self.height() / 2 + self._pan[1])
+        xform.rotate(self._angle)
+        xform.scale(
+            self._zoom * _sign(MyNumpyImageWidget.Flip.Horizontal) / image_width,
+            self._zoom * _sign(MyNumpyImageWidget.Flip.Vertical) / image_height
+        )
+
+        (width, height) = self._get_drawn_image_dimensions(shape)
+
+        #print(f'make_draw_transform: image size {image_width}x{image_height} -> draw size {width}x{height}')
         # scale up to actual display size
         xform.scale(width, height)
 
@@ -564,17 +578,64 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         return xform
 
     def _map_window_to_data(self, window_point: QPointF) -> QPointF:
+        """Given a point in window coordinates, returns same point in data coordinates. 
+
+        Args:
+            window_point (QPointF): Data point in window coordinates, where (0, 0) is the top-left of the widget and (width, height) is the bottom-right.
+
+        Returns:
+            QPointF: Data point in data coordinates.
+        """
         image_point = self._make_window_transform().map(window_point)
         row = int(floor(image_point.y()))
         col = int(floor(image_point.x()))
         return (row, col)
     
-    def _map_data_to_window(self, data_point: QPointF) -> QPointF:
-        xform = self._make_draw_transform()
-        xform.translate(-self.data.shape[1] / 2, -self.data.shape[0] / 2)
-        window_point = xform.map(data_point)
-        return window_point
-    
+    def _map_data_to_window(self, data_point: QPointF) -> Tuple[float, float]:
+        """Given a point in data coordinates, return the point in current window (widget, really) coords
+
+        Args:
+            data_point (QPointF): Point in data coordinates
+
+        Returns:
+            QPointF: Point in widget coords
+        """
+
+
+        # translate to data center before rotation and scaling, so that those operations are about the image center.
+        shape = self.data.shape
+        tr1 = QTransform()
+        tr1.translate(-shape[1] / 2, -shape[0] / 2)
+        print("tr1 {0:f}, {1:f}".format(tr1.dx(), tr1.dy()))
+
+        # Rotation and scale
+        (drawn_width, drawn_height) = self._get_drawn_image_dimensions(shape)
+        tr2 = QTransform()  
+        tr2.rotate(self._angle)
+        tr2.scale(
+            self._zoom * (-1 if (self._flip & MyNumpyImageWidget.Flip.Horizontal) else 1) * drawn_width / shape[1],
+            self._zoom * (-1 if (self._flip & MyNumpyImageWidget.Flip.Vertical) else 1) * drawn_height / shape[0]
+        )
+        print("tr2 m11 {0:f}, m22 {1:f}".format(tr2.m11(), tr2.m22()))
+
+        # and translate to widget center
+        tr3 = QTransform()
+        tr3.translate(self.width() / 2 + self._pan[0], self.height() / 2 + self._pan[1])
+        print("tr3 {0:f}, {1:f}".format(tr3.dx(), tr3.dy()))
+
+
+        ptr1 = tr1.map(data_point)
+        ptr2 = tr2.map(ptr1)
+        ptr3 = tr3.map(ptr2)
+        print("ptr1 {0:f}, {1:f}".format(ptr1.x(), ptr1.y()))
+        print("ptr2 {0:f}, {1:f}".format(ptr2.x(), ptr2.y()))
+        print("ptr3 {0:f}, {1:f}".format(ptr3.x(), ptr3.y()))
+
+        # Now build full transform.
+        xf = tr1 * tr2 * tr3    
+        window_point = xf.map(data_point)
+        return (window_point.y(), window_point.x())
+
 
     @property
     def flip(self) -> Flip:
