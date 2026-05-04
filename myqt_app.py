@@ -9,7 +9,6 @@ from qtpy.QtGui import QImage
 from qtpy.QtWidgets import QApplication, QDialog, QVBoxLayout, QHBoxLayout
 from qtpy.QtCore import QTimer, Qt
 from qtpy.QtGui import QPen, QBrush, QColor
-from QCustomPlot_PyQt5 import QCustomPlot, QCP, QCPAxisRect, QCPAxis, QCPAxisTickerLog, QCPColorMap, QCPColorMapData, QCPColorScale, QCPMarginGroup, QCPRange, QCPColorGradient, QCPGraph
 
 from myqt import MyNumpyImageWidget
 
