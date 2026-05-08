@@ -88,6 +88,13 @@ class LaserSource:
     def is_on(self) -> bool:
         return self.laser_state() == LaserSource.LaserState.ON
     
+    def info(self) -> str:
+        state = self.laser_state()
+        sweep_mode, mzi_delay = self.sweep_mode()
+        self.command('read_string oem')
+        _, _, oem = self.get_response()
+        return f"Laser OEM: {oem}, state: {state.name}, Sweep mode: {sweep_mode}, MZI delay: {mzi_delay}"
+    
 if __name__ == '__main__':
 
     try:
