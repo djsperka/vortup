@@ -64,7 +64,6 @@ class LaserSource:
 
     def laser_state(self) -> LaserState:
         state_str = self.read_param('laser_state')
-        print(f"Laser state string: '{state_str}'")
         try:
             return LaserSource.LaserState(int(state_str))
         except KeyError:
