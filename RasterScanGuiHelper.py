@@ -199,7 +199,8 @@ class RasterScanGUIHelper(ScanGUIHelper):
         # tab widget
         self._tabwidget.currentChanged.connect(self._tabCurrentChanged)
 
-
+        # connect signals for cross section drawing widget
+        self._cross_widget.new_slice.connect(self.new_slice)
 
 
         # make first tab page
@@ -227,6 +228,9 @@ class RasterScanGUIHelper(ScanGUIHelper):
         self._logger.info("tab 1 has index {:d}".format(tab1_index))
 
         return self._tabwidget
+
+    def new_slice(self, y0, y1):
+        self._raster_widget.section = (int(y0), int(y1))
 
     def _savedata(self, r, c):
         self._logger.info("save data at r={:d} c={:d}".format(r, c))
