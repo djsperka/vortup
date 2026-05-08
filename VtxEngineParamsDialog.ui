@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>518</width>
-    <height>728</height>
+    <height>602</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,575 +15,593 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_9">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_29" stretch="1,1">
+    <layout class="QVBoxLayout" name="verticalLayout_7">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_7">
+      <layout class="QHBoxLayout" name="horizontalLayout_33">
        <item>
-        <widget class="QGroupBox" name="groupBox_3">
-         <property name="title">
-          <string>Acquisition</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_4">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_17" stretch="1,1">
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <widget class="QGroupBox" name="groupBox_3">
+           <property name="title">
+            <string>Acquisition</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
             <item>
-             <widget class="QLabel" name="label_10">
-              <property name="text">
-               <string>sweep/s</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditTriggersPerSecond">
-              <property name="toolTip">
-               <string notr="true" extracomment="This is the triggers per sec toolTip comment."/>
-              </property>
-              <property name="toolTipDuration">
-               <number>5</number>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_18" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_11">
-              <property name="text">
-               <string>trig(ext)/sweep</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditClockRisingEdgesPerTrigger">
-              <property name="toolTip">
-               <string extracomment="K-clock triggers. Ignored if internal clock used."/>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_19" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_21">
-              <property name="text">
-               <string>trigger range (mV)</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditTriggerRange"/>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_20" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_22">
-              <property name="text">
-               <string>trigger level fraction</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditTriggerLevelFraction"/>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_21" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_12">
-              <property name="text">
-               <string>trig dly(samples)</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="leTriggerDelay"/>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_22">
-            <item>
-             <widget class="QCheckBox" name="checkBoxInternalClock">
-              <property name="toolTip">
-               <string extracomment="Check to use on-board trig clock. "/>
-              </property>
-              <property name="text">
-               <string>use internal trigger clock</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_23" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_15">
-              <property name="text">
-               <string>int clock rate</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditInternalClockRate">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="toolTip">
-               <string extracomment="Rate for internal trigger clock, when used. "/>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_27" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_17">
-              <property name="text">
-               <string>trig(int)/sweep</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="leSperA">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="toolTip">
-               <string extracomment="Internally-generated K-clock triggers, only used with internal clock."/>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_24" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_16">
-              <property name="text">
-               <string>ext clock level %</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditExternalClockLevelPct">
-              <property name="toolTip">
-               <string extracomment="% level for external clock trigger"/>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_25" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_18">
-              <property name="text">
-               <string>input channel</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="comboBoxInputChannel">
+             <layout class="QHBoxLayout" name="horizontalLayout_17" stretch="1,1">
               <item>
-               <property name="text">
-                <string>A</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>B</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>C</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>D</string>
-               </property>
-              </item>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_26" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_6">
-              <property name="text">
-               <string>input range (mV)</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="EnumComboBox" name="comboBoxInputRange">
-              <property name="toolTip">
-               <string extracomment="Input range in mV. Alazar 9373 requires 400mV."/>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_5">
-         <property name="title">
-          <string>Memory/processing</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_13">
-              <property name="text">
-               <string>Ascan/block</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="leAperBlock"/>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_23">
-              <property name="text">
-               <string>blocks to allocate</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditBlocksToAllocate"/>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_24">
-              <property name="text">
-               <string>preload count</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditPreloadCount"/>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_25">
-              <property name="text">
-               <string>process slots</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditProcessSlots"/>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_8">
-       <item>
-        <widget class="QGroupBox" name="groupBoxGalvo">
-         <property name="title">
-          <string>Galvo</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>Delay(s)</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditGalvoDelay"/>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_4">
-              <property name="text">
-               <string>SLOW units/V</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditSLOWUnitsPerVolt"/>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_2">
-              <property name="text">
-               <string>SLOW limits(V)</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,1">
-              <item>
-               <widget class="QLineEdit" name="lineEditGalvoSLOWmin"/>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="lineEditGalvoSLOWmax"/>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_5">
-              <property name="text">
-               <string>FAST units/V</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditFASTUnitsPerVolt"/>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_3">
-              <property name="text">
-               <string>FAST limits(V)</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1,1">
-              <item>
-               <widget class="QLineEdit" name="lineEditGalvoFASTmin">
+               <widget class="QLabel" name="label_10">
                 <property name="text">
-                 <string/>
+                 <string>sweep/s</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEditGalvoFASTmax">
-                <property name="text">
-                 <string/>
+               <widget class="QLineEdit" name="lineEditTriggersPerSecond">
+                <property name="toolTip">
+                 <string notr="true" extracomment="This is the triggers per sec toolTip comment."/>
+                </property>
+                <property name="toolTipDuration">
+                 <number>5</number>
                 </property>
                </widget>
               </item>
              </layout>
             </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_18" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_11">
+                <property name="text">
+                 <string>trig(ext)/sweep</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditClockRisingEdgesPerTrigger">
+                <property name="toolTip">
+                 <string extracomment="K-clock triggers. Ignored if internal clock used."/>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_19" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_21">
+                <property name="text">
+                 <string>trigger range (mV)</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditTriggerRange"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_20" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_22">
+                <property name="text">
+                 <string>trigger level fraction</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditTriggerLevelFraction"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_21" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_12">
+                <property name="text">
+                 <string>trig dly(samples)</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="leTriggerDelay"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_22">
+              <item>
+               <widget class="QCheckBox" name="checkBoxInternalClock">
+                <property name="toolTip">
+                 <string extracomment="Check to use on-board trig clock. "/>
+                </property>
+                <property name="text">
+                 <string>use internal trigger clock</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_23" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_15">
+                <property name="text">
+                 <string>int clock rate</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditInternalClockRate">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="toolTip">
+                 <string extracomment="Rate for internal trigger clock, when used. "/>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_27" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_17">
+                <property name="text">
+                 <string>trig(int)/sweep</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="leSperA">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="toolTip">
+                 <string extracomment="Internally-generated K-clock triggers, only used with internal clock."/>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_24" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_16">
+                <property name="text">
+                 <string>ext clock level %</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditExternalClockLevelPct">
+                <property name="toolTip">
+                 <string extracomment="% level for external clock trigger"/>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_25" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_18">
+                <property name="text">
+                 <string>input channel</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="comboBoxInputChannel">
+                <item>
+                 <property name="text">
+                  <string>A</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>B</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>C</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>D</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_26" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>input range (mV)</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="EnumComboBox" name="comboBoxInputRange">
+                <property name="toolTip">
+                 <string extracomment="Input range in mV. Alazar 9373 requires 400mV."/>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_29">
+              <item>
+               <widget class="QLabel" name="label_26">
+                <property name="text">
+                 <string>Laser COM port</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="leLaserPort"/>
+              </item>
+             </layout>
+            </item>
            </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="1,1">
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_5">
+           <property name="title">
+            <string>Memory/processing</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
-             <widget class="QLabel" name="label_7">
-              <property name="text">
-               <string>clock source</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_13">
+                <property name="text">
+                 <string>Ascan/block</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="leAperBlock"/>
+              </item>
+             </layout>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEditGalvoClockSource"/>
+             <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_23">
+                <property name="text">
+                 <string>blocks to allocate</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditBlocksToAllocate"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_24">
+                <property name="text">
+                 <string>preload count</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditPreloadCount"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_25">
+                <property name="text">
+                 <string>process slots</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditProcessSlots"/>
+              </item>
+             </layout>
             </item>
            </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_8">
-              <property name="text">
-               <string>SLOW axis device</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditGalvoSLOWDevice"/>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="1,1">
-            <item>
-             <widget class="QLabel" name="label_9">
-              <property name="text">
-               <string>FAST axis device</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditGalvoFASTDevice"/>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBoxStrobe">
-         <property name="title">
-          <string>Strobe</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="1,1">
+        <layout class="QVBoxLayout" name="verticalLayout_8">
+         <item>
+          <widget class="QGroupBox" name="groupBoxGalvo">
+           <property name="title">
+            <string>Galvo</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout">
             <item>
-             <widget class="QLabel" name="label_19">
-              <property name="text">
-               <string>clock source</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>Delay(s)</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditGalvoDelay"/>
+              </item>
+             </layout>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEditStrobeClockSource"/>
+             <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string>SLOW units/V</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditSLOWUnitsPerVolt"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>SLOW limits(V)</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,1">
+                <item>
+                 <widget class="QLineEdit" name="lineEditGalvoSLOWmin"/>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEditGalvoSLOWmax"/>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_5">
+                <property name="text">
+                 <string>FAST units/V</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditFASTUnitsPerVolt"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_3">
+                <property name="text">
+                 <string>FAST limits(V)</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1,1">
+                <item>
+                 <widget class="QLineEdit" name="lineEditGalvoFASTmin">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEditGalvoFASTmax">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>clock source</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditGalvoClockSource"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_8">
+                <property name="text">
+                 <string>SLOW axis device</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditGalvoSLOWDevice"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>FAST axis device</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditGalvoFASTDevice"/>
+              </item>
+             </layout>
             </item>
            </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="1,1">
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBoxStrobe">
+           <property name="title">
+            <string>Strobe</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
             <item>
-             <widget class="QLabel" name="label_20">
-              <property name="text">
-               <string>out device</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_19">
+                <property name="text">
+                 <string>clock source</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditStrobeClockSource"/>
+              </item>
+             </layout>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEditStrobeDevice"/>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_2">
-         <property name="title">
-          <string>Other</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_5">
-          <item>
-           <widget class="QCheckBox" name="cbSaveProfilerData">
-            <property name="text">
-             <string>Save profiler data</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_28">
-            <item>
-             <widget class="QLabel" name="label_28">
-              <property name="text">
-               <string>log level</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEditLogLevel"/>
+             <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="1,1">
+              <item>
+               <widget class="QLabel" name="label_20">
+                <property name="text">
+                 <string>out device</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditStrobeDevice"/>
+              </item>
+             </layout>
             </item>
            </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_31">
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_2">
+           <property name="title">
+            <string>Other</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_5">
             <item>
-             <widget class="QCheckBox" name="cbFileAcquisition">
+             <widget class="QCheckBox" name="cbSaveProfilerData">
               <property name="text">
-               <string>Use file acquisition</string>
+               <string>Save profiler data</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="pbSelectFile">
-              <property name="text">
-               <string>Select</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_28">
+              <item>
+               <widget class="QLabel" name="label_28">
+                <property name="text">
+                 <string>log level</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditLogLevel"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_31">
+              <item>
+               <widget class="QCheckBox" name="cbFileAcquisition">
+                <property name="text">
+                 <string>Use file acquisition</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pbSelectFile">
+                <property name="text">
+                 <string>Select</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_32">
+              <item>
+               <widget class="QLabel" name="label_14">
+                <property name="text">
+                 <string>File:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="labelFileName">
+                <property name="text">
+                 <string>TextLabel</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
            </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_32">
-            <item>
-             <widget class="QLabel" name="label_14">
-              <property name="text">
-               <string>File:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="labelFileName">
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_30">
      <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QDialogButtonBox" name="buttonBoxMain">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="standardButtons">
-        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_30">
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QDialogButtonBox" name="buttonBoxMain">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="standardButtons">
+          <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

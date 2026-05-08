@@ -19,6 +19,7 @@ class VtxEngineParams:
     samples_per_ascan: int=0
     blocks_to_acquire: int=0
     trigger_delay_samples: int=0
+    laser_port: str = 'COM3'
 
     # left over from scan parameters
     galvo_delay: float = 0.0

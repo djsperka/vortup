@@ -88,6 +88,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.leAperBlock.setText(str(cfg.ascans_per_block))
         self.leSperA.setText(str(cfg.samples_per_ascan))
         self.leTriggerDelay.setText(str(cfg.trigger_delay_samples))
+        self.leLaserPort.setText(str(cfg.laser_port))
 
         self.lineEditGalvoDelay.setText(str(cfg.galvo_delay))
         self.lineEditGalvoSLOWmin.setText(str(cfg.galvo_slow_voltage_range.min))
@@ -139,6 +140,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         s.ascans_per_block = int(self.leAperBlock.text())
         s.samples_per_ascan = int(self.leSperA.text())
         s.trigger_delay_samples = int(self.leTriggerDelay.text())
+        s.laser_port = self.leLaserPort.text()
 
         s.galvo_delay = float(self.lineEditGalvoDelay.text())
         s.galvo_slow_voltage_range = Range(float(self.lineEditGalvoSLOWmin.text()), float(self.lineEditGalvoSLOWmax.text()))

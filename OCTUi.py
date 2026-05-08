@@ -1,5 +1,6 @@
 import sys
 import os
+from VtxEngineParams import AcquisitionType
 from VtxEngineParamsDialog import VtxEngineParamsDialog
 from VtxEngine import VtxEngine
 from OCTUiMainWindow import OCTUiMainWindow
@@ -12,6 +13,7 @@ from vortex.storage import SimpleStackConfig, SimpleStackHeader
 from vortex.log import Logger
 from ScanGUIHelper import ScanGUIHelper
 from scanGUIHelperFactory import scanGUIHelperFactory
+from LaserSource import LaserSource
 from typing import Tuple
 import traceback
 import matplotlib as mpl
@@ -181,6 +183,14 @@ class OCTUi(QObject):
                 del self._vtxengine
             self._vtxengine = None
 
+            # check if laser source is present and on. If not, throw an error.
+            if self._params.vtx.acquisition_type == AcquisitionType.ALAZAR_ACQUISITION:
+                laser = LaserSource(self._params.vtx.laser_port)
+                if not laser.is_on():
+                    raise RuntimeError("Laser source is not on")
+                else:
+                    self._logger.info(laser.info())
+    
             # create engine
             self._logger.info('Setting up OCT engine...')
             self._vtxengine = VtxEngine(self._params, self._guihelpers)
