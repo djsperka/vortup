@@ -333,13 +333,16 @@ class OCTUi(QObject):
                 npsc.shape = (shape[0], shape[1], shape[2], 1)
                 npsc.header = SimpleStackHeader.NumPy
                 npsc.path = baseFilename + ".npy"
-                self._logger.info('Open storage.')
+                self._logger.info('Open storage at {0:s}.'.format(baseFilename))
                 helper.components.storage.open(npsc)
                 self._savingVolumesNow = True
                 self._savingVolumesRequested = False
                 #self._savingVolumesThisMany = SHOULD HAVE BEEN SET IN PB CALLBACK WHEN SAVING VOLUMES REQUESTED
                 self._savingVolumesThisManySaved = 0
                 self._octDialog.gbSaveVolumes.enableSaving(False, self._savingVolumesThisMany==0)
+
+                # now write metadata file (same as conf file)
+                self._params.save(baseFilename + ".conf")
             else:
                 self._logger.warn("Cannot open file {0:s} for saving.".format(baseFilename))
                 self._savingVolumesRequested = False
