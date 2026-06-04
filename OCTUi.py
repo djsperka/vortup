@@ -14,6 +14,7 @@ from vortex.log import Logger
 from ScanGUIHelper import ScanGUIHelper
 from scanGUIHelperFactory import scanGUIHelperFactory
 from LaserSource import LaserSource
+from serial import SerialException
 from typing import Tuple
 import traceback
 import matplotlib as mpl
@@ -227,6 +228,9 @@ class OCTUi(QObject):
 
         except RuntimeError as e:
             print("RuntimeError:")
+            traceback.print_exception(e)
+        except SerialException as e:
+            print("Error connecting to laser source! Check power and USB connection.\nSerialException:")
             traceback.print_exception(e)
 
     def connectCurrentScan(self, helper: ScanGUIHelper): 
