@@ -14,10 +14,11 @@ class LaserSource:
         UNKNOWN = 64
 
     def __init__(self, port: str, baudrate: int = 9600, timeout: float = 0):
+        self.ser = None
         self.ser = serial.Serial(port, baudrate)
 
     def __del__(self):
-        if self.ser.is_open:
+        if self.ser and self.ser.is_open:
             self.ser.close()
 
     def parse_response(self, response: str) -> Tuple[int, str, str]:
