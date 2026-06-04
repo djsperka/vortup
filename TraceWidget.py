@@ -32,6 +32,9 @@ class SpectraTraceWidget(FigureCanvas):
         self._update_ylim = False
         self._update_ylim_ready = False
         self._ylim_temp = [999999,-999999]
+        self._factor = 800/2**16
+        self._axes.set_ylabel('mV')
+        self._axes.set_xlabel('K-clock sample')
 
         # call flush() to force a re-draw of the line (including re-doing range)
         self._is_flushed = False
@@ -67,19 +70,13 @@ class SpectraTraceWidget(FigureCanvas):
                     else:
                         self._is_cuda = False
                     self._is_cuda_known = True
-                    #print("get_xy_data shape: ", self._axes.get_title(), self._endpoint.tensor.shape)
 
                 if self._is_cuda:
                     with self._endpoint.stream:
-                        # self._ydata = volume[self._bidx].mean(axis=0).get()
-                        # print("volume[bidx]: ", cupy.shape(volume[self._bidx]))
-                        # print("volume[self._bidx].mean(axis=0).get()", numpy.shape(self._ydata))
-
                         s=slice(100,111)
                         ztmp = volume[self._bidx, s, :].get()
                         zavg = ztmp.mean(axis=0)
-                        #print(numpy.shape(ztmp), numpy.shape(zavg))
-                        self._ydata = ztmp[5]-zavg
+                        self._ydata = (ztmp[5]-zavg)*self._factor
 
                 else:
                     # look at ascan #105
@@ -87,9 +84,7 @@ class SpectraTraceWidget(FigureCanvas):
                     s=slice(100,111)
                     ztmp = volume[self._bidx, s, :]
                     zavg = ztmp.mean(axis=0)
-                    #print(numpy.shape(ztmp), numpy.shape(zavg))
-                    self._ydata = ztmp[5]-zavg
-                    # self._ydata = volume[self._bidx].mean(axis=0)
+                    self._ydata = (ztmp[5]-zavg)*self._factor
 
                 if self._update_ylim and not self._update_ylim_ready:
 
@@ -122,7 +117,6 @@ class SpectraTraceWidget(FigureCanvas):
                         self._ylim_temp[0] = ylow
                     if yhi > self._ylim_temp[1]:
                         self._ylim_temp[1] = yhi
-                    #print("ylim update first {0:d} last {1:d}, lap , lim ({2:f},{3:f})".format(self._update_ylim_start_idx, self._update_ylim_last_idx, self._ylim_temp[0], self._ylim_temp[1]))
             have_data = True
 
             # check for x data
@@ -313,8 +307,8 @@ class AscanTraceWidget(FigureCanvas):
             self._axes.grid(which="minor", color="0.5")            
             self._axes.grid(which="major", color="0.5")            
             #self._axes.set_ylim(10**-1, 10**2)
-            self._axes.set_ylim(10, 100)
-            self._axes.set_ylabel('dB')
+            #self._axes.set_ylim(10, 100)
+            self._axes.set_ylabel('log')
             
             self._line2d = line2ds[0]
         else:
@@ -327,6 +321,13 @@ class AscanTraceWidget(FigureCanvas):
             self._axes.set_ylim(self._ylim_temp[0], self._ylim_temp[1])
 
         self._invalidated = False
+
+        # find max/min of current data, and update ylim if needed
+        ylow = numpy.min(self._ydata)
+        yhi = numpy.max(self._ydata)
+        logylow = numpy.log10(ylow)
+        logyhi = numpy.log10(yhi)
+        #print("current y range: ({0:f}, {1:f}), log10 range ({2:f}, {3:f})".format(ylow, yhi, logylow, logyhi))
 
         self.draw()
         super().paintEvent(e)
