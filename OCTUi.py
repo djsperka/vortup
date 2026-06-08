@@ -186,11 +186,11 @@ class OCTUi(QObject):
 
             # check if laser source is present and on. If not, throw an error.
             if self._params.vtx.acquisition_type == AcquisitionType.ALAZAR_ACQUISITION:
-                laser = LaserSource(self._params.vtx.laser_port)
-                if not laser.is_on():
-                    raise RuntimeError("Laser source is not on")
-                else:
-                    self._logger.info(laser.info())
+                with LaserSource(self._params.vtx.laser_port) as laser:
+                    if not laser.is_on():
+                        raise RuntimeError("Laser source is not on")
+                    else:
+                        self._logger.info(laser.info())     
     
             # create engine
             self._logger.info('Setting up OCT engine...')
