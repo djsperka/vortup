@@ -14,7 +14,7 @@ from typing import Tuple
 
 class SpectraTraceWidget(FigureCanvas):
 
-    def __init__(self, endpoint, parent=None, width=5, height=4, dpi=100, title=None):
+    def __init__(self, endpoint, parent=None, width=5, height=4, dpi=100, title=None, factor=800/2**16, zsubplot=True):
         self._endpoint = endpoint
         fig = Figure(figsize=(width, height), dpi=dpi)
         self._axes = fig.add_subplot(111)
@@ -32,7 +32,8 @@ class SpectraTraceWidget(FigureCanvas):
         self._update_ylim = False
         self._update_ylim_ready = False
         self._ylim_temp = [999999,-999999]
-        self._factor = 800/2**16
+        self._factor = factor
+        self._zsubplot = zsubplot
         self._axes.set_ylabel('mV')
         self._axes.set_xlabel('K-clock sample')
 
@@ -76,7 +77,10 @@ class SpectraTraceWidget(FigureCanvas):
                         s=slice(100,111)
                         ztmp = volume[self._bidx, s, :].get()
                         zavg = ztmp.mean(axis=0)
-                        self._ydata = (ztmp[5]-zavg)*self._factor
+                        if self._zsubplot:
+                            self._ydata = (ztmp-zavg)*self._factor
+                        else:   
+                            self._ydata = zavg[0:100] * self._factor
 
                 else:
                     # look at ascan #105
@@ -212,7 +216,9 @@ class AscanTraceWidget(FigureCanvas):
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
 
     def set_ylim(self, lim):
-        self._axes.set_ylim(lim[0], lim[1])
+        #self._axes.set_ylim(lim[0], lim[1])
+        self._axes.set_ylim(10**-1, 10**3)
+
 
     def flush(self):
         if self._axes is not None:
@@ -244,7 +250,7 @@ class AscanTraceWidget(FigureCanvas):
                 else:
                     ytmp = volume[self._bidx].mean(axis=0)
 
-                self._ydata = ytmp
+                self._ydata = 20 * ytmp
 
                 if self._update_ylim and not self._update_ylim_ready:
 
@@ -277,7 +283,7 @@ class AscanTraceWidget(FigureCanvas):
                         self._ylim_temp[0] = ylow
                     if yhi > self._ylim_temp[1]:
                         self._ylim_temp[1] = yhi
-                    #print("ylim update first {0:d} last {1:d}, lap , lim ({2:f},{3:f})".format(self._update_ylim_start_idx, self._update_ylim_last_idx, self._ylim_temp[0], self._ylim_temp[1]))
+                    print("ylim update first {0:d} last {1:d}, lap , lim ({2:f},{3:f})".format(self._update_ylim_start_idx, self._update_ylim_last_idx, self._ylim_temp[0], self._ylim_temp[1]))
             have_data = True
 
             # check for x data
@@ -318,7 +324,8 @@ class AscanTraceWidget(FigureCanvas):
             self._update_ylim = False
             self._update_ylim_ready = False
             self._update_ylim_start_idx = -1
-            self._axes.set_ylim(self._ylim_temp[0], self._ylim_temp[1])
+            #self._axes.set_ylim(self._ylim_temp[0], self._ylim_temp[1])
+            self._axes.set_ylim(10**-1, 10**2)
 
         self._invalidated = False
 
