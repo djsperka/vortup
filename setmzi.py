@@ -2,7 +2,7 @@ from LaserSource import LaserSource
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 if __name__ == "__main__":
-    parser = ArgumentParser(description='save volume to disk', formatter_class=ArgumentDefaultsHelpFormatter)
+    parser = ArgumentParser(description='write mzi setting to laser', formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument('mzi', type=int, help='MZI delay to set (in ns)')
     parser.add_argument('--port', default='COM3', help='serial port for laser source')
     args = parser.parse_args()
