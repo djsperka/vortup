@@ -5,6 +5,7 @@ launch.json
 *.npy
 *.mat
 *.zip
+*.dat
 
 
 # Byte-compiled / optimized / DLL files
