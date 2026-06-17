@@ -22,10 +22,11 @@ class ScanGUIHelperComponents:
         self._spectra_endpoint = spectra_endpoint
         self._ascan_endpoint = ascan_endpoint
         self._plot_widget = plot_widget
+        self._null_endpoint2 = NullEndpoint()
 
     @property
     def endpoints(self) -> List[Any]:
-        return [self._null_endpoint, self._storage_endpoint, self._spectra_endpoint, self._ascan_endpoint]
+        return [self._null_endpoint, self._storage_endpoint, self._spectra_endpoint, self._ascan_endpoint, self._null_endpoint2]
     
     @property
     def format_planner(self) -> FormatPlanner:
@@ -34,6 +35,10 @@ class ScanGUIHelperComponents:
     @property 
     def null_endpoint(self) -> NullEndpoint:
         return self._null_endpoint
+
+    @property 
+    def null_endpoint2(self) -> NullEndpoint:
+        return self._null_endpoint2
 
     @property
     def storage_endpoint(self) -> SpectraStackEndpoint:
