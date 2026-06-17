@@ -23,6 +23,8 @@ from json import dumps
 from git import Repo
 from pathlib import Path
 import logging
+import numpy
+import cupy
 
 class OCTUi(QObject):
     
@@ -313,7 +315,8 @@ class OCTUi(QObject):
             volume_idx (int): volume index
         """
 
-
+        #self._logger.info("volumeCallback:({0:d}, {1:d}, {2:d}),helper={3:s})".format(arg0, arg1, arg2, "octui"))
+        
         # shape for raster is (BperV, AperB, depth)
         # For an aiming scan, each "cross" consists of 2 b-scans
 
@@ -323,10 +326,21 @@ class OCTUi(QObject):
         helper.volume(arg0, arg1, arg2)
         
         shape = helper.components.spectra_endpoint.tensor.shape
+        #self._logger.info("volumeCallback:({0:d}, {1:d}, {2:d}),helper={3:s},shape={4},tensor={5}".format(arg0, arg1, arg2, helper.name, shape, helper.components.spectra_endpoint.tensor))   
         #self._logger.info("volumeCallback({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
         if self._savingVolumesRequested:
             (bOK, baseFilename) = self.checkFileSaveStuff()
             if bOK:
+
+                import numpy as np
+                with helper.components.spectra_endpoint.tensor as volume:
+                    with open('data.dat', 'wb') as f:
+                        np.save(f, volume) 
+                        print("Saved data to data.dat")
+
+
+
+
                 # Create SimpleStackConfig to config storage
                 npsc = SimpleStackConfig()
 
@@ -359,6 +373,8 @@ class OCTUi(QObject):
             arg1 (_type_): _description_
             arg2 (_type_): _description_
         """
+        #self._logger.info("volumeCallback:({0:d}, {1:d}, {2:d}),helper={3:s})".format(arg0, arg1, arg2, "octui-2"))
+
         if self._savingVolumesNow:
 
             # this is called after the current volume has been written
