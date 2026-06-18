@@ -168,22 +168,22 @@ class LineScanGUIHelper(ScanGUIHelper):
         # endpoint for display of ascans
         vshape = (self.params.lines_per_volume, self.params.ascans_per_bscan, samples_to_save)
         self._logger.info('Create StackDeviceTensorEndpointInt8 with shape {0:s}'.format(str(vshape)))
-        ascan_endpoint = self._createAscanEndpoint(sfe, vshape, octuiparams.vtx, get_logger('stack', self.log_level))
+        ascan_endpoint = self._createAscanEndpoint(sfe, vshape, octuiparams.vtx, get_logger('line-ascan-endpoint-plot', self.log_level))
 
         sfec_spectra = StackFormatExecutorConfig()
         sfe_spectra  = StackFormatExecutor()
         sfe_spectra.initialize(sfec_spectra)
         shape_spectra = (self.params.lines_per_volume, self.params.ascans_per_bscan, samples_per_record)
         self._logger.info('Create SpectraStackHostTensorEndpointUInt16 with shape {0:s}'.format(str(shape_spectra)))
-        spectra_endpoint = SpectraStackHostTensorEndpointUInt16(sfe_spectra, shape_spectra, get_logger('stack', self.log_level))
+        spectra_endpoint = SpectraStackHostTensorEndpointUInt16(sfe_spectra, shape_spectra, get_logger('line-spectra-endpoint-plot', self.log_level))
 
         # make an endpoint for saving spectra data
         shape = (self.params.lines_per_volume, self.params.ascans_per_bscan, samples_per_record, 1)
-        spectra_storage = SimpleStackUInt16(get_logger('npy-spectra', self.log_level))
+        spectra_storage = SimpleStackUInt16(get_logger('line-spectra-storage', self.log_level))
         sfec = StackFormatExecutorConfig()
         sfe = StackFormatExecutor()
         sfe.initialize(sfec)
-        storage_endpoint = SpectraStackEndpoint(sfe, spectra_storage, log=get_logger('npy-spectra', self.log_level))
+        storage_endpoint = SpectraStackEndpoint(sfe, spectra_storage, log=get_logger('line-spectra-endpoint', self.log_level))
 
         self._components = ScanGUIHelperComponents(format_planner=format_planner, null_endpoint=null_endpoint, storage_endpoint=storage_endpoint, spectra_endpoint=spectra_endpoint, storage=spectra_storage, ascan_endpoint=ascan_endpoint, plot_widget=self.getPlotWidget(ascan_endpoint))
     

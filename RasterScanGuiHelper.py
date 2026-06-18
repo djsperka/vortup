@@ -86,6 +86,8 @@ class RasterScanGUIHelper(ScanGUIHelper):
             scan_idx (int): scan index
             volume_idx (int): volume index
         """
+        # self._logger.info("volumeCallback:({0:d}, {1:d}, {2:d}),helper={3:s})".format(sample_idx, scan_idx, volume_idx, self.name))
+
 
         # we only care if we are at index 1
         if self._tabwidget.currentIndex() == 1:
@@ -144,7 +146,7 @@ class RasterScanGUIHelper(ScanGUIHelper):
         # When using Alazar/CUDA, this must be on the Device = StackDeviceTensorEndpointInt8.
         # When using FileAcquisition, this must be on the Host = StackHostTensorEndpointInt8
         vshape = (self.params.bscans_per_volume, self.params.ascans_per_bscan, samples_to_save)
-        ascan_endpoint = self._createAscanEndpoint(sfe, vshape, octuiparams.vtx, get_logger('ascan_endpoint', self.log_level))
+        ascan_endpoint = self._createAscanEndpoint(sfe, vshape, octuiparams.vtx, get_logger('raster-ascan-endpoint-plot', self.log_level))
 
 
         sfec_spectra = StackFormatExecutorConfig()
@@ -152,15 +154,15 @@ class RasterScanGUIHelper(ScanGUIHelper):
         sfe_spectra.initialize(sfec_spectra)
         shape_spectra = (self.params.bscans_per_volume, self.params.ascans_per_bscan, samples_per_record)
         self._logger.info('Create SpectraStackHostTensorEndpointUInt16 with shape {0:s}'.format(str(shape_spectra)))
-        spectra_endpoint = SpectraStackHostTensorEndpointUInt16(sfe_spectra, shape_spectra, get_logger('stack', self.log_level))
+        spectra_endpoint = SpectraStackHostTensorEndpointUInt16(sfe_spectra, shape_spectra, get_logger('raster-spectra-endpoint-plot', self.log_level))
 
         # make an endpoint for saving spectra data
         shape = (self.params.bscans_per_volume, self.params.ascans_per_bscan, samples_per_record, 1)
-        spectra_storage = SimpleStackUInt16(get_logger('npy-spectra', self.log_level))
+        spectra_storage = SimpleStackUInt16(get_logger('raster-spectra-storage', self.log_level))
         sfec = StackFormatExecutorConfig()
         sfe = StackFormatExecutor()
         sfe.initialize(sfec)
-        storage_endpoint = SpectraStackEndpoint(sfe, spectra_storage, log=get_logger('npy-spectra', self.log_level))
+        storage_endpoint = SpectraStackEndpoint(sfe, spectra_storage, log=get_logger('raster-spectra-endpoint', self.log_level))
 
 
         self._components = ScanGUIHelperComponents(format_planner=format_planner, null_endpoint=null_endpoint, storage_endpoint=storage_endpoint, spectra_endpoint=spectra_endpoint, storage=spectra_storage, ascan_endpoint=ascan_endpoint, plot_widget=self.getPlotWidget(ascan_endpoint, spectra_endpoint))
