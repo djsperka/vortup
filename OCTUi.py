@@ -315,12 +315,12 @@ class OCTUi(QObject):
             volume_idx (int): volume index
         """
 
-        #self._logger.info("volumeCallback:({0:d}, {1:d}, {2:d}),helper={3:s})".format(arg0, arg1, arg2, "octui"))
         
         # shape for raster is (BperV, AperB, depth)
         # For an aiming scan, each "cross" consists of 2 b-scans
 
         helper = self._guihelpers[self._params.scn.current_index]
+        #self._logger.info("volumeCallback:({0:d}, {1:d}, {2:d}),helper={3:s})".format(arg0, arg1, arg2, helper.name))
 
         # call helper's volume method
         helper.volume(arg0, arg1, arg2)
@@ -329,14 +329,18 @@ class OCTUi(QObject):
         #self._logger.info("volumeCallback:({0:d}, {1:d}, {2:d}),helper={3:s},shape={4},tensor={5}".format(arg0, arg1, arg2, helper.name, shape, helper.components.spectra_endpoint.tensor))   
         #self._logger.info("volumeCallback({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
         if self._savingVolumesRequested:
+
+            self._logger.info("volumeCallback({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
+
             (bOK, baseFilename) = self.checkFileSaveStuff()
             if bOK:
 
                 import numpy as np
                 with helper.components.spectra_endpoint.tensor as volume:
-                    with open('data.dat', 'wb') as f:
+                    tmpFilename = baseFilename + ".dat"
+                    with open(tmpFilename, 'wb') as f:
                         np.save(f, volume) 
-                        print("Saved data to data.dat")
+                        print(f"Saved data to {tmpFilename}")
 
 
 
@@ -347,7 +351,7 @@ class OCTUi(QObject):
                 # shape is a mystery. Let's just copy what the endpoint is. 
                 # TODO Must figure out why this volume doesn't match acq params (see esp. non-raster scan)
                 #npsc.shape = (self._params.scn.bscans_per_volume, self._params.scn.ascans_per_bscan, self._params.acq.samples_per_ascan, 1)
-                self._logger.info("volumeCallback:({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
+                self._logger.info("volumeCallback:open storage({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
                 npsc.shape = (shape[0], shape[1], shape[2], 1)
                 npsc.header = SimpleStackHeader.NumPy
                 npsc.path = baseFilename + ".npy"
