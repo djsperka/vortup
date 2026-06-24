@@ -25,7 +25,6 @@ from pathlib import Path
 import logging
 import numpy
 import cupy
-
 class OCTUi(QObject):
     
     stopengine = pyqtSignal()
@@ -79,7 +78,7 @@ class OCTUi(QObject):
             else:
                 s = {}
 
-            self._guihelpers.append(scanGUIHelperFactory(name, flag, cfg, s, self))
+            self._guihelpers.append(scanGUIHelperFactory(name, flag, cfg, s, self, log_level=self._params.vtx.log_level))
             self._octDialog.widgetScanConfig.addScanType(name, self._guihelpers[-1].edit_widget)
 
         self._octDialog.widgetScanConfig.setCurrentIndex(self._params.scn.current_index)
@@ -187,7 +186,7 @@ class OCTUi(QObject):
             self._vtxengine = None
 
             # check if laser source is present and on. If not, throw an error.
-            if self._params.vtx.acquisition_type == AcquisitionType.ALAZAR_ACQUISITION:
+            if self._params.vtx.acquisition_type == AcquisitionType.ALAZAR_ACQUISITION and self._params.vtx.laser_port:
                 with LaserSource(self._params.vtx.laser_port) as laser:
                     if not laser.is_on():
                         raise RuntimeError("Laser source is not on")

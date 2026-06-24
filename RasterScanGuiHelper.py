@@ -20,8 +20,8 @@ from vortex import get_console_logger as get_logger
 
 
 class RasterScanGUIHelper(ScanGUIHelper):
-    def __init__(self, name: str, flags: int, params: RasterScanParams, settings: Dict[str, Any], octui):
-        super().__init__(name, flags, params, settings, octui)
+    def __init__(self, name: str, flags: int, params: RasterScanParams, settings: Dict[str, Any], octui, log_level):
+        super().__init__(name, flags, params, settings, octui, log_level)
 
         self._edit_widget = RasterScanConfigWidget()
         self._edit_widget.setRasterScanParams(self.params)

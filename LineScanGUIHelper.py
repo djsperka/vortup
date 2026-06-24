@@ -10,6 +10,7 @@ from TraceWidget import AscanTraceWidget
 import matplotlib as mpl
 import numpy as np
 
+from EPTracePlot import EPTracePlot
 
 from vortex import Range
 from vortex.scan import RasterScanConfig, FreeformScan, FreeformScanConfig
@@ -26,8 +27,8 @@ class LineScanGUIHelper(ScanGUIHelper):
     '''
     GUIHelper for a line scan.
     '''
-    def __init__(self, name: str, number: int, params: LineScanParams, settings: Dict[str, Any], octui):
-        super().__init__(name, number, params, settings, octui)
+    def __init__(self, name: str, number: int, params: LineScanParams, settings: Dict[str, Any], octui, log_level):
+        super().__init__(name, number, params, settings, octui, log_level)
 
         self._edit_widget = LineScanConfigWidget()
         self._edit_widget.setLineScanParams(self.params)
@@ -190,14 +191,15 @@ class LineScanGUIHelper(ScanGUIHelper):
     def getPlotWidget(self, ascan_endpoint) -> QWidget:
         #self._mpsw = MPSW()
         self._cross_widget = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="Cross section")
-        self._ascan_trace_widget = AscanTraceWidget(ascan_endpoint, title="Ascan")
+        #self._ascan_trace_widget = AscanTraceWidget(ascan_endpoint, title="Ascan")
+        self._ascan_trace_widget = EPTracePlot(ascan_endpoint, title="Ascan")
 
         # apply settings
         if 'cross.range' in self.settings:
             self._cross_widget._range = self.settings['cross.range']
 
-        if 'ascan.ylim' in self.settings:
-            self._ascan_trace_widget.set_ylim(self.settings['ascan.ylim'])
+        # if 'ascan.ylim' in self.settings:
+        #     self._ascan_trace_widget.set_ylim(self.settings['ascan.ylim'])
 
         # callbacks
         ascan_endpoint.aggregate_segment_callback = self.cb_ascan
