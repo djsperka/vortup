@@ -1,7 +1,6 @@
 from qtpy.QtWidgets import QApplication, QMainWindow, QWidget, QGridLayout, QLabel
 from qtpy.QtCore import QTimer, Signal, Qt
 from qtpy.QtGui import QPixmap, QImage, QPen, QColor, QPainter
-from image_display import ImageDisplay
 from PIL import Image
 
 import numpy as np
