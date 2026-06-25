@@ -3,7 +3,6 @@ from qtpy.QtWidgets import QMainWindow, QApplication
 from qtpy.QtGui import QCursor, QMouseEvent, QEnterEvent, QKeyEvent, QPainter, QTransform, QPaintEvent, QPen, QColor
 from qtpy.QtCore import QEvent, Qt as qt, QPoint, QPointF, Signal
 import sys
-import skimage as ski
 from typing import Iterable, List, Set, Optional
 from math import floor
 
