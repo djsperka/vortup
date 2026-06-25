@@ -10,7 +10,6 @@ from TraceWidget import AscanTraceWidget
 import matplotlib as mpl
 import numpy as np
 
-from EPTracePlot import EPTracePlot
 
 from vortex import Range
 from vortex.scan import RasterScanConfig, FreeformScan, FreeformScanConfig
@@ -83,9 +82,8 @@ class LineScanGUIHelper(ScanGUIHelper):
 
     def getSettings(self):
         settings = {}
-        # settings['cross1.range'] = self._cross_widget_1._range
-        # settings['cross2.range'] = self._cross_widget_2._range
-        # settings['linescan.ylim'] = list(self._linescan_trace_widget._axes.get_ylim())
+        settings['cross.range'] = self._cross_widget._range
+        settings['ascan.ylim'] = list(self._ascan_trace_widget._axes.get_ylim())
         return settings
     
     def getScan(self, doStrobe=False):
@@ -191,15 +189,14 @@ class LineScanGUIHelper(ScanGUIHelper):
     def getPlotWidget(self, ascan_endpoint) -> QWidget:
         #self._mpsw = MPSW()
         self._cross_widget = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="Cross section")
-        #self._ascan_trace_widget = AscanTraceWidget(ascan_endpoint, title="Ascan")
-        self._ascan_trace_widget = EPTracePlot(ascan_endpoint, title="Ascan")
+        self._ascan_trace_widget = AscanTraceWidget(ascan_endpoint, title="Ascan")
 
         # apply settings
         if 'cross.range' in self.settings:
             self._cross_widget._range = self.settings['cross.range']
 
-        # if 'ascan.ylim' in self.settings:
-        #     self._ascan_trace_widget.set_ylim(self.settings['ascan.ylim'])
+        if 'ascan.ylim' in self.settings:
+            self._ascan_trace_widget.set_ylim(self.settings['ascan.ylim'])
 
         # callbacks
         ascan_endpoint.aggregate_segment_callback = self.cb_ascan
@@ -208,13 +205,6 @@ class LineScanGUIHelper(ScanGUIHelper):
         hbox = QHBoxLayout()
         hbox.addWidget(self._cross_widget)
         hbox.addWidget(self._ascan_trace_widget)
-        # vbox_left = QVBoxLayout()
-        # vbox_left.addWidget(self._cross_widget_1)
-        # vbox_left.addWidget(self._cross_widget_2)
-        # vbox_right = QVBoxLayout()
-        # vbox_right.addWidget(self._linescan_trace_widget)
-        # hbox.addLayout(vbox_left)
-        # hbox.addLayout(vbox_right)
         w = QWidget()
         w.setLayout(hbox)
         #return self._mpsw
