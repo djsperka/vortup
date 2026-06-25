@@ -8,6 +8,8 @@ import cupy
 from typing import Iterable, List
 from qtpy.QtGui import QPaintEvent
 from typing import Tuple
+from math import log10 as log10, floor as floor, ceil as ceil
+
 
 # Inheriting from FigureCanvasQTAgg. 
 # FigureCanvasQTAgg is a widget. Call update() to invalidate and trigger a paintEvent.
@@ -216,8 +218,16 @@ class AscanTraceWidget(FigureCanvas):
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
 
     def set_ylim(self, lim):
-        #self._axes.set_ylim(lim[0], lim[1])
-        self._axes.set_ylim(10**-1, 10**3)
+
+        # Figure out a nice set of limits....
+        if lim[0]>0 and lim[1]>0:
+            low = log10(lim[0])
+            low_power = floor(low)
+            hi = log10(lim[1])
+            hi_power = ceil(hi)
+            self._axes.set_ylim(10**low_power, 10**hi_power)
+
+
 
 
     def flush(self):
@@ -250,6 +260,7 @@ class AscanTraceWidget(FigureCanvas):
                 else:
                     ytmp = volume[self._bidx].mean(axis=0)
 
+                # TODO: Should this factor be here? Convert from log10 to 20*log10?
                 self._ydata = 20 * ytmp
 
                 if self._update_ylim and not self._update_ylim_ready:
@@ -324,17 +335,9 @@ class AscanTraceWidget(FigureCanvas):
             self._update_ylim = False
             self._update_ylim_ready = False
             self._update_ylim_start_idx = -1
-            #self._axes.set_ylim(self._ylim_temp[0], self._ylim_temp[1])
-            self._axes.set_ylim(10**-1, 10**2)
+            self.set_ylim(self._ylim_temp)
 
         self._invalidated = False
-
-        # find max/min of current data, and update ylim if needed
-        ylow = numpy.min(self._ydata)
-        yhi = numpy.max(self._ydata)
-        logylow = numpy.log10(ylow)
-        logyhi = numpy.log10(yhi)
-        #print("current y range: ({0:f}, {1:f}), log10 range ({2:f}, {3:f})".format(ylow, yhi, logylow, logyhi))
 
         self.draw()
         super().paintEvent(e)
