@@ -91,9 +91,8 @@ class LineScanGUIHelper(ScanGUIHelper):
 
     def getSettings(self) -> dict[str, Any]:
         settings: dict[str, Any] = {}
-        # settings['cross1.range'] = self._cross_widget_1._range
-        # settings['cross2.range'] = self._cross_widget_2._range
-        # settings['linescan.ylim'] = list(self._linescan_trace_widget._axes.get_ylim())
+        settings['cross.range'] = self._cross_widget._range
+        settings['ascan.ylim'] = list(self._ascan_trace_widget._axes.get_ylim())
         return settings
 
     def getScan(self, doStrobe: bool = False) -> FreeformScan:
@@ -179,8 +178,8 @@ class LineScanGUIHelper(ScanGUIHelper):
 
         # endpoint for display of ascans
         vshape = (self.params.lines_per_volume, self.params.ascans_per_bscan, samples_to_save)
-        self._logger.info("Create StackDeviceTensorEndpointInt8 with shape {0:s}".format(str(vshape)))
-        ascan_endpoint = self._createAscanEndpoint(sfe, vshape, octuiparams.vtx, get_logger("stack", self.log_level))
+        self._logger.info('Create StackDeviceTensorEndpointInt8 with shape {0:s}'.format(str(vshape)))
+        ascan_endpoint = self._createAscanEndpoint(sfe, vshape, octuiparams.vtx, get_logger('line-ascan-endpoint-plot', self.log_level))
 
         sfec_spectra = StackFormatExecutorConfig()
         sfe_spectra = StackFormatExecutor()
@@ -193,11 +192,11 @@ class LineScanGUIHelper(ScanGUIHelper):
 
         # make an endpoint for saving spectra data
         shape = (self.params.lines_per_volume, self.params.ascans_per_bscan, samples_per_record, 1)
-        spectra_storage = SimpleStackUInt16(get_logger("npy-spectra", self.log_level))
+        spectra_storage = SimpleStackUInt16(get_logger("line-spectra-storage", self.log_level))
         sfec = StackFormatExecutorConfig()
         sfe = StackFormatExecutor()
         sfe.initialize(sfec)
-        storage_endpoint = SpectraStackEndpoint(sfe, spectra_storage, log=get_logger("npy-spectra", self.log_level))
+        storage_endpoint = SpectraStackEndpoint(sfe, spectra_storage, log=get_logger("line-spectra-endpoint", self.log_level))
 
         self._components = ScanGUIHelperComponents(
             format_planner=format_planner,
@@ -228,13 +227,6 @@ class LineScanGUIHelper(ScanGUIHelper):
         hbox = QHBoxLayout()
         hbox.addWidget(self._cross_widget)
         hbox.addWidget(self._ascan_trace_widget)
-        # vbox_left = QVBoxLayout()
-        # vbox_left.addWidget(self._cross_widget_1)
-        # vbox_left.addWidget(self._cross_widget_2)
-        # vbox_right = QVBoxLayout()
-        # vbox_right.addWidget(self._linescan_trace_widget)
-        # hbox.addLayout(vbox_left)
-        # hbox.addLayout(vbox_right)
         w = QWidget()
         w.setLayout(hbox)
         # return self._mpsw

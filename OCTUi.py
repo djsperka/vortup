@@ -80,7 +80,7 @@ class OCTUi(QObject):
             else:
                 s = {}
 
-            self._guihelpers.append(scanGUIHelperFactory(name, flag, cfg, s, self))
+            self._guihelpers.append(scanGUIHelperFactory(name, flag, cfg, s, self, log_level=self._params.vtx.log_level))
             self._octDialog.widgetScanConfig.addScanType(name, self._guihelpers[-1].edit_widget)
 
         self._octDialog.widgetScanConfig.setCurrentIndex(self._params.scn.current_index)
@@ -194,7 +194,7 @@ class OCTUi(QObject):
             self._vtxengine = None
 
             # check if laser source is present and on. If not, throw an error.
-            if self._params.vtx.acquisition_type == AcquisitionType.ALAZAR_ACQUISITION:
+            if self._params.vtx.acquisition_type == AcquisitionType.ALAZAR_ACQUISITION and self._params.vtx.laser_port:
                 with LaserSource(self._params.vtx.laser_port) as laser:
                     if not laser.is_on():
                         raise LaserNotOnError("Laser source is not on")
@@ -340,6 +340,7 @@ class OCTUi(QObject):
         # For an aiming scan, each "cross" consists of 2 b-scans
 
         helper = self._guihelpers[self._params.scn.current_index]
+        #self._logger.info("volumeCallback:({0:d}, {1:d}, {2:d}),helper={3:s})".format(arg0, arg1, arg2, helper.name))
 
         # call helper's volume method
         helper.volume(arg0, arg1, arg2)
@@ -348,14 +349,21 @@ class OCTUi(QObject):
         # self._logger.info("volumeCallback:({0:d}, {1:d}, {2:d}),helper={3:s},shape={4},tensor={5}".format(arg0, arg1, arg2, helper.name, shape, helper.components.spectra_endpoint.tensor))
         # self._logger.info("volumeCallback({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
         if self._savingVolumesRequested:
+
+            self._logger.info("volumeCallback({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
+
             (bOK, baseFilename) = self.checkFileSaveStuff()
             if bOK:
                 import numpy as np
 
                 with helper.components.spectra_endpoint.tensor as volume:
-                    with open("data.dat", "wb") as f:
-                        np.save(f, volume)
-                        self._logger.info("Saved data to data.dat")
+                    tmpFilename = baseFilename + ".dat"
+                    with open(tmpFilename, 'wb') as f:
+                        np.save(f, volume) 
+                        print(f"Saved data to {tmpFilename}")
+
+
+
 
                 # Create SimpleStackConfig to config storage
                 npsc = SimpleStackConfig()
