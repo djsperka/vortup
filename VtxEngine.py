@@ -1,3 +1,5 @@
+import logging
+
 from vortex import get_console_logger
 from vortex.engine import Block, Engine, EngineConfig, VolumeStrobe
 from vortex.io import DAQmxConfig, DAQmxIO, daqmx
@@ -15,7 +17,7 @@ class VtxEngine(VtxBaseEngine):
 
         # base class
         super().__init__(params.vtx)
-        self._logger = get_console_logger(__name__)
+        self._logger = logging.getLogger(__name__)
         # Base class has stuff made, but no engine constructed:
         # self._acquire
         # self._octprocess  - CUDA based processing

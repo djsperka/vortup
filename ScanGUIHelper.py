@@ -1,8 +1,8 @@
+import logging
 from abc import ABC, abstractmethod
 from typing import Any
 
 from qtpy.QtWidgets import QWidget
-from vortex import get_console_logger
 from vortex.engine import (
     EventStrobe,
     NullEndpoint,
@@ -115,7 +115,7 @@ class ScanGUIHelper(ABC):
         self.settings = settings
         self.octui = octui
         self.log_level = log_level
-        self._logger = get_console_logger("GUIHelper({0:s})".format(self.name))
+        self._logger = logging.getLogger("GUIHelper({0:s})".format(self.name))
         self._components = None
 
     def has_components(self) -> bool:

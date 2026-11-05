@@ -13,7 +13,6 @@ from PyQt5.QtCore import QDateTime, QObject, Qt, QTimer, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QLabel, QMessageBox
 from serial import SerialException
 from vortex import __version__ as vortex_version
-from vortex import get_console_logger
 from vortex.engine import Engine
 from vortex.storage import SimpleStackConfig, SimpleStackHeader
 
@@ -34,7 +33,7 @@ class OCTUi(QObject):
         super().__init__()  # Call the inherited class' __init__ method
 
         # self._testlogger = get_console_logger("OCTUI-Main")
-        self._logger = get_console_logger("OCTUi")
+        self._logger = logging.getLogger("OCTUi")
         self._vtxengine = None
         self._cross_widget = None
         self._trace_widget = None

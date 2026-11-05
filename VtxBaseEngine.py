@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 from vortex import get_console_logger
 from vortex.acquire import AlazarAcquisition, AlazarConfig, FileAcquisition, FileAcquisitionConfig, alazar
@@ -8,7 +10,7 @@ from vortex.process import CPUProcessor, CPUProcessorConfig, CUDAProcessor, CUDA
 from DAQConst import getAlazarChannel
 from VtxEngineParams import AcquisitionType, VtxEngineParams
 
-LOGGER = get_console_logger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class VtxBaseEngine:

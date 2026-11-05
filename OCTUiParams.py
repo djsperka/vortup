@@ -6,12 +6,12 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
-from vortex import Range, get_console_logger
+from vortex import Range
 
 from ScanParams import AimingScanParams, GalvoTuningScanParams, LineScanParams, RasterScanParams, ScanParams
 from VtxEngineParams import AcquisitionType, VtxEngineParams
 
-local_logger = get_console_logger("OCTUiParams")
+local_logger = logging.getLogger("OCTUiParams")
 
 # default location and name for config file
 default_config_base = "octui.conf"

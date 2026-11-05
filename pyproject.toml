@@ -19,6 +19,8 @@ select = [
 ]
 ignore = [
     "G001",   # .format() inside logging calls: used throughout, harmless
+    "G010",   # .warn -> .warning: WRONG for vortex.log.Logger, which has only .warn;
+              # ruff cannot tell vortex loggers from Python loggers
     "UP030",  # explicit {0:s} indices in .format(): style only
     "UP031",  # %-formatting: style only
     "UP032",  # .format() -> f-string: style only
