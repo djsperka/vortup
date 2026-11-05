@@ -5,6 +5,7 @@ import traceback
 from datetime import datetime
 from json import dumps
 from pathlib import Path
+import importlib.metadata
 
 import cupy  # noqa: F401  (kept deliberately: load CUDA/cupy before the engine is built)
 import matplotlib as mpl
@@ -12,7 +13,6 @@ from git import Repo
 from PyQt5.QtCore import QDateTime, QObject, Qt, QTimer, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QLabel, QMessageBox
 from serial import SerialException
-from vortex import __version__ as vortex_version
 from vortex.engine import Engine
 from vortex.storage import SimpleStackConfig, SimpleStackHeader
 
@@ -53,7 +53,8 @@ class OCTUi(QObject):
         self._logger.info(
             "OCTUi {0:s} starting...".format(repo.git.describe(tags=True, always=True, dirty=True, long=True))
         )
-        self._logger.info("Using vortex {0:s}".format(vortex_version))
+        version = importlib.metadata.version("vortex-oct.cuda12x")
+        self._logger.info(f"Using vortex {version}")
 
         # load config file - default file only!
         # TODO - make it configurable, or be able to load a diff't config.
