@@ -1,6 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, TypeAlias
 
 from qtpy.QtWidgets import QWidget
 from vortex.engine import (
@@ -15,12 +15,18 @@ from vortex.engine import (
     VolumeStrobe,
 )
 from vortex.format import FormatPlanner, StackFormatExecutor
+from vortex.scan import FreeformScan, RadialScan, RasterScan
 from vortex.storage import SimpleStackUInt16
 
 from OCTUiParams import OCTUiParams
+from ScanParams import AnyScanParams
 
 # from OCTUi import OCTUi
 from VtxEngineParams import AcquisitionType, VtxEngineParams
+
+# Scan patterns that ScanGUIHelper.getScan() can return. vortex's scan classes share no
+# common base class, so this lists the ones the helpers use; extend it for new scan types.
+ScanPattern: TypeAlias = RasterScan | RadialScan | FreeformScan
 
 
 class ScanGUIHelperComponents:
@@ -97,6 +103,9 @@ class ScanGUIHelper(ABC):
     with the latest engine parameters as an argument.
     """
 
+    # Subclasses must set this in __init__ (returned by the edit_widget property).
+    _edit_widget: QWidget
+
     def __init__(self, name, flags, params, settings, octui, log_level=1):
         """
         Docstring for __init__
@@ -129,7 +138,7 @@ class ScanGUIHelper(ABC):
             return self._components
 
     @property
-    def edit_widget(self):
+    def edit_widget(self) -> QWidget:
         """
         Widget displayed in the editing widget - QStackedWidget. Subclasses should set this.
 
@@ -141,7 +150,7 @@ class ScanGUIHelper(ABC):
         pass
 
     @abstractmethod
-    def getScan(self):
+    def getScan(self) -> ScanPattern:
         """
         Returns a configured scan pattern, e.g. RasterScan
 
@@ -150,12 +159,12 @@ class ScanGUIHelper(ABC):
         pass
 
     @abstractmethod
-    def getParams(self):
+    def getParams(self) -> AnyScanParams:
         """Return the parameters currently specified in the edit widget"""
         pass
 
     @abstractmethod
-    def getSettings(self) -> dict:
+    def getSettings(self) -> dict[str, Any]:
         """Gets settings for plots. Each subclass can decide for itself what settings to save.
 
         Returns:
@@ -164,7 +173,7 @@ class ScanGUIHelper(ABC):
         pass
 
     @abstractmethod
-    def clear(self):
+    def clear(self) -> None:
         """Clear plots and any internal data
         Returns:
             None: None

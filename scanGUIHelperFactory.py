@@ -5,13 +5,13 @@ from GalvoTuningScanGUIHelper import GalvoTuningScanGUIHelper
 from LineScanGUIHelper import LineScanGUIHelper
 from RasterScanGuiHelper import RasterScanGUIHelper
 from ScanGUIHelper import ScanGUIHelper
-from ScanParams import AimingScanParams, GalvoTuningScanParams, LineScanParams, RasterScanParams
+from ScanParams import AimingScanParams, AnyScanParams, GalvoTuningScanParams, LineScanParams, RasterScanParams
 
 
 def scanGUIHelperFactory(
     name: str,
     number: int,
-    params: RasterScanParams | AimingScanParams | LineScanParams | GalvoTuningScanParams,
+    params: AnyScanParams,
     settings: dict[str, Any],
     octui,
 ) -> ScanGUIHelper:

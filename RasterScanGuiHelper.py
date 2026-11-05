@@ -43,7 +43,7 @@ class RasterScanGUIHelper(ScanGUIHelper):
         self._mpsw = None
         # self._plot_widget = self.rasterPlotWidget()
 
-    def getSettings(self):
+    def getSettings(self) -> dict[str, Any]:
         settings = {}
         settings["enface.range"] = self._raster_widget._range
         settings["cross.range"] = self._cross_widget._range
@@ -51,11 +51,11 @@ class RasterScanGUIHelper(ScanGUIHelper):
         settings["spectra.ylim"] = list(self._spectra_trace_widget._axes.get_ylim())
         return settings
 
-    def getParams(self):
+    def getParams(self) -> RasterScanParams:
         params = self._edit_widget.getRasterScanParams()
         return params
 
-    def getScan(self):
+    def getScan(self) -> RasterScan:
 
         params = self.getParams()
         cfg = RasterScanConfig()
@@ -70,7 +70,7 @@ class RasterScanGUIHelper(ScanGUIHelper):
         scan.initialize(cfg)
         return scan
 
-    def clear(self):
+    def clear(self) -> None:
         self._cross_widget.notify_segments([0])
         self._raster_widget.notify_segments([0])
         self._ascan_trace_widget.flush()

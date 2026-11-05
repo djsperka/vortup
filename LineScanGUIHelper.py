@@ -82,21 +82,21 @@ class LineScanGUIHelper(ScanGUIHelper):
         """
         pass
 
-    def getParams(self):
+    def getParams(self) -> LineScanParams:
         params = self._edit_widget.getLineScanParams()
         return params
 
-    def clear(self):
+    def clear(self) -> None:
         print("LineScanGUIHelper::clear")
 
-    def getSettings(self):
-        settings = {}
+    def getSettings(self) -> dict[str, Any]:
+        settings: dict[str, Any] = {}
         # settings['cross1.range'] = self._cross_widget_1._range
         # settings['cross2.range'] = self._cross_widget_2._range
         # settings['linescan.ylim'] = list(self._linescan_trace_widget._axes.get_ylim())
         return settings
 
-    def getScan(self, doStrobe=False):
+    def getScan(self, doStrobe: bool = False) -> FreeformScan:
         params = self.getParams()
         cfg = RasterScanConfig()
         cfg.bscans_per_volume = params.lines_per_volume

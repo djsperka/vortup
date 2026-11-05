@@ -71,21 +71,21 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
         """
         print("galvo cb_volume({0:d},{1:d},{2:d})".format(sample_idx, scan_idx, volume_idx))
 
-    def getParams(self):
+    def getParams(self) -> GalvoTuningScanParams:
         params = self._edit_widget.getGalvoTuningScanParams()
         return params
 
-    def clear(self):
+    def clear(self) -> None:
         print("GalvoTuningingScanGUIHelper::clear")
 
-    def getSettings(self):
+    def getSettings(self) -> dict[str, Any]:
         settings = {}
         settings["cross1.range"] = self._cross_widget_1._range
         settings["cross2.range"] = self._cross_widget_2._range
         settings["linescan.ylim"] = list(self._linescan_trace_widget._axes.get_ylim())
         return settings
 
-    def getScan(self):
+    def getScan(self) -> RasterScan:
         params = self.getParams()
         cfg = RasterScanConfig()
         cfg.bscans_per_volume = params.lines_per_volume

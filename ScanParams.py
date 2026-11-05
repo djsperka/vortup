@@ -41,9 +41,11 @@ class GalvoTuningScanParams:
     lines_per_volume: int = 10
 
 
+# Parameters for any one scan type. Each ScanGUIHelper subclass works with one of these.
+AnyScanParams = RasterScanParams | AimingScanParams | LineScanParams | GalvoTuningScanParams
+
+
 @dataclass
 class ScanParams:
     current_index: int = 0
-    scans: dict[str, RasterScanParams | AimingScanParams | LineScanParams | GalvoTuningScanParams] = field(
-        default_factory=lambda: {}
-    )
+    scans: dict[str, AnyScanParams] = field(default_factory=lambda: {})

@@ -58,14 +58,14 @@ class AimingScanGUIHelper(ScanGUIHelper):
     def cb_spectra(self, v):
         self._spectra_trace_widget.update_trace(v)
 
-    def getParams(self):
+    def getParams(self) -> AimingScanParams:
         params = self._edit_widget.getAimingScanParams()
         return params
 
-    def clear(self):
+    def clear(self) -> None:
         print("AimingScanGUIHelper::clear")
 
-    def getSettings(self):
+    def getSettings(self) -> dict[str, Any]:
         settings = {}
         settings["cross1.range"] = self._cross_widget_1._range
         settings["cross2.range"] = self._cross_widget_2._range
@@ -73,7 +73,7 @@ class AimingScanGUIHelper(ScanGUIHelper):
         settings["spectra.ylim"] = list(self._spectra_trace_widget._axes.get_ylim())
         return settings
 
-    def getScan(self):
+    def getScan(self) -> RadialScan:
         params = self.getParams()
         cfg = RadialScanConfig()
         cfg.ascans_per_bscan = params.ascans_per_bscan
