@@ -3,6 +3,8 @@ from collections.abc import Iterable
 from enum import Enum
 from math import floor
 
+import matplotlib.pyplot as plt
+import numpy as np
 import skimage as ski
 from qtpy.QtCore import QEvent, QPoint, QPointF, Signal
 from qtpy.QtCore import Qt as qt
@@ -60,6 +62,11 @@ class TestPlotWidget(BackendImageWidget):
                 self._cmdstate = PlotCmdStates.PLACING_FIRST_SLICE
                 print("keyPress - cmd started")
             bUpdate = True
+        if e.key() == qt.Key.Key_H:
+            if self._cmdstate == PlotCmdStates.NOTHING:
+                print("H - get histogram, max is ", np.max(self.data))
+                plt.hist(self.data)
+                plt.show()
 
         if needsUpdate:
             self.update(True)
@@ -195,6 +202,11 @@ class TestPlotWidget(BackendImageWidget):
         return (row, col)
 
 
+class SuperPlotWidget(TestPlotWidget):
+    def __init__(self, *args, **kwargs):
+        super().__init__(args, kwargs)
+
+
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -203,7 +215,7 @@ class Window(QMainWindow):
         self.resize(800, 600)
 
         # Create a central widget
-        self.plot = TestPlotWidget(self)
+        self.plot = DoubleTestPlotWidget(self)
         self.setCentralWidget(self.plot)
 
         self.plot.new_slice.connect(self.slice)
