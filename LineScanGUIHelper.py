@@ -87,7 +87,7 @@ class LineScanGUIHelper(ScanGUIHelper):
         return params
 
     def clear(self) -> None:
-        print("LineScanGUIHelper::clear")
+        self._logger.debug("clear")
 
     def getSettings(self) -> dict[str, Any]:
         settings: dict[str, Any] = {}

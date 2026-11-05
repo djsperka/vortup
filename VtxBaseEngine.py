@@ -167,7 +167,7 @@ class VtxBaseEngine:
             self._processor.initialize(self._processor_config)
 
         else:
-            print(cfg.acquisition_type)
+            LOGGER.debug("Acquisition type: %s", cfg.acquisition_type)
             raise RuntimeError("Unknown acquisition type")
 
         # Save the number of samples per record that we settled on.

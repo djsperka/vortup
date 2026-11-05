@@ -37,7 +37,7 @@ class UiParams:
 
 
 def pickle_uiparams(u: UiParams):
-    print("pickling a UiParams instance")
+    local_logger.debug("pickling a UiParams instance")
     return UiParams, (u.vtx, u.scn, u.settings)
 
 

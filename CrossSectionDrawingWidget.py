@@ -1,3 +1,4 @@
+import logging
 import sys
 from collections.abc import Iterable
 from enum import Enum
@@ -9,6 +10,8 @@ from qtpy.QtCore import Qt as qt
 from qtpy.QtGui import QColor, QCursor, QEnterEvent, QKeyEvent, QMouseEvent, QPainter, QPaintEvent, QPen, QTransform
 from qtpy.QtWidgets import QApplication, QMainWindow
 from vortex_tools.ui.display import CrossSectionImageWidget
+
+_logger = logging.getLogger(__name__)
 
 
 class PlotCmdStates(Enum):
@@ -38,17 +41,17 @@ class CrossSectionDrawingWidget(CrossSectionImageWidget):
         self._placing_slice_color = QColor(255, 0, 0)
         self._placed_slice_color = QColor(0, 255, 0)
 
-        print("responsive? {0:s}", self._mouse_responsive)
+        _logger.debug("responsive? %s", self._mouse_responsive)
         self.setMouseTracking(True)
         self.update(safe=True)
-        print("responsive? {0:s}", self._mouse_responsive)
+        _logger.debug("responsive? %s", self._mouse_responsive)
 
     def keyPressEvent(self, e: QKeyEvent) -> None:
         needsUpdate = False
         if e.key() == qt.Key.Key_S:
             if self._cmdstate == PlotCmdStates.NOTHING:
                 self._cmdstate = PlotCmdStates.PLACING_FIRST_SLICE
-                print("keyPress - cmd started")
+                _logger.debug("keyPress - cmd started")
             bUpdate = True
 
         if needsUpdate:
@@ -120,11 +123,11 @@ class CrossSectionDrawingWidget(CrossSectionImageWidget):
     def mousePressEvent(self, e: QMouseEvent) -> None:
         # right button is reset/quit command
         if e.buttons() & qt.MouseButton.RightButton:
-            print("mousePressEvent = right button")
+            _logger.debug("mousePressEvent = right button")
             self._cmdstate = PlotCmdStates.NOTHING
         elif e.buttons() & qt.MouseButton.LeftButton:
             if self._cmdstate == PlotCmdStates.PLACING_FIRST_SLICE:
-                print("mousePressEvent = placing first slice")
+                _logger.debug("mousePressEvent = placing first slice")
                 self._cmdstate = PlotCmdStates.PLACING_SECOND_SLICE
                 self._maybe_slice_first_y = e.position().y()
             elif self._cmdstate == PlotCmdStates.PLACING_SECOND_SLICE:
@@ -133,9 +136,7 @@ class CrossSectionDrawingWidget(CrossSectionImageWidget):
                     min(self._maybe_slice_first_y, e.position().y()),
                     max(self._maybe_slice_first_y, e.position().y()),
                 ]
-                print(
-                    "mousePressEvent = placing second slice at {0:f}-{1:f}".format(self._slice_y[0], self._slice_y[1])
-                )
+                _logger.debug("mousePressEvent = placing second slice at %f-%f", self._slice_y[0], self._slice_y[1])
                 (row0, _) = self._map_window_to_data(QPointF(0, self._slice_y[0]))
                 (row1, _) = self._map_window_to_data(QPointF(0, self._slice_y[1]))
                 self._has_slice = True

@@ -1,3 +1,4 @@
+import logging
 import sys
 
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
@@ -7,6 +8,8 @@ from vortex import Range
 from DAQConst import ATS9350InputRange
 from Ui_VtxEngineParamsDialog import Ui_VtxEngineParamsDialog
 from VtxEngineParams import DEFAULT_VTX_ENGINE_PARAMS, AcquisitionType, VtxEngineParams
+
+_logger = logging.getLogger(__name__)
 
 
 class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
@@ -75,10 +78,10 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         options |= QFileDialog.DontUseNativeDialog
         fname, _ = QFileDialog.getOpenFileName(self, "Select input file", "", "numpy files (*.npy)", options=options)
         if fname:
-            print(fname)
+            _logger.debug("Selected input file %s", fname)
             self.labelFileName.setText(fname)
         else:
-            print("None selected")
+            _logger.debug("No input file selected")
 
     def _accepted(self) -> None:
         self._cfg = self.getEngineParameters()

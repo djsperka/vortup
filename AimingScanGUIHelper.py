@@ -63,7 +63,7 @@ class AimingScanGUIHelper(ScanGUIHelper):
         return params
 
     def clear(self) -> None:
-        print("AimingScanGUIHelper::clear")
+        self._logger.debug("clear")
 
     def getSettings(self) -> dict[str, Any]:
         settings = {}

@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Iterable
 
 import cupy
@@ -6,6 +7,8 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from qtpy.QtCore import Qt
 from qtpy.QtGui import QKeyEvent, QPaintEvent
+
+_logger = logging.getLogger(__name__)
 
 # Inheriting from FigureCanvasQTAgg.
 # FigureCanvasQTAgg is a widget. Call update() to invalidate and trigger a paintEvent.
@@ -268,13 +271,12 @@ class AscanTraceWidget(FigureCanvas):
                         self._ylim_temp[0] = ylow
                     if yhi > self._ylim_temp[1]:
                         self._ylim_temp[1] = yhi
-                    print(
-                        "ylim update first {0:d} last {1:d}, lap , lim ({2:f},{3:f})".format(
-                            self._update_ylim_start_idx,
-                            self._update_ylim_last_idx,
-                            self._ylim_temp[0],
-                            self._ylim_temp[1],
-                        )
+                    _logger.debug(
+                        "ylim update first %d last %d, lim (%f,%f)",
+                        self._update_ylim_start_idx,
+                        self._update_ylim_last_idx,
+                        self._ylim_temp[0],
+                        self._ylim_temp[1],
                     )
             have_data = True
 

@@ -5,6 +5,10 @@ from enum import Enum
 import serial
 
 
+class LaserNotOnError(RuntimeError):
+    """The laser source is connected but not switched on."""
+
+
 class LaserSource(serial.Serial):
     class LaserState(Enum):
         ON = 60

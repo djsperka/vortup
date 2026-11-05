@@ -1,12 +1,7 @@
-import traceback
-
-from matplotlib import pyplot
 from PyQt5.QtCore import QRegExp, pyqtSignal
 from PyQt5.QtGui import QIntValidator, QRegExpValidator
 from PyQt5.QtWidgets import QApplication, QGroupBox, QWidget
 from vortex import Range
-from vortex.scan import RasterScan
-from vortex_tools.scan import plot_annotated_waveforms_space, plot_annotated_waveforms_time
 
 from ScanParams import AimingScanParams, GalvoTuningScanParams, LineScanParams, RasterScanParams, ScanParams
 from Ui_AimingScanConfigWidget import Ui_AimingScanConfigWidget
@@ -68,23 +63,6 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
 
     def setCurrentIndex(self, index):
         self.cbScanTypes.setCurrentIndex(index)
-
-    def showPatternClicked(self):
-        try:
-            cfg = self.getScanConfig()
-            scan = RasterScan()
-            scan.initialize(cfg)
-            name = "scan pattern"
-            fig, _ = plot_annotated_waveforms_time(cfg.sampling_interval, scan.scan_buffer(), scan.scan_markers())
-            fig.suptitle(name)
-            fig.show()
-            fig, _ = plot_annotated_waveforms_space(scan.scan_buffer(), scan.scan_markers())
-            fig.suptitle(name)
-            fig.show()
-            pyplot.show()
-        except RuntimeError as e:
-            print("RuntimeError:")
-            traceback.print_exception(e)
 
 
 from abc import ABC, ABCMeta, abstractmethod

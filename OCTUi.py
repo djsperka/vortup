@@ -1,7 +1,6 @@
 import logging
 import os
 import sys
-import traceback
 from datetime import datetime
 from json import dumps
 from pathlib import Path
@@ -16,7 +15,7 @@ from serial import SerialException
 from vortex.engine import Engine
 from vortex.storage import SimpleStackConfig, SimpleStackHeader
 
-from LaserSource import LaserSource
+from LaserSource import LaserNotOnError, LaserSource
 from OCTUiMainWindow import OCTUiMainWindow
 from OCTUiParams import OCTUiParams
 from ScanGUIHelper import ScanGUIHelper
@@ -198,7 +197,7 @@ class OCTUi(QObject):
             if self._params.vtx.acquisition_type == AcquisitionType.ALAZAR_ACQUISITION:
                 with LaserSource(self._params.vtx.laser_port) as laser:
                     if not laser.is_on():
-                        raise RuntimeError("Laser source is not on")
+                        raise LaserNotOnError("Laser source is not on")
                     else:
                         self._logger.info(laser.info())
 
@@ -233,12 +232,18 @@ class OCTUi(QObject):
             self._octDialog.pbStart.setEnabled(False)
             self._octDialog.pbStop.setEnabled(True)
 
-        except RuntimeError as e:
-            print("RuntimeError:")
-            traceback.print_exception(e)
+        # Problems the user can fix: log a clear message, no traceback.
+        except LaserNotOnError as e:
+            self._logger.error("Cannot start engine: %s. Turn on the laser source and press Start again.", e)
         except SerialException as e:
-            print("Error connecting to laser source! Check power and USB connection.\nSerialException:")
-            traceback.print_exception(e)
+            self._logger.error(
+                "Cannot connect to laser source on %s: %s. Check power and USB connection.",
+                self._params.vtx.laser_port,
+                e,
+            )
+        # Anything else (e.g. vortex failing to configure hardware): log with traceback.
+        except RuntimeError:
+            self._logger.exception("Failed to start the OCT engine")
 
     def connectCurrentScan(self, helper: ScanGUIHelper):
 
@@ -350,7 +355,7 @@ class OCTUi(QObject):
                 with helper.components.spectra_endpoint.tensor as volume:
                     with open("data.dat", "wb") as f:
                         np.save(f, volume)
-                        print("Saved data to data.dat")
+                        self._logger.info("Saved data to data.dat")
 
                 # Create SimpleStackConfig to config storage
                 npsc = SimpleStackConfig()

@@ -69,14 +69,14 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
             scan_idx (int): scan index
             volume_idx (int): volume index
         """
-        print("galvo cb_volume({0:d},{1:d},{2:d})".format(sample_idx, scan_idx, volume_idx))
+        self._logger.debug("cb_volume(%d, %d, %d)", sample_idx, scan_idx, volume_idx)
 
     def getParams(self) -> GalvoTuningScanParams:
         params = self._edit_widget.getGalvoTuningScanParams()
         return params
 
     def clear(self) -> None:
-        print("GalvoTuningingScanGUIHelper::clear")
+        self._logger.debug("clear")
 
     def getSettings(self) -> dict[str, Any]:
         settings = {}
