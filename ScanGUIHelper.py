@@ -229,3 +229,5 @@ class ScanGUIHelper(ABC):
         elif vtx.acquisition_type == AcquisitionType.FILE_ACQUISITION:
             self._logger.info("Create StackHostTensorEndpointInt8 with shape {0:s}".format(str(shape)))
             return StackHostTensorEndpointInt8(sfe, shape, logger)
+        # NotImplementedError is a RuntimeError, so OCTUi.startClicked logs it instead of crashing.
+        raise NotImplementedError(f"No ascan endpoint for acquisition type {vtx.acquisition_type}")

@@ -167,8 +167,8 @@ class VtxBaseEngine:
             self._processor.initialize(self._processor_config)
 
         else:
-            LOGGER.debug("Acquisition type: %s", cfg.acquisition_type)
-            raise RuntimeError("Unknown acquisition type")
+            # NotImplementedError is a RuntimeError, so OCTUi.startClicked logs it instead of crashing.
+            raise NotImplementedError(f"No acquisition/processing set up for acquisition type {cfg.acquisition_type}")
 
         # Save the number of samples per record that we settled on.
         self._samples_per_record = self._processor.config.samples_per_record
