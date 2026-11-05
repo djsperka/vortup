@@ -5,29 +5,36 @@ import cupy
 
 from vortex import Range, get_console_logger as get_logger
 from vortex.scan import RasterScan, warp
-from vortex.engine import EngineConfig, Engine, dispersion_phasor, StackDeviceTensorEndpointInt8 as StackDeviceTensorEndpoint
+from vortex.engine import (
+    EngineConfig,
+    Engine,
+    dispersion_phasor,
+    StackDeviceTensorEndpointInt8 as StackDeviceTensorEndpoint,
+)
 
 from vortex.acquire import NullAcquisition
 from vortex.process import CUDAProcessor
 from vortex.format import FormatPlanner, StackFormatExecutor, StackFormatExecutorConfig, SimpleSlice
+
 
 class cfg:
     samples_per_ascan = 1024
     ascans_per_bscan = 512
     bscans_per_volume = 512
 
-    ascans_per_block = 512      # number of A-scans in a memory buffer
-    blocks_to_allocate = 32     # number of memory buffers to allocate
+    ascans_per_block = 512  # number of A-scans in a memory buffer
+    blocks_to_allocate = 32  # number of memory buffers to allocate
     blocks_to_acquire = 100  # number of memory buffers to acquire before exiting
-    #blocks_to_acquire = 100000  # number of memory buffers to acquire before exiting
-                                # (0 means infinite)
+    # blocks_to_acquire = 100000  # number of memory buffers to acquire before exiting
+    # (0 means infinite)
 
-    preload_count = 8           # number of memory buffers to post to Alazar and NI cards before
-                                # the acquistion begins (determines scan change latency)
+    preload_count = 8  # number of memory buffers to post to Alazar and NI cards before
+    # the acquistion begins (determines scan change latency)
 
     process_slots = 2
 
-    log_level = 1               # log verbosity (higher number means less verbose)
+    log_level = 1  # log verbosity (higher number means less verbose)
+
 
 class OCTEngine:
     def __init__(self, cfg):
@@ -42,8 +49,8 @@ class OCTEngine:
 
         # rsc.offset = (1, 1)               # units of volts
         # rsc.angle = 0                     # units of radians
-        rsc.bscan_extent = Range(-0, 0)     # units of volts
-        rsc.volume_extent = Range(-0, 0)    # units of volts
+        rsc.bscan_extent = Range(-0, 0)  # units of volts
+        rsc.volume_extent = Range(-0, 0)  # units of volts
 
         rsc.bidirectional_segments = False
         rsc.bidirectional_volumes = False
@@ -74,7 +81,7 @@ class OCTEngine:
         # OCT processing setup
         #
 
-        self._process = CUDAProcessor(get_logger('process', cfg.log_level))
+        self._process = CUDAProcessor(get_logger("process", cfg.log_level))
         pc = self._process.config
 
         # match acquisition settings
@@ -101,7 +108,7 @@ class OCTEngine:
         #
 
         # format planners
-        self._stack_format = FormatPlanner(get_logger('format', cfg.log_level))
+        self._stack_format = FormatPlanner(get_logger("format", cfg.log_level))
 
         fc = self._stack_format.config
         fc.segments_per_volume = cfg.bscans_per_volume
@@ -116,7 +123,9 @@ class OCTEngine:
 
         cfe = StackFormatExecutor()
         cfe.initialize(cfec)
-        stack_tensor_endpoint = StackDeviceTensorEndpoint(cfe, (cfg.bscans_per_volume, cfg.ascans_per_bscan, samples_to_save), get_logger('cube', cfg.log_level))
+        stack_tensor_endpoint = StackDeviceTensorEndpoint(
+            cfe, (cfg.bscans_per_volume, cfg.ascans_per_bscan, samples_to_save), get_logger("cube", cfg.log_level)
+        )
         self._stack_tensor_endpoint = stack_tensor_endpoint
 
         #
@@ -133,7 +142,7 @@ class OCTEngine:
         ec.blocks_to_allocate = cfg.blocks_to_allocate
         ec.blocks_to_acquire = cfg.blocks_to_acquire
 
-        self._engine = Engine(get_logger('engine', cfg.log_level))
+        self._engine = Engine(get_logger("engine", cfg.log_level))
 
         self._engine.initialize(ec)
         self._engine.prepare()
@@ -153,11 +162,14 @@ class OCTEngine:
         total_ascans = cfg.blocks_to_acquire * cfg.ascans_per_block
 
         with cupy.cuda.Device(self._process.config.device) as device:
-            print(f'using GPU {device.pci_bus_id} ({device.id})')
-        print(f'ascan length = {cfg.samples_per_ascan}, block size = {cfg.ascans_per_block}, process slots = {cfg.process_slots}')
-        print(f'input: {self._process.config.input_shape}, output: {self._process.config.output_shape}')
-        print(f'time = {dt} s   ascans = {total_ascans}   ascans/sec = {total_ascans / dt:.0f}')
+            print(f"using GPU {device.pci_bus_id} ({device.id})")
+        print(
+            f"ascan length = {cfg.samples_per_ascan}, block size = {cfg.ascans_per_block}, process slots = {cfg.process_slots}"
+        )
+        print(f"input: {self._process.config.input_shape}, output: {self._process.config.output_shape}")
+        print(f"time = {dt} s   ascans = {total_ascans}   ascans/sec = {total_ascans / dt:.0f}")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     engine = OCTEngine(cfg)
     engine.run()

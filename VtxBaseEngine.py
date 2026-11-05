@@ -1,7 +1,14 @@
 from vortex import Range, get_console_logger
 from vortex.engine import Block, dispersion_phasor
 from vortex.acquire import AlazarConfig, AlazarAcquisition, alazar, FileAcquisitionConfig, FileAcquisition
-from vortex.process import CUDAProcessor, CUDAProcessorConfig, NullProcessor, NullProcessorConfig, CPUProcessor, CPUProcessorConfig
+from vortex.process import (
+    CUDAProcessor,
+    CUDAProcessorConfig,
+    NullProcessor,
+    NullProcessorConfig,
+    CPUProcessor,
+    CPUProcessorConfig,
+)
 from vortex.io import DAQmxIO, DAQmxConfig, daqmx
 from VtxEngineParams import VtxEngineParams, AcquisitionType
 from DAQConst import getAlazarChannel
@@ -9,16 +16,17 @@ import numpy as np
 from typing import Tuple
 
 LOGGER = get_console_logger(__name__)
-class VtxBaseEngine():
+
+
+class VtxBaseEngine:
     def __init__(self, cfg: VtxEngineParams):
 
         #
         # acquisition
         #
 
-        resampling = []     # may be reassigned in this block, used below this block
+        resampling = []  # may be reassigned in this block, used below this block
         if cfg.acquisition_type == AcquisitionType.ALAZAR_ACQUISITION:
-
             # configure external clocking from an Alazar card
             # internal clock works for testing with 9350 (doesn't take 800*10**6)
             ac = AlazarConfig()
@@ -26,7 +34,6 @@ class VtxBaseEngine():
             if cfg.internal_clock:
                 LOGGER.warn("alazar internal clock not tested in this program!")
                 ac.clock = alazar.InternalClock(cfg.clock_samples_per_second)
-
 
                 # (clock_samples_per_second, clock) = acquire_alazar_clock(cfg.swept_source, ac, cfg.clock_channel, get_logger('acquire', cfg.log_level))
                 # cfg.swept_source.clock_edges_seconds = find_rising_edges(clock, clock_samples_per_second, len(cfg.swept_source.clock_edges_seconds))
@@ -36,17 +43,33 @@ class VtxBaseEngine():
                 # ac.samples_per_record = board.info.smallest_aligned_samples_per_record(resampling.max())
 
             else:
-                ac.clock = alazar.ExternalClock(level_ratio=cfg.external_clock_level_pct/100, coupling=alazar.Coupling.AC, edge=alazar.ClockEdge.Rising, dual=False)
+                ac.clock = alazar.ExternalClock(
+                    level_ratio=cfg.external_clock_level_pct / 100,
+                    coupling=alazar.Coupling.AC,
+                    edge=alazar.ClockEdge.Rising,
+                    dual=False,
+                )
 
             board = alazar.Board(ac.device.system_index, ac.device.board_index)
-            ac.samples_per_record = board.info.smallest_aligned_samples_per_record(cfg.ssrc_clock_rising_edges_per_trigger)
+            ac.samples_per_record = board.info.smallest_aligned_samples_per_record(
+                cfg.ssrc_clock_rising_edges_per_trigger
+            )
             ac.records_per_block = cfg.ascans_per_block
 
             # trigger with range - must be 5000 (2500 will err). TTL will work in config also. Discrepancy with docs
-            ac.trigger = alazar.SingleExternalTrigger(range_millivolts=cfg.trigger_range_millivolts, level_ratio=cfg.trigger_level_fraction, delay_samples=cfg.trigger_delay_samples, slope=alazar.TriggerSlope.Positive)
+            ac.trigger = alazar.SingleExternalTrigger(
+                range_millivolts=cfg.trigger_range_millivolts,
+                level_ratio=cfg.trigger_level_fraction,
+                delay_samples=cfg.trigger_delay_samples,
+                slope=alazar.TriggerSlope.Positive,
+            )
 
             # only input channel A
-            LOGGER.info("Using input channel {0:s} for input \"{1:s}\"".format(str(getAlazarChannel(cfg.input_channel)), cfg.input_channel))
+            LOGGER.info(
+                'Using input channel {0:s} for input "{1:s}"'.format(
+                    str(getAlazarChannel(cfg.input_channel)), cfg.input_channel
+                )
+            )
             input = alazar.Input(getAlazarChannel(cfg.input_channel), cfg.input_channel_range_millivolts)
             ac.inputs.append(input)
 
@@ -57,10 +80,9 @@ class VtxBaseEngine():
             # AuxIO
             ac.options.append(alazar.AuxIOTriggerOut())
 
-            acquire = AlazarAcquisition(get_console_logger('acquire', cfg.log_level))
+            acquire = AlazarAcquisition(get_console_logger("acquire", cfg.log_level))
             acquire.initialize(ac)
             self._acquire = acquire
-
 
             # Now set up CUDA processing
             self._processor_config = CUDAProcessorConfig()
@@ -81,13 +103,12 @@ class VtxBaseEngine():
             # DC subtraction per block
             self._processor_config.average_window = 2 * self._processor_config.ascans_per_block
 
-            self._processor = CUDAProcessor(get_console_logger('process', cfg.log_level))
+            self._processor = CUDAProcessor(get_console_logger("process", cfg.log_level))
             self._processor.initialize(self._processor_config)
 
         elif cfg.acquisition_type == AcquisitionType.FILE_ACQUISITION:
-
-            # Create a single block (as defined in acq settings) of ascans. 
-            # 
+            # Create a single block (as defined in acq settings) of ascans.
+            #
             # rng = np.random.default_rng()
             # noise = rng.integers(0, 2**13, cfg.samples_per_ascan)
 
@@ -106,23 +127,21 @@ class VtxBaseEngine():
             # open(test_file_path, 'wb').write(spectra.astype(np.uint16).tobytes())
             # os.close(fd)
 
-
             # test_file_path='/home/dan/work/oct/data/Volumes-2025-09-12/2025-09-12-102925.npy'
             # print(test_file_path)
-
 
             # produce blocks ready from a file
             ac = FileAcquisitionConfig()
             ac.path = cfg.input_file
             ac.samples_per_record = cfg.samples_per_ascan
             ac.records_per_block = cfg.ascans_per_block
-            ac.loop = True # repeat the file indefinitely
+            ac.loop = True  # repeat the file indefinitely
 
-            acquire = FileAcquisition(get_console_logger('acquire', cfg.log_level))
+            acquire = FileAcquisition(get_console_logger("acquire", cfg.log_level))
             acquire.initialize(ac)
             self._acquire = acquire
 
-            # configure no processing. 
+            # configure no processing.
             # pc = NullProcessorConfig()
             # pc.samples_per_record = ac.samples_per_record   #has to be same as that in AcquisitionConfig
             # pc.ascans_per_block = cfg.ascans_per_block
@@ -149,24 +168,21 @@ class VtxBaseEngine():
             # DC subtraction per block
             self._processor_config.average_window = 2 * self._processor_config.ascans_per_block
 
-            self._processor = CPUProcessor(get_console_logger('process', cfg.log_level))
+            self._processor = CPUProcessor(get_console_logger("process", cfg.log_level))
             self._processor.initialize(self._processor_config)
 
         else:
             print(cfg.acquisition_type)
             raise RuntimeError("Unknown acquisition type")
 
-
-
-
-        # Save the number of samples per record that we settled on. 
+        # Save the number of samples per record that we settled on.
         self._samples_per_record = self._processor.config.samples_per_record
 
         #
         # galvo control
         #
-        # Control signals for the galvonometers are sent via the analog output of the IO card. 
-        # We use DAQmxIO objects to control the NI card. This card must be configured with DI drivers, 
+        # Control signals for the galvonometers are sent via the analog output of the IO card.
+        # We use DAQmxIO objects to control the NI card. This card must be configured with DI drivers,
         # and should show up in your NI-MAX application under "Devices and Instruments". Make a note
         # of the name("Dev1" in our case).
         #
@@ -178,15 +194,27 @@ class VtxBaseEngine():
             ioc_out.samples_per_second = cfg.ssrc_triggers_per_second
             ioc_out.blocks_to_buffer = cfg.preload_count
             ioc_out.clock.source = cfg.galvo_clock_source
-            ioc_out.name = 'output'
+            ioc_out.name = "output"
 
             # channel 0, will be
-            LOGGER.info("Galvo slow axis output on \"{0:s}\", {1:f} units/volt".format(cfg.galvo_slow_device_channel, cfg.galvo_slow_units_per_volt))
-            xAVO = daqmx.AnalogVoltageOutput(cfg.galvo_slow_device_channel, cfg.galvo_slow_units_per_volt, Block.StreamIndex.GalvoTarget, 0)
+            LOGGER.info(
+                'Galvo slow axis output on "{0:s}", {1:f} units/volt'.format(
+                    cfg.galvo_slow_device_channel, cfg.galvo_slow_units_per_volt
+                )
+            )
+            xAVO = daqmx.AnalogVoltageOutput(
+                cfg.galvo_slow_device_channel, cfg.galvo_slow_units_per_volt, Block.StreamIndex.GalvoTarget, 0
+            )
             xAVO.limits = cfg.galvo_slow_voltage_range
             ioc_out.channels.append(xAVO)
-            LOGGER.info("Galvo fast axis output on \"{0:s}\", {1:f} units/volt".format(cfg.galvo_fast_device_channel, cfg.galvo_fast_units_per_volt))
-            yAVO = daqmx.AnalogVoltageOutput(cfg.galvo_fast_device_channel, cfg.galvo_fast_units_per_volt, Block.StreamIndex.GalvoTarget, 1)
+            LOGGER.info(
+                'Galvo fast axis output on "{0:s}", {1:f} units/volt'.format(
+                    cfg.galvo_fast_device_channel, cfg.galvo_fast_units_per_volt
+                )
+            )
+            yAVO = daqmx.AnalogVoltageOutput(
+                cfg.galvo_fast_device_channel, cfg.galvo_fast_units_per_volt, Block.StreamIndex.GalvoTarget, 1
+            )
             yAVO.limits = cfg.galvo_fast_voltage_range
             ioc_out.channels.append(yAVO)
 
@@ -195,7 +223,6 @@ class VtxBaseEngine():
             self._io_out = io_out
         else:
             self._io_out = None
-
 
     def get_spectral_filter(self, dispersion: Tuple[float, float], samples_per_record: int) -> np.ndarray:
         window = np.hanning(samples_per_record)

@@ -21,10 +21,10 @@ graph1 = customPlot.addGraph()
 graph1.setPen(QPen(Qt.red))
 
 x, y0, y1 = [], [], []
-for i in range (251):
+for i in range(251):
     x.append(i)
-    y0.append(math.exp(-i/150.0)*math.cos(i/10.0))  # exponentially decaying cosine
-    y1.append(math.exp(-i/150.0))                   # exponential envelope
+    y0.append(math.exp(-i / 150.0) * math.cos(i / 10.0))  # exponentially decaying cosine
+    y1.append(math.exp(-i / 150.0))  # exponential envelope
 
 graph0.setData(x, y0)
 graph1.setData(x, y1)

@@ -13,8 +13,21 @@ import numpy as np
 
 from vortex import Range
 from vortex.scan import RasterScanConfig, FreeformScan, FreeformScanConfig
-from vortex.engine import StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, SpectraStackEndpoint, NullEndpoint, EventStrobe, ScanQueue
-from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, SimpleSlice
+from vortex.engine import (
+    StackDeviceTensorEndpointInt8,
+    SpectraStackHostTensorEndpointUInt16,
+    SpectraStackEndpoint,
+    NullEndpoint,
+    EventStrobe,
+    ScanQueue,
+)
+from vortex.format import (
+    FormatPlanner,
+    FormatPlannerConfig,
+    StackFormatExecutorConfig,
+    StackFormatExecutor,
+    SimpleSlice,
+)
 from vortex.storage import SimpleStackUInt16
 from vortex.marker import Flags, Event
 from vortex import get_console_logger as get_logger
@@ -23,22 +36,23 @@ from MultiPlotSelectWidget import MPSW
 
 
 class LineScanGUIHelper(ScanGUIHelper):
-    '''
+    """
     GUIHelper for a line scan.
-    '''
+    """
+
     def __init__(self, name: str, number: int, params: LineScanParams, settings: Dict[str, Any], octui):
         super().__init__(name, number, params, settings, octui)
 
         self._edit_widget = LineScanConfigWidget()
         self._edit_widget.setLineScanParams(self.params)
-        self._edit_widget.pbTriggerAndSave.clicked.connect(self.triggerAndSave) 
+        self._edit_widget.pbTriggerAndSave.clicked.connect(self.triggerAndSave)
 
         # These are saved here (they are also in _components, as part of the plot_widget)
         # for convenience
         self._cross_widget = None
         self._ascan_trace_widget = None
-        
-        #self._plot_widget = self.linePlotWidget()
+
+        # self._plot_widget = self.linePlotWidget()
 
     def cbScan1(self, i, scanEvent):
         self._logger.info("LineScanGUIHelper::cbScan1: scanEvent {0:d}, {1:s}".format(i, str(scanEvent)))
@@ -55,7 +69,7 @@ class LineScanGUIHelper(ScanGUIHelper):
         scan2 = self.getScan(doStrobe=False)
         self.octui._vtxengine._engine.scan_queue.interrupt(scan1, callback=self.cbScan1)
         self.octui._vtxengine._engine.scan_queue.append(scan2, callback=self.cbScan2)
-            
+
     def cb_ascan(self, v):
         # with self.spectra_endpoint.tensor as volume:
         #     print("{0:d}, ({1:d},{2:d},{3:d})".format(v[-1], volume.shape[0], volume.shape[1], volume.shape[2]))
@@ -86,7 +100,7 @@ class LineScanGUIHelper(ScanGUIHelper):
         # settings['cross2.range'] = self._cross_widget_2._range
         # settings['linescan.ylim'] = list(self._linescan_trace_widget._axes.get_ylim())
         return settings
-    
+
     def getScan(self, doStrobe=False):
         params = self.getParams()
         cfg = RasterScanConfig()
@@ -111,14 +125,17 @@ class LineScanGUIHelper(ScanGUIHelper):
         if doStrobe:
             if params.strobe_bscan_index < 0 or params.strobe_bscan_index > (params.lines_per_volume - 1):
                 # TODO: should do this check in the edit widget, and disallow setting strobe index to an invalid value
-                self._logger.warn("Cannot add strobe trigger at bscan index {0:d}: must be in less than lines per volume ({1:d})".format(params.strobe_bscan_index, params.lines_per_volume))
+                self._logger.warn(
+                    "Cannot add strobe trigger at bscan index {0:d}: must be in less than lines per volume ({1:d})".format(
+                        params.strobe_bscan_index, params.lines_per_volume
+                    )
+                )
             else:
                 e = Event()
                 e.flags = Flags(self.flags)
                 e.id = 1
                 e.sample = 0
                 segments[params.strobe_bscan_index].markers.append(e)
-
 
         # now make scan
         ffsc = FreeformScanConfig()
@@ -134,30 +151,30 @@ class LineScanGUIHelper(ScanGUIHelper):
 
     def getStrobe(self):
         if self.params.strobe_enabled:
-            #return EventStrobe(line=self.params.strobe_output_line, flags=Flags(self.flags), duration=200)
+            # return EventStrobe(line=self.params.strobe_output_line, flags=Flags(self.flags), duration=200)
             return EventStrobe(line=self.params.strobe_output_line, flags=Flags(self.flags), duration=1)
         else:
             return None
-        
+
     def createEngineComponents(self, octuiparams: OCTUiParams, samples_per_record: int):
- 
+
         fc = FormatPlannerConfig()
         fc.segments_per_volume = self.params.lines_per_volume
         fc.records_per_segment = self.params.ascans_per_bscan
         fc.adapt_shape = False
         fc.mask = Flags(self.flags)
 
-        format_planner = FormatPlanner(get_logger('line format', self.log_level))
+        format_planner = FormatPlanner(get_logger("line format", self.log_level))
         format_planner.initialize(fc)
 
-        # For saving volumes, this NullEndpoint is used. The volume_callback for this 
+        # For saving volumes, this NullEndpoint is used. The volume_callback for this
         # endpoint will be called before that of the other endpoints. If needed, we open
-        # the storage in the volume_callback for this endpoint when needed. The storage 
-        # is closed in the volume_callback for the SpectraStackEndpoint, which does the 
+        # the storage in the volume_callback for this endpoint when needed. The storage
+        # is closed in the volume_callback for the SpectraStackEndpoint, which does the
         # saving/writing of volumes.
-        null_endpoint = NullEndpoint(get_logger('Traffic cop(line)', self.log_level))
+        null_endpoint = NullEndpoint(get_logger("Traffic cop(line)", self.log_level))
 
-        # For DISPLAYING ascans (oct-processed data), slice away half the data. 
+        # For DISPLAYING ascans (oct-processed data), slice away half the data.
         # This stack format executor isn't used with the other endpoints.
         sfec = StackFormatExecutorConfig()
         sfec.sample_slice = SimpleSlice(samples_per_record // 2)
@@ -167,42 +184,52 @@ class LineScanGUIHelper(ScanGUIHelper):
 
         # endpoint for display of ascans
         vshape = (self.params.lines_per_volume, self.params.ascans_per_bscan, samples_to_save)
-        self._logger.info('Create StackDeviceTensorEndpointInt8 with shape {0:s}'.format(str(vshape)))
-        ascan_endpoint = self._createAscanEndpoint(sfe, vshape, octuiparams.vtx, get_logger('stack', self.log_level))
+        self._logger.info("Create StackDeviceTensorEndpointInt8 with shape {0:s}".format(str(vshape)))
+        ascan_endpoint = self._createAscanEndpoint(sfe, vshape, octuiparams.vtx, get_logger("stack", self.log_level))
 
         sfec_spectra = StackFormatExecutorConfig()
-        sfe_spectra  = StackFormatExecutor()
+        sfe_spectra = StackFormatExecutor()
         sfe_spectra.initialize(sfec_spectra)
         shape_spectra = (self.params.lines_per_volume, self.params.ascans_per_bscan, samples_per_record)
-        self._logger.info('Create SpectraStackHostTensorEndpointUInt16 with shape {0:s}'.format(str(shape_spectra)))
-        spectra_endpoint = SpectraStackHostTensorEndpointUInt16(sfe_spectra, shape_spectra, get_logger('stack', self.log_level))
+        self._logger.info("Create SpectraStackHostTensorEndpointUInt16 with shape {0:s}".format(str(shape_spectra)))
+        spectra_endpoint = SpectraStackHostTensorEndpointUInt16(
+            sfe_spectra, shape_spectra, get_logger("stack", self.log_level)
+        )
 
         # make an endpoint for saving spectra data
         shape = (self.params.lines_per_volume, self.params.ascans_per_bscan, samples_per_record, 1)
-        spectra_storage = SimpleStackUInt16(get_logger('npy-spectra', self.log_level))
+        spectra_storage = SimpleStackUInt16(get_logger("npy-spectra", self.log_level))
         sfec = StackFormatExecutorConfig()
         sfe = StackFormatExecutor()
         sfe.initialize(sfec)
-        storage_endpoint = SpectraStackEndpoint(sfe, spectra_storage, log=get_logger('npy-spectra', self.log_level))
+        storage_endpoint = SpectraStackEndpoint(sfe, spectra_storage, log=get_logger("npy-spectra", self.log_level))
 
-        self._components = ScanGUIHelperComponents(format_planner=format_planner, null_endpoint=null_endpoint, storage_endpoint=storage_endpoint, spectra_endpoint=spectra_endpoint, storage=spectra_storage, ascan_endpoint=ascan_endpoint, plot_widget=self.getPlotWidget(ascan_endpoint))
-    
+        self._components = ScanGUIHelperComponents(
+            format_planner=format_planner,
+            null_endpoint=null_endpoint,
+            storage_endpoint=storage_endpoint,
+            spectra_endpoint=spectra_endpoint,
+            storage=spectra_storage,
+            ascan_endpoint=ascan_endpoint,
+            plot_widget=self.getPlotWidget(ascan_endpoint),
+        )
+
     def getPlotWidget(self, ascan_endpoint) -> QWidget:
-        #self._mpsw = MPSW()
-        self._cross_widget = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="Cross section")
+        # self._mpsw = MPSW()
+        self._cross_widget = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps["gray"], title="Cross section")
         self._ascan_trace_widget = AscanTraceWidget(ascan_endpoint, title="Ascan")
 
         # apply settings
-        if 'cross.range' in self.settings:
-            self._cross_widget._range = self.settings['cross.range']
+        if "cross.range" in self.settings:
+            self._cross_widget._range = self.settings["cross.range"]
 
-        if 'ascan.ylim' in self.settings:
-            self._ascan_trace_widget.set_ylim(self.settings['ascan.ylim'])
+        if "ascan.ylim" in self.settings:
+            self._ascan_trace_widget.set_ylim(self.settings["ascan.ylim"])
 
         # callbacks
         ascan_endpoint.aggregate_segment_callback = self.cb_ascan
 
-        # 
+        #
         hbox = QHBoxLayout()
         hbox.addWidget(self._cross_widget)
         hbox.addWidget(self._ascan_trace_widget)
@@ -215,6 +242,5 @@ class LineScanGUIHelper(ScanGUIHelper):
         # hbox.addLayout(vbox_right)
         w = QWidget()
         w.setLayout(hbox)
-        #return self._mpsw
+        # return self._mpsw
         return w
-

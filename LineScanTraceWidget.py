@@ -9,18 +9,18 @@ from typing import Iterable, List
 from qtpy.QtGui import QPaintEvent
 from typing import Tuple
 
-# Inheriting from FigureCanvasQTAgg. 
+# Inheriting from FigureCanvasQTAgg.
 # FigureCanvasQTAgg is a widget. Call update() to invalidate and trigger a paintEvent.
 
-class LineScanTraceWidget(FigureCanvas):
 
+class LineScanTraceWidget(FigureCanvas):
     def __init__(self, endpoint, parent=None, width=5, height=4, dpi=100, title=None, cuda=True):
         self._endpoint = endpoint
         self._cuda = cuda
         fig = Figure(figsize=(width, height), dpi=dpi)
         self._axes = fig.add_subplot(111)
         self._axes.set_ylim(0, 100)
-        #self._axes.get_yaxis().set_visible(False)
+        # self._axes.get_yaxis().set_visible(False)
         if title:
             self._axes.set_title(title)
         fig.tight_layout()
@@ -28,12 +28,12 @@ class LineScanTraceWidget(FigureCanvas):
         self._line2d_b = None
         self._ydata_a = None
         self._ydata_b = None
-        self._color_a = (1,0,0)
-        self._color_b = (0,0,1)
+        self._color_a = (1, 0, 0)
+        self._color_b = (0, 0, 1)
         self._update_ylim = False
         self._mip = None
         self._invalidated = False
-        self._bscan_index_list = []     # when _invalidated is true, this is list of bscans to fetch
+        self._bscan_index_list = []  # when _invalidated is true, this is list of bscans to fetch
         self._not_ylim_yet = True
         super().__init__(fig)
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
@@ -46,7 +46,6 @@ class LineScanTraceWidget(FigureCanvas):
             self._is_flushed = True
             self._axes.clear()
             self._line2d = None
-
 
     def get_data(self) -> bool:
         retval = False
@@ -66,13 +65,12 @@ class LineScanTraceWidget(FigureCanvas):
                 self._ydata_a = np.nanmean(self._mip[::2], axis=0)
                 self._ydata_b = np.nanmean(self._mip[1::2], axis=0)
         return retval
-    
+
     def paintEvent(self, e: QPaintEvent) -> None:
         if not self._invalidated:
             return
 
         if self.get_data():
-
             if self._update_ylim:
                 maxa = np.max(self._ydata_a)
                 mina = np.min(self._ydata_a)
@@ -82,19 +80,18 @@ class LineScanTraceWidget(FigureCanvas):
             if self._line2d_a:
                 self._line2d_a.set_ydata(self._ydata_a)
             else:
-                l2ds = self._axes.plot(self._ydata_a, 'r')
+                l2ds = self._axes.plot(self._ydata_a, "r")
                 self._line2d_a = l2ds[0]
             if self._line2d_b:
                 self._line2d_b.set_ydata(self._ydata_b)
             else:
-                l2ds = self._axes.plot(self._ydata_b, 'b')
+                l2ds = self._axes.plot(self._ydata_b, "b")
                 self._line2d_b = l2ds[0]
         self._bscan_index_list.clear()
         self._invalidated = False
 
         self.draw()
         super().paintEvent(e)
-
 
     def update_trace(self, bscan_idxs: Iterable[int] = []):
         # Set _invalidated to true, save the bscan indices, and call update(). The update() call will move the actual update
@@ -112,4 +109,3 @@ class LineScanTraceWidget(FigureCanvas):
         if e.key() == Qt.Key.Key_Y:
             if not self._update_ylim:
                 self._update_ylim = True
-

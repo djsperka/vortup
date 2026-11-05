@@ -6,11 +6,11 @@ from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, Acquisit
 from Ui_VtxEngineParamsDialog import Ui_VtxEngineParamsDialog
 from vortex import Range
 
-class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
-    """Dialog for setting VtxEngineParameters.     
 
-    """
-    def __init__(self, cfg: VtxEngineParams=DEFAULT_VTX_ENGINE_PARAMS):
+class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
+    """Dialog for setting VtxEngineParameters."""
+
+    def __init__(self, cfg: VtxEngineParams = DEFAULT_VTX_ENGINE_PARAMS):
         """Instantiate dialog for editing params in cfg.
 
         Args:
@@ -30,18 +30,18 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.lineEditGalvoDelay.setValidator(v)
 
         # plain double validators
-        v = QDoubleValidator(-10,10,3)
+        v = QDoubleValidator(-10, 10, 3)
         self.lineEditGalvoSLOWmin.setValidator(v)
-        v = QDoubleValidator(-10,10,3)
+        v = QDoubleValidator(-10, 10, 3)
         self.lineEditGalvoSLOWmax.setValidator(v)
-        v = QDoubleValidator(-10,10,3)
+        v = QDoubleValidator(-10, 10, 3)
         self.lineEditGalvoFASTmin.setValidator(v)
-        v = QDoubleValidator(-10,10,3)
+        v = QDoubleValidator(-10, 10, 3)
         self.lineEditGalvoFASTmax.setValidator(v)
-        
-        v = QDoubleValidator(0,2,3)
+
+        v = QDoubleValidator(0, 2, 3)
         self.lineEditSLOWUnitsPerVolt.setValidator(v)
-        v = QDoubleValidator(0,2,3)
+        v = QDoubleValidator(0, 2, 3)
         self.lineEditFASTUnitsPerVolt.setValidator(v)
 
         self.lineEditBlocksToAllocate.setValidator(v)
@@ -50,16 +50,16 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         v = QIntValidator(0, 16)
         self.lineEditProcessSlots.setValidator(v)
 
-        v = QIntValidator(1000,1000000)
+        v = QIntValidator(1000, 1000000)
         self.lineEditInternalClockRate.setValidator(v)
-        v = QIntValidator(1,100)
+        v = QIntValidator(1, 100)
         self.lineEditExternalClockLevelPct.setValidator(v)
-        v = QIntValidator(1,10000)
+        v = QIntValidator(1, 10000)
         self.lineEditTriggerRange.setValidator(v)
         v = QDoubleValidator()
         self.lineEditTriggerLevelFraction.setValidator(v)
 
-        self.initializeDialog(cfg)        # takes whatever is in cfg and inits dlg
+        self.initializeDialog(cfg)  # takes whatever is in cfg and inits dlg
 
         # slot for pb to select file
         self.pbSelectFile.clicked.connect(self._selectFileClicked)
@@ -71,7 +71,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
     def _selectFileClicked(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        fname, _ = QFileDialog.getOpenFileName(self,"Select input file", "","numpy files (*.npy)", options=options)
+        fname, _ = QFileDialog.getOpenFileName(self, "Select input file", "", "numpy files (*.npy)", options=options)
         if fname:
             print(fname)
             self.labelFileName.setText(fname)
@@ -79,7 +79,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
             print("None selected")
 
     def _accepted(self) -> None:
-        self._cfg = self.getEngineParameters()        
+        self._cfg = self.getEngineParameters()
         self.accept()
 
     def initializeDialog(self, cfg: VtxEngineParams):
@@ -133,7 +133,6 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         self.groupBoxGalvo.setChecked(cfg.galvo_enabled)
         self.groupBoxStrobe.setChecked(cfg.strobe_enabled)
 
-
     def getEngineParameters(self) -> VtxEngineParams:
         s = VtxEngineParams()
 
@@ -143,8 +142,12 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         s.laser_port = self.leLaserPort.text()
 
         s.galvo_delay = float(self.lineEditGalvoDelay.text())
-        s.galvo_slow_voltage_range = Range(float(self.lineEditGalvoSLOWmin.text()), float(self.lineEditGalvoSLOWmax.text()))
-        s.galvo_fast_voltage_range = Range(float(self.lineEditGalvoFASTmin.text()), float(self.lineEditGalvoFASTmax.text()))
+        s.galvo_slow_voltage_range = Range(
+            float(self.lineEditGalvoSLOWmin.text()), float(self.lineEditGalvoSLOWmax.text())
+        )
+        s.galvo_fast_voltage_range = Range(
+            float(self.lineEditGalvoFASTmin.text()), float(self.lineEditGalvoFASTmax.text())
+        )
         s.galvo_slow_units_per_volt = float(self.lineEditSLOWUnitsPerVolt.text())
         s.galvo_fast_units_per_volt = float(self.lineEditFASTUnitsPerVolt.text())
 
@@ -184,8 +187,7 @@ class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):
         return s
 
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     dlg = VtxEngineParamsDialog(DEFAULT_VTX_ENGINE_PARAMS)
     dlg.show()
@@ -195,4 +197,3 @@ if __name__ == '__main__':
     dlg2 = VtxEngineParamsDialog(params)
     dlg2.exec()
     # app.exec_()
-

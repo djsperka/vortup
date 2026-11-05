@@ -8,7 +8,16 @@ import numpy as np
 import cupy as cp
 
 from PyQt5.QtCore import QTimer, pyqtSignal
-from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, QDoubleSpinBox, QMessageBox
+from PyQt5.QtWidgets import (
+    QApplication,
+    QWidget,
+    QHBoxLayout,
+    QVBoxLayout,
+    QPushButton,
+    QLabel,
+    QDoubleSpinBox,
+    QMessageBox,
+)
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvas
@@ -16,7 +25,13 @@ from matplotlib.backends.backend_qt5agg import FigureCanvas
 from vortex import Range, get_console_logger as get_logger
 from vortex.scan import RasterScanConfig, RasterScan
 from vortex.engine import EngineConfig, Engine, StackDeviceTensorEndpointInt8 as StackDeviceTensorEndpoint
-from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, SimpleSlice
+from vortex.format import (
+    FormatPlanner,
+    FormatPlannerConfig,
+    StackFormatExecutorConfig,
+    StackFormatExecutor,
+    SimpleSlice,
+)
 
 from vortex_tools.ui.display import RasterEnFaceWidget
 
@@ -26,6 +41,7 @@ from VtxEngineParamsDialog import VtxEngineParamsDialog
 from VtxBaseEngine import VtxBaseEngine
 
 _log = logging.getLogger(__name__)
+
 
 class GalvoTunerWindow(QWidget):
     stop_signal = pyqtSignal()
@@ -62,18 +78,18 @@ class GalvoTunerWindow(QWidget):
         fc.adapt_shape = False
 
         print(fc)
-        # result   
-        # FormatPlannerConfig(shape=[100, 500], segments_per_volume=100, records_per_segments=500, mask=Flags(value=0xffffffffffffffff), flip_reversed=True, strip_inactive=True, adapt_shape=False)     
+        # result
+        # FormatPlannerConfig(shape=[100, 500], segments_per_volume=100, records_per_segments=500, mask=Flags(value=0xffffffffffffffff), flip_reversed=True, strip_inactive=True, adapt_shape=False)
         # 100 = bscans per volume (hard-coded as 100 above) (ROWS)
         # 500 = ascans per bscan (COLUMNS)
-        # Note that the SimpleSlice added to the StackFormatExecutor takes just 688 samples from each Ascan, so the 
+        # Note that the SimpleSlice added to the StackFormatExecutor takes just 688 samples from each Ascan, so the
         # size of the volume we fetch below is (100, 500, 688)
 
-        self._stack_format = FormatPlanner(get_logger('format', params.log_level))
+        self._stack_format = FormatPlanner(get_logger("format", params.log_level))
         self._stack_format.initialize(fc)
 
         # format executors
-        # the sample_slice works on the Ascans. In our system, each Ascan has 1368 samples (K-clock ticks), 
+        # the sample_slice works on the Ascans. In our system, each Ascan has 1368 samples (K-clock ticks),
         # and this line takes the first half of the samples as a slice (and passes just those samples on to the next step)
 
         cfec = StackFormatExecutorConfig()
@@ -83,8 +99,11 @@ class GalvoTunerWindow(QWidget):
 
         cfe = StackFormatExecutor()
         cfe.initialize(cfec)
-        self._stack_endpoint = StackDeviceTensorEndpoint(cfe, (self._scan_config.bscans_per_volume, self._scan_config.ascans_per_bscan, samples_to_save), get_logger('stack', params.log_level))
-
+        self._stack_endpoint = StackDeviceTensorEndpoint(
+            cfe,
+            (self._scan_config.bscans_per_volume, self._scan_config.ascans_per_bscan, samples_to_save),
+            get_logger("stack", params.log_level),
+        )
 
         self._engine = None
 
@@ -92,7 +111,7 @@ class GalvoTunerWindow(QWidget):
         # UI
         #
 
-        self.setWindowTitle('Vortex - Galvo Tuner')
+        self.setWindowTitle("Vortex - Galvo Tuner")
         self.resize(720, 720)
 
         layout = QVBoxLayout(self)
@@ -108,7 +127,7 @@ class GalvoTunerWindow(QWidget):
         panel = QHBoxLayout()
         layout.addLayout(panel)
 
-        label = QLabel('Delay (s):')
+        label = QLabel("Delay (s):")
         panel.addWidget(label)
 
         self._galvo_delay_spin = QDoubleSpinBox()
@@ -119,7 +138,7 @@ class GalvoTunerWindow(QWidget):
         self._galvo_delay_spin.setDecimals(6)
         panel.addWidget(self._galvo_delay_spin)
 
-        label = QLabel('Velocity Limit (1/s):')
+        label = QLabel("Velocity Limit (1/s):")
         panel.addWidget(label)
 
         self._galvo_velocity_spin = QDoubleSpinBox()
@@ -130,7 +149,7 @@ class GalvoTunerWindow(QWidget):
         self._galvo_velocity_spin.setDecimals(0)
         panel.addWidget(self._galvo_velocity_spin)
 
-        label = QLabel('Acceleration Limit (1/s^2):')
+        label = QLabel("Acceleration Limit (1/s^2):")
         panel.addWidget(label)
 
         self._galvo_acceleration_spin = QDoubleSpinBox()
@@ -143,7 +162,7 @@ class GalvoTunerWindow(QWidget):
 
         panel.addWidget(QWidget(), 1)
 
-        run = QPushButton('Run')
+        run = QPushButton("Run")
         run.clicked.connect(self.start)
         panel.addWidget(run)
 
@@ -153,7 +172,7 @@ class GalvoTunerWindow(QWidget):
         # create a new engine each time
         if self._engine:
             if not self._engine.done:
-                _log.warning('engine is not stopped')
+                _log.warning("engine is not stopped")
                 return
             del self._engine
         self._engine = None
@@ -178,8 +197,11 @@ class GalvoTunerWindow(QWidget):
             scan.initialize(self._scan_config)
             scan.prepare()
         except RuntimeError as e:
-            _log.error(f'unable to generate scan pattern: {e}')
-            QMessageBox.critical(self, 'Invalid Parameters', dedent(f'''
+            _log.error(f"unable to generate scan pattern: {e}")
+            QMessageBox.critical(
+                self,
+                "Invalid Parameters",
+                dedent(f"""
                 An error occurred while generating a scan pattern with the requested parameters:
 
                 {e}
@@ -187,8 +209,8 @@ class GalvoTunerWindow(QWidget):
                 Please adjust the limits and try again.
 
                     - For velocity limit errors, increase the velocity limit.
-                    - For position limit errors, increase the acceleration limit.'''
-            ))
+                    - For position limit errors, increase the acceleration limit."""),
+            )
             return
 
         #
@@ -199,7 +221,9 @@ class GalvoTunerWindow(QWidget):
         ec.add_acquisition(self._system._acquire, [self._system._process])
         ec.add_processor(self._system._process, [self._stack_format])
         ec.add_formatter(self._stack_format, [self._stack_endpoint])
-        ec.add_io(self._system._io_out, lead_samples=round(galvo_delay * self._system._io_out.config.samples_per_second))
+        ec.add_io(
+            self._system._io_out, lead_samples=round(galvo_delay * self._system._io_out.config.samples_per_second)
+        )
 
         ec.preload_count = self._params.preload_count
         ec.records_per_block = self._params.ascans_per_block
@@ -208,7 +232,7 @@ class GalvoTunerWindow(QWidget):
 
         ec.galvo_output_channels = len(self._system._io_out.config.channels)
 
-        self._engine = Engine(get_logger('engine', self._params.log_level))
+        self._engine = Engine(get_logger("engine", self._params.log_level))
 
         # automatically stop when engine exits
         def handler(event, exc):
@@ -216,6 +240,7 @@ class GalvoTunerWindow(QWidget):
                 self.stop_signal.emit()
             if exc:
                 _log.exception(exc)
+
         self._engine.event_callback = handler
 
         self._engine.initialize(ec)
@@ -224,14 +249,14 @@ class GalvoTunerWindow(QWidget):
         self._engine.scan_queue.append(scan)
         self._stack_format.reset()
 
-        _log.info('starting engine')
+        _log.info("starting engine")
         self._engine.start()
 
     def stop(self):
         if not self._engine:
             return
 
-        _log.info('stopping engine')
+        _log.info("stopping engine")
         self._engine.stop()
         self._engine.wait()
 
@@ -239,23 +264,23 @@ class GalvoTunerWindow(QWidget):
         if self._stack_endpoint.tensor.valid:
             with self._stack_endpoint.tensor as volume:
                 s = np.shape(volume)
-                _log.info("shape of volume from _stack_endpoint.tensor: {0:d},{1:d},{2:d}".format(s[0],s[1],s[2]))
+                _log.info("shape of volume from _stack_endpoint.tensor: {0:d},{1:d},{2:d}".format(s[0], s[1], s[2]))
                 mip = cp.max(volume, axis=2)
                 a = cp.mean(mip[::2], axis=0).get()
                 b = cp.mean(mip[1::2], axis=0).get()
 
             if self._axes:
-                #self._axes.lines.clear()
+                # self._axes.lines.clear()
                 self._axes.clear()
             else:
                 self._axes = self._canvas.figure.subplots()
-                self._axes.set_xlabel('Sample Index')
-                self._axes.set_ylabel('Intensity')
+                self._axes.set_xlabel("Sample Index")
+                self._axes.set_ylabel("Intensity")
                 self._axes.set_xlim(0, len(a))
                 self._canvas.figure.tight_layout()
 
-            self._axes.plot(a, 'C0')
-            self._axes.plot(b, 'C1')
+            self._axes.plot(a, "C0")
+            self._axes.plot(b, "C1")
 
             self._canvas.draw()
 
@@ -266,7 +291,9 @@ def setup_logging():
     root_logger.setLevel(logging.NOTSET)
     logging.getLogger("matplotlib").setLevel(logging.WARNING)
 
-    formatter = logging.Formatter('%(asctime)s.%(msecs)03d [%(name)s] %(filename)s:%(lineno)d\t%(levelname)s:\t%(message)s')
+    formatter = logging.Formatter(
+        "%(asctime)s.%(msecs)03d [%(name)s] %(filename)s:%(lineno)d\t%(levelname)s:\t%(message)s"
+    )
 
     # set up colored logging to console
     console_handler = RainbowLoggingHandler(sys.stderr)
@@ -274,7 +301,7 @@ def setup_logging():
     root_logger.addHandler(console_handler)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     setup_logging()
 
     app = QApplication(sys.argv)
@@ -282,24 +309,28 @@ if __name__ == '__main__':
 
     # catch unhandled exceptions
     import traceback
+
     def handler(cls, ex, trace):
         traceback.print_exception(cls, ex, trace)
         app.closeAllWindows()
+
     sys.excepthook = handler
 
     # prevent Fortran routines in NumPy from catching interrupt signal
     import os
-    os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = '1'
+
+    os.environ["FOR_DISABLE_CONSOLE_CTRL_HANDLER"] = "1"
 
     # cause KeyboardInterrupt to exit the Qt application
     import signal
+
     signal.signal(signal.SIGINT, lambda sig, frame: app.exit())
 
     # regularly re-enter Python so the signal handler runs
     def keepalive(msec):
         QTimer.singleShot(msec, lambda: keepalive(msec))
-    keepalive(10)
 
+    keepalive(10)
 
     cfg = DEFAULT_VTX_ENGINE_PARAMS
     window = GalvoTunerWindow(cfg)

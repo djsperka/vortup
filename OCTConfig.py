@@ -4,6 +4,6 @@ from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
 from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS
 
 
-@dataclass 
+@dataclass
 class OCTConfig:
     eng: VtxEngineParams

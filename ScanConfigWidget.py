@@ -19,10 +19,11 @@ import traceback
 f_sFloat = "([+-]?([0-9]*[.])?[0-9]+)"
 RegexForExtents = QRegExp("({0:s}[\\s,]{1:s})|{2:s}".format(f_sFloat, f_sFloat, f_sFloat))
 
+
 def getRangeFromTextEntry(txt) -> Range:
     # match regex. Validator should ensure that there is ALWAYS a match, but throw exception if not.
     if RegexForExtents.exactMatch(txt):
-        if RegexForExtents.cap(6) == '':
+        if RegexForExtents.cap(6) == "":
             iLow = float(RegexForExtents.cap(2))
             iHigh = float(RegexForExtents.cap(4))
             r = Range(iLow, iHigh)
@@ -34,12 +35,10 @@ def getRangeFromTextEntry(txt) -> Range:
     return r
 
 
-
-
 class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
     scanTypeChanged = pyqtSignal(object)
 
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: QWidget = None):
         """Instantiate class
 
         Args:
@@ -89,12 +88,16 @@ class ScanConfigWidget(QGroupBox, Ui_ScanConfigWidget):
             traceback.print_exception(e)
 
 
-from abc import ABC, ABCMeta,  abstractmethod
+from abc import ABC, ABCMeta, abstractmethod
+
 QWidgetMeta = type(QWidget)
-class _ABCQWidgetMeta(QWidgetMeta, ABCMeta): pass
+
+
+class _ABCQWidgetMeta(QWidgetMeta, ABCMeta):
+    pass
+
 
 class ScanTypeConfigWidget(ABC):
-
     @abstractmethod
     def setParams(self, params):
         """Initialize widget with the given parameters"""
@@ -105,8 +108,9 @@ class ScanTypeConfigWidget(ABC):
         """Return the parameters currently specified in the widget"""
         pass
 
+
 class RasterScanConfigWidget(QWidget, Ui_RasterScanConfigWidget, ScanTypeConfigWidget, metaclass=_ABCQWidgetMeta):
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: QWidget = None):
         """Instantiate class
 
         Args:
@@ -115,15 +119,14 @@ class RasterScanConfigWidget(QWidget, Ui_RasterScanConfigWidget, ScanTypeConfigW
         self.setupUi(self)
 
         # validators
-        self.leAperB.setValidator(QIntValidator(1,5000))
-        self.leBperV.setValidator(QIntValidator(1,5000))
+        self.leAperB.setValidator(QIntValidator(1, 5000))
+        self.leBperV.setValidator(QIntValidator(1, 5000))
         self.leSLOWextent.setValidator(QRegExpValidator(RegexForExtents))
         self.leFASTextent.setValidator(QRegExpValidator(RegexForExtents))
 
-
     def getParams(self):
         return self.getRasterScanParams()
-    
+
     def setParams(self, params):
         self.setRasterScanParams(params)
 
@@ -146,9 +149,8 @@ class RasterScanConfigWidget(QWidget, Ui_RasterScanConfigWidget, ScanTypeConfigW
         self.dsbAngle.setValue(params.angle)
 
 
-
 class AimingScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_AimingScanConfigWidget, metaclass=_ABCQWidgetMeta):
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: QWidget = None):
         """Instantiate class
 
         Args:
@@ -157,13 +159,13 @@ class AimingScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_AimingScanConfigW
         self.setupUi(self)
 
         # validators
-        self.leAperB.setValidator(QIntValidator(1,5000))
-        self.leBperV.setValidator(QIntValidator(1,5000))
+        self.leAperB.setValidator(QIntValidator(1, 5000))
+        self.leBperV.setValidator(QIntValidator(1, 5000))
         self.leAextent.setValidator(QRegExpValidator(RegexForExtents))
 
     def getParams(self):
         return self.getAimingScanParams()
-    
+
     def setParams(self, params):
         self.setAimingScanParams(params)
 
@@ -185,7 +187,7 @@ class AimingScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_AimingScanConfigW
 
 
 class LineScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_LineScanConfigWidget, metaclass=_ABCQWidgetMeta):
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: QWidget = None):
         """Instantiate class
 
         Args:
@@ -194,15 +196,15 @@ class LineScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_LineScanConfigWidge
         self.setupUi(self)
 
         # validators
-        self.leAperB.setValidator(QIntValidator(1,5000))
-        self.leLperV.setValidator(QIntValidator(1,5000))
+        self.leAperB.setValidator(QIntValidator(1, 5000))
+        self.leLperV.setValidator(QIntValidator(1, 5000))
         self.leLINEextent.setValidator(QRegExpValidator(RegexForExtents))
-        self.leBscanTriggerIndex.setValidator(QIntValidator(1,500)) # TODO This must be less than BperV
-        self.leOutputLine.setValidator(QIntValidator(0,7))
+        self.leBscanTriggerIndex.setValidator(QIntValidator(1, 500))  # TODO This must be less than BperV
+        self.leOutputLine.setValidator(QIntValidator(0, 7))
 
     def getParams(self):
         return self.getLineScanParams()
-    
+
     def setParams(self, params):
         self.setLineScanParams(params)
 
@@ -229,8 +231,10 @@ class LineScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_LineScanConfigWidge
         self.leOutputLine.setText("{0:d}".format(params.strobe_output_line))
 
 
-class GalvoTuningScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_GalvoTuningScanConfigWidget, metaclass=_ABCQWidgetMeta):
-    def __init__(self, parent: QWidget=None):
+class GalvoTuningScanConfigWidget(
+    QWidget, ScanTypeConfigWidget, Ui_GalvoTuningScanConfigWidget, metaclass=_ABCQWidgetMeta
+):
+    def __init__(self, parent: QWidget = None):
         """Instantiate class
 
         Args:
@@ -239,12 +243,12 @@ class GalvoTuningScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_GalvoTuningS
         self.setupUi(self)
 
         # validators
-        self.leAperB.setValidator(QIntValidator(1,5000))
+        self.leAperB.setValidator(QIntValidator(1, 5000))
         self.leTextent.setValidator(QRegExpValidator(RegexForExtents))
 
     def getParams(self):
         return self.getGalvoTuningScanParams()
-    
+
     def setParams(self, params):
         self.setGalvoTuningScanParams(params)
 
@@ -263,18 +267,19 @@ class GalvoTuningScanConfigWidget(QWidget, ScanTypeConfigWidget, Ui_GalvoTuningS
 
 if __name__ == "__main__":
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-    parser = ArgumentParser(description='save volume to disk', formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--type', choices=['raster', 'aim', 'line', 'galvo'], default='raster', help='dlg type')
+
+    parser = ArgumentParser(description="save volume to disk", formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument("--type", choices=["raster", "aim", "line", "galvo"], default="raster", help="dlg type")
     args = parser.parse_args()
     app = QApplication([])
     match args.type:
-        case 'raster':
+        case "raster":
             w = RasterScanConfigWidget()
 
             r = RasterScanParams()
-            r.angle=99
-            r.segment_extent = Range(-4,4)
-            r.volume_extent = Range(-1,3)
+            r.angle = 99
+            r.segment_extent = Range(-4, 4)
+            r.volume_extent = Range(-1, 3)
             r.bidirectional_segments = False
             r.ascans_per_bscan = 400
             r.bscans_per_volume = 450
@@ -286,12 +291,12 @@ if __name__ == "__main__":
             r2 = w.getParams()
             print(r)
             print(r2)
-        case 'aim':
+        case "aim":
             w = AimingScanConfigWidget()
 
             r = AimingScanParams()
-            r.angle=99
-            r.aim_extent = Range(-2,5)
+            r.angle = 99
+            r.aim_extent = Range(-2, 5)
             r.bidirectional_segments = False
             r.ascans_per_bscan = 400
             w.setAimingScanParams(r)
@@ -302,12 +307,12 @@ if __name__ == "__main__":
             print(r)
             print(r2)
 
-        case 'line':
+        case "line":
             w = LineScanConfigWidget()
 
             r = LineScanParams()
-            r.angle=99
-            r.line_extent = Range(-1,4)
+            r.angle = 99
+            r.line_extent = Range(-1, 4)
             r.bidirectional_segments = False
             r.ascans_per_bscan = 423
             w.setLineScanParams(r)
@@ -318,11 +323,11 @@ if __name__ == "__main__":
             print(r)
             print(r2)
 
-        case 'galvo':
+        case "galvo":
             w = GalvoTuningScanConfigWidget()
 
             r = GalvoTuningScanParams()
-            r.tuning_extent = Range(-1,4)
+            r.tuning_extent = Range(-1, 4)
             r.ascans_per_bscan = 423
             r.lines_per_volume = 333
             w.setGalvoTuningScanParams(r)
@@ -332,4 +337,3 @@ if __name__ == "__main__":
             r2 = w.getGalvoTuningScanParams()
             print(r)
             print(r2)
-

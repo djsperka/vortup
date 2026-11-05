@@ -12,29 +12,36 @@ from typing import Tuple, Any, Dict
 import os
 import sys
 
-local_logger = get_console_logger('OCTUiParams')
+local_logger = get_console_logger("OCTUiParams")
 
 # default location and name for config file
-default_config_base = 'octui.conf'
-default_config_path = Path.home() / '.octui/' / default_config_base
+default_config_base = "octui.conf"
+default_config_path = Path.home() / ".octui/" / default_config_base
+
 
 # This stuff is needed for when we call asdict() on a dataclass
-# It contains things that cannot be "pickled", and these functions tell the pickler 
+# It contains things that cannot be "pickled", and these functions tell the pickler
 # process how to do it. Seems counter-intuitive to need to do this.
 def pickle_range(r: Range):
     return Range, (r.min, r.max)
+
+
 copyreg.pickle(Range, pickle_range)
 
+
 @dataclass
-class UiParams():
-    #vtx: VtxEngineParams = DEFAULT_VTX_ENGINE_PARAMS
+class UiParams:
+    # vtx: VtxEngineParams = DEFAULT_VTX_ENGINE_PARAMS
     vtx: VtxEngineParams = field(default_factory=VtxEngineParams)
     scn: ScanParams = field(default_factory=lambda: ScanParams())
     settings: Dict[str, Any] = field(default_factory=lambda: {})
 
+
 def pickle_uiparams(u: UiParams):
     print("pickling a UiParams instance")
     return UiParams, (u.vtx, u.scn, u.settings)
+
+
 copyreg.pickle(UiParams, pickle_uiparams)
 
 
@@ -50,9 +57,9 @@ class _octui_encoder(json.JSONEncoder):
             elif isinstance(o, AcquisitionType):
                 value = o.value
             elif isinstance(o, Range):
-                value = {'min': o.min, 'max': o.max}
+                value = {"min": o.min, "max": o.max}
             else:
-                raise TypeError('Unknown type: {0:s}\n'.format(type(o)))
+                raise TypeError("Unknown type: {0:s}\n".format(type(o)))
         except TypeError:
             pass
         else:
@@ -67,37 +74,73 @@ class _octui_decoder(json.JSONDecoder):
 
     @staticmethod
     def from_dict(d):
-        #print('from_dict: ', d.keys())
-        if d.keys() == {'min', 'max'}:
-            return Range(d['min'], d['max'])
-        elif {'acquisition_type',  'galvo_delay', 'galvo_slow_voltage_range', 'save_profiler_data'}.issubset(d.keys()):
-            # This should be the VtxEngineParams object itself. 
-            d['acquisition_type'] = AcquisitionType(d['acquisition_type'])
-        elif {'vtx', 'scn'}.issubset(d.keys()):
-            d['vtx'] = VtxEngineParams(**d['vtx'])
-            d['scn'] = ScanParams(**d['scn'])
+        # print('from_dict: ', d.keys())
+        if d.keys() == {"min", "max"}:
+            return Range(d["min"], d["max"])
+        elif {"acquisition_type", "galvo_delay", "galvo_slow_voltage_range", "save_profiler_data"}.issubset(d.keys()):
+            # This should be the VtxEngineParams object itself.
+            d["acquisition_type"] = AcquisitionType(d["acquisition_type"])
+        elif {"vtx", "scn"}.issubset(d.keys()):
+            d["vtx"] = VtxEngineParams(**d["vtx"])
+            d["scn"] = ScanParams(**d["scn"])
             # if no settings, create a new one.
-            if 'settings' not in d:
-                d['settings'] = {}
-        elif {'ascans_per_bscan','bscans_per_volume','bidirectional_segments','segment_extent','volume_extent','angle'}.issubset(d.keys()):
-            return RasterScanParams(ascans_per_bscan=d['ascans_per_bscan'],bscans_per_volume=d['bscans_per_volume'],bidirectional_segments=d['bidirectional_segments'],segment_extent=d['segment_extent'],volume_extent=d['volume_extent'],angle=d['angle'])
-        elif {'ascans_per_bscan','bscans_per_volume','bidirectional_segments','aim_extent','angle'}.issubset(d.keys()):
-            return AimingScanParams(ascans_per_bscan=d['ascans_per_bscan'],bscans_per_volume=d['bscans_per_volume'],bidirectional_segments=d['bidirectional_segments'],aim_extent=d['aim_extent'],angle=d['angle'])
-        elif {'ascans_per_bscan','bidirectional_segments','line_extent','lines_per_volume','angle'}.issubset(d.keys()):
-            return LineScanParams(ascans_per_bscan=d['ascans_per_bscan'],bidirectional_segments=d['bidirectional_segments'],line_extent=d['line_extent'],lines_per_volume=d['lines_per_volume'],angle=d['angle'],strobe_enabled=d['strobe_enabled'],strobe_output_line=d['strobe_output_line'],strobe_bscan_index=d['strobe_bscan_index'])
-        elif {'ascans_per_bscan','tuning_extent','lines_per_volume'}.issubset(d.keys()):
-            return GalvoTuningScanParams(ascans_per_bscan=d['ascans_per_bscan'], tuning_extent=d['tuning_extent'], lines_per_volume=d['lines_per_volume'])
+            if "settings" not in d:
+                d["settings"] = {}
+        elif {
+            "ascans_per_bscan",
+            "bscans_per_volume",
+            "bidirectional_segments",
+            "segment_extent",
+            "volume_extent",
+            "angle",
+        }.issubset(d.keys()):
+            return RasterScanParams(
+                ascans_per_bscan=d["ascans_per_bscan"],
+                bscans_per_volume=d["bscans_per_volume"],
+                bidirectional_segments=d["bidirectional_segments"],
+                segment_extent=d["segment_extent"],
+                volume_extent=d["volume_extent"],
+                angle=d["angle"],
+            )
+        elif {"ascans_per_bscan", "bscans_per_volume", "bidirectional_segments", "aim_extent", "angle"}.issubset(
+            d.keys()
+        ):
+            return AimingScanParams(
+                ascans_per_bscan=d["ascans_per_bscan"],
+                bscans_per_volume=d["bscans_per_volume"],
+                bidirectional_segments=d["bidirectional_segments"],
+                aim_extent=d["aim_extent"],
+                angle=d["angle"],
+            )
+        elif {"ascans_per_bscan", "bidirectional_segments", "line_extent", "lines_per_volume", "angle"}.issubset(
+            d.keys()
+        ):
+            return LineScanParams(
+                ascans_per_bscan=d["ascans_per_bscan"],
+                bidirectional_segments=d["bidirectional_segments"],
+                line_extent=d["line_extent"],
+                lines_per_volume=d["lines_per_volume"],
+                angle=d["angle"],
+                strobe_enabled=d["strobe_enabled"],
+                strobe_output_line=d["strobe_output_line"],
+                strobe_bscan_index=d["strobe_bscan_index"],
+            )
+        elif {"ascans_per_bscan", "tuning_extent", "lines_per_volume"}.issubset(d.keys()):
+            return GalvoTuningScanParams(
+                ascans_per_bscan=d["ascans_per_bscan"],
+                tuning_extent=d["tuning_extent"],
+                lines_per_volume=d["lines_per_volume"],
+            )
         return d
 
 
-
-class OCTUiParams():
-    def __init__(self, config_file = '', load = True):
+class OCTUiParams:
+    def __init__(self, config_file="", load=True):
 
         if len(config_file):
             maybepath = Path(config_file)
             if not maybepath.exists():
-                local_logger.warn('Config file {0:s} not found.'.format(config_file))
+                local_logger.warn("Config file {0:s} not found.".format(config_file))
             self.__cfgpath = maybepath
         else:
             self.__cfgpath = default_config_path
@@ -116,22 +159,22 @@ class OCTUiParams():
     @property
     def vtx(self):
         return self._vtx
-    
+
     @vtx.setter
     def vtx(self, value):
         if not self._vtx == value:
             self._isdirty = True
             self._vtx = value
 
-    # dispersion setter is explicit to ensure isdirty gets set. 
+    # dispersion setter is explicit to ensure isdirty gets set.
     # This value has a widget independent of the VtxEngineParametersDialog
-    # When it is updated we must directly access the contents of self._vtx, 
-    # which bypasses the isdirty business. 
-    
+    # When it is updated we must directly access the contents of self._vtx,
+    # which bypasses the isdirty business.
+
     @property
     def dispersion(self):
         return self._vtx.dispersion
-    
+
     @dispersion.setter
     def dispersion(self, value):
         if not self._vtx.dispersion == value:
@@ -151,7 +194,7 @@ class OCTUiParams():
     @property
     def settings(self):
         return self._settings
-    
+
     @settings.setter
     def settings(self, value):
         if not self._settings == value:
@@ -161,29 +204,28 @@ class OCTUiParams():
     @property
     def path(self):
         return self.__cfgpath
-    
+
     @path.setter
     def path(self, p: Path):
         self.__cfgpath = p
 
-
-    def load(self, config_file=''):
+    def load(self, config_file=""):
         if len(config_file):
             maybepath = Path(config_file)
             if not maybepath.exists():
-                raise FileNotFoundError('Config file {0:s} not found.'.format(config_file))
+                raise FileNotFoundError("Config file {0:s} not found.".format(config_file))
             else:
                 use_this_path = maybepath
         else:
             if self.__cfgpath.exists():
                 use_this_path = self.__cfgpath
             else:
-                raise FileNotFoundError('Config file {0:s} not found.'.format(str(self.__cfgpath)))
+                raise FileNotFoundError("Config file {0:s} not found.".format(str(self.__cfgpath)))
 
         local_logger.info("loading OCTUi config from {0:s}".format(str(use_this_path)))
-        with use_this_path.open(mode='r') as f:
+        with use_this_path.open(mode="r") as f:
             dct = json.load(f, cls=_octui_decoder)
-        
+
         params = UiParams(**dct)
         self._vtx = params.vtx
         self._scn = params.scn
@@ -193,12 +235,12 @@ class OCTUiParams():
     def isdirty(self):
         return self._isdirty
 
-    def save(self, config_file = ''):
+    def save(self, config_file=""):
 
         # Save to the given filename.
-        # If the filename already exists, overwrite it. 
+        # If the filename already exists, overwrite it.
         # If the filename doesn't exist, create it.
-        # If the filename is empty, use the private __cfgpath member, 
+        # If the filename is empty, use the private __cfgpath member,
         # and apply the same rules to it.
         if len(config_file):
             use_this_path = Path(config_file)
@@ -218,14 +260,18 @@ class OCTUiParams():
 
 
 if __name__ == "__main__":
-
     logging.basicConfig(level=logging.DEBUG)
 
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-    parser = ArgumentParser(description='Initialize/update OCTUi config file.', formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--create', action='store_true', help='create new config file')
-    parser.add_argument('--update', action='store_true', help='create new config file')
-    parser.add_argument('--config', default='', help='path to config file [default = {0:s}]'.format(str(default_config_path)))
+
+    parser = ArgumentParser(
+        description="Initialize/update OCTUi config file.", formatter_class=ArgumentDefaultsHelpFormatter
+    )
+    parser.add_argument("--create", action="store_true", help="create new config file")
+    parser.add_argument("--update", action="store_true", help="create new config file")
+    parser.add_argument(
+        "--config", default="", help="path to config file [default = {0:s}]".format(str(default_config_path))
+    )
     args = parser.parse_args()
 
     # check if a config file was passed with --config arg
@@ -243,12 +289,14 @@ if __name__ == "__main__":
 
         # check that use_config_path does not already exist
         if use_config_path.exists():
-            local_logger.error("config file {0:s} already exists - please move, remove, or rename".format(str(use_config_path)))
+            local_logger.error(
+                "config file {0:s} already exists - please move, remove, or rename".format(str(use_config_path))
+            )
             sys.exit()
 
         # load config file from the dir where this file lives
         script_directory = Path(__file__).parent.resolve()
-        octui_file = script_directory / 'octui.conf'
+        octui_file = script_directory / "octui.conf"
         p = OCTUiParams(config_file=str(octui_file), load=True)
 
         # now change the path of the OCTUiParams object and save
@@ -260,9 +308,8 @@ if __name__ == "__main__":
         local_logger.info("Load existing config file...")
         if not use_config_path.exists():
             local_logger.error("Cannot update config file {0:s}, file not found.".format(str(use_config_path)))
-        p=OCTUiParams(config_file=args.config, load=True)
+        p = OCTUiParams(config_file=args.config, load=True)
         p.save()
         local_logger.info("Done.")
     else:
         local_logger.error("Must specify --create or --update")
-

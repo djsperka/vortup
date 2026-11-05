@@ -8,22 +8,18 @@ import numpy as np
 from dataclasses import dataclass
 
 
-
-
 class MyImageWidget(QLabel):
-
-    __clicked_signal = Signal(int, int, name='clicked')
-    __doubleclicked_signal = Signal(int, int, name='doubleclicked')
- #  __selected_color = QColor(102, 255, 51)
+    __clicked_signal = Signal(int, int, name="clicked")
+    __doubleclicked_signal = Signal(int, int, name="doubleclicked")
+    #  __selected_color = QColor(102, 255, 51)
     __selected_color = QColor(0, 255, 0)
     __selected_width = 8
     __latest_color = QColor(255, 0, 0)
     __latest_width = 8
 
-
     def __init__(self, parent=None):
         super().__init__(parent)
-        #self.setStyleSheet("background-color: gray;")
+        # self.setStyleSheet("background-color: gray;")
         self.setScaledContents(False)
         self.setAlignment(Qt.AlignCenter)
         self.setMinimumSize(256, 256)
@@ -36,7 +32,7 @@ class MyImageWidget(QLabel):
     @property
     def userdata(self):
         return self._userdata
-    
+
     @userdata.setter
     def userdata(self, value):
         self._userdata = value
@@ -54,13 +50,12 @@ class MyImageWidget(QLabel):
         #              'g': lambda x: QtGui.qRgb(0, x, 0),
         #              'b': lambda x: QtGui.qRgb(0, 0, x)}
         # colortable = [qrgb_dict[color](i) for i in range(256)]
-        s=data.shape
+        s = data.shape
         img = QImage(data, s[1], s[0], s[1], QImage.Format_Indexed8)
         qpix = QPixmap(QImage(img))
         self._original_pixmap = qpix
         self._scaleAndSetPixmap()
         self.update()
-
 
     def mousePressEvent(self, ev):
         if self._original_pixmap is not None:
@@ -69,7 +64,7 @@ class MyImageWidget(QLabel):
 
     def mouseDoubleClickEvent(self, ev):
         (r, c) = self.userdata
-        #print("double click at {:d},{:d}".format(r, c))
+        # print("double click at {:d},{:d}".format(r, c))
         self.__doubleclicked_signal.emit(r, c)
 
     def paintEvent(self, ev):
@@ -84,18 +79,17 @@ class MyImageWidget(QLabel):
             self._drawOutlineBox(painter, self.__latest_color, self.__latest_width)
         painter.end()
 
-
     def _drawOutlineBox(self, painter: QPainter, color: QColor = QColor(255, 255, 255), width: int = 8):
         painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Source)
         pen = QPen(color)
         pen.setWidth(width)
         painter.setPen(pen)
-        W=self.pixmap().width()
-        H=self.pixmap().height()
-        hpw = width//2          # half pen width
+        W = self.pixmap().width()
+        H = self.pixmap().height()
+        hpw = width // 2  # half pen width
         x0 = (self.width() - W) // 2
         y0 = (self.height() - H) // 2
-        painter.drawRect(x0, y0, W - hpw+1, H - hpw+1)
+        painter.drawRect(x0, y0, W - hpw + 1, H - hpw + 1)
 
     def _scaleAndSetPixmap(self):
         if self._original_pixmap:
@@ -113,10 +107,6 @@ class MyImageWidget(QLabel):
         super().resizeEvent(event)
 
 
-
-
-
-
 @dataclass
 class MPSWData:
     ascan_data: None | np.ndarray = None
@@ -124,20 +114,20 @@ class MPSWData:
 
 
 class MPSW(QWidget):
-    '''
-    This is a widget that will display images in an MxN grid. After images fill the grid, new images replace the oldest ones. 
+    """
+    This is a widget that will display images in an MxN grid. After images fill the grid, new images replace the oldest ones.
     User can select an image with a mouse click - the image is outlined, and will not be replaced while it is outlined. A double-click on an image
     causes the save(row,col) signal to be emitted. Calling get_data(row,col) will get the data passed when the image was added. The first
     object returned is the image that was displayed. The second is the data passed along with the image - presumaby the data you want to save.
-    '''
+    """
 
-    __save_signal = Signal(int, int, name='save')
+    __save_signal = Signal(int, int, name="save")
 
     def __init__(self, parent=None, columns=2, rows=2):
         super().__init__(parent)
         self._rows = rows
         self._columns = columns
-        self._last_position = (0, 0)   # this will keep track of the last position that was updated
+        self._last_position = (0, 0)  # this will keep track of the last position that was updated
 
         layout = QGridLayout()
 
@@ -145,14 +135,14 @@ class MPSW(QWidget):
         # Naming of each element in _data and _widgets
         self._data = [[None for _ in range(self._columns)] for _ in range(self._rows)]
         self._widgets = [[0 for _ in range(self._columns)] for _ in range(self._rows)]
-        self._count = -1     # this will keep track of the next position to be replaced
+        self._count = -1  # this will keep track of the next position to be replaced
         for i in range(self._columns):
-            layout.setColumnStretch(i, 1)   # add column stretch once to each column
+            layout.setColumnStretch(i, 1)  # add column stretch once to each column
             for j in range(self._rows):
                 if i == 0:
-                    layout.setRowStretch(j, 1)   # add row stretch to each row, only at column 0
+                    layout.setRowStretch(j, 1)  # add row stretch to each row, only at column 0
                 self._widgets[j][i] = MyImageWidget()
-                self._widgets[j][i].userdata = (j,i)
+                self._widgets[j][i].userdata = (j, i)
                 self._widgets[j][i].clicked.connect(self.image_clicked)
                 self._widgets[j][i].doubleclicked.connect(self.image_doubleclicked)
                 layout.addWidget(self._widgets[j][i], j, i)
@@ -160,11 +150,10 @@ class MPSW(QWidget):
         self.setLayout(layout)
 
     def get_data(self, r, c) -> MPSWData:
-        if r<self._rows and c < self._columns:
+        if r < self._rows and c < self._columns:
             return self._data[r][c]
         else:
             raise RuntimeError("Indices out of range for this widget.")
-
 
     def _update_selected(self, r, c):
         for i in range(self._columns):
@@ -177,10 +166,10 @@ class MPSW(QWidget):
 
     def image_clicked(self, r, c):
         self._update_selected(r, c)
-        #print("Image clicked r={:d} c={:d}, width={:d} height={:d}".format(r, c, self._widgets[r][c].width(), self._widgets[r][c].height()))
+        # print("Image clicked r={:d} c={:d}, width={:d} height={:d}".format(r, c, self._widgets[r][c].width(), self._widgets[r][c].height()))
 
     def image_doubleclicked(self, r, c):
-        #print("Image doubleclicked r={:d} c={:d}, width={:d} height={:d}".format(r, c, self._widgets[r][c].width(), self._widgets[r][c].height()))
+        # print("Image doubleclicked r={:d} c={:d}, width={:d} height={:d}".format(r, c, self._widgets[r][c].width(), self._widgets[r][c].height()))
         self.__save_signal.emit(r, c)
 
     def _ind2sub(self, ind):
@@ -191,10 +180,10 @@ class MPSW(QWidget):
 
     def _next_position(self):
         while True:
-            self._count+=1
-            (r,c) = self._ind2sub(self._count)
+            self._count += 1
+            (r, c) = self._ind2sub(self._count)
             if self._data[r][c] is None or not self._widgets[r][c]._selected:
-                return (r,c)
+                return (r, c)
 
     def add_data(self, ascan_data, spectra_data):
         (r, c) = self._next_position()
@@ -203,7 +192,6 @@ class MPSW(QWidget):
         self._widgets[self._last_position[0]][self._last_position[1]].latest = False
         self._widgets[r][c].latest = True
         self._last_position = (r, c)
-
 
 
 class MainWindow(QMainWindow):
@@ -227,24 +215,22 @@ class MainWindow(QMainWindow):
             image = Image.open(self._image_list[self._image_index])
             # convert image to numpy array
             data = np.asarray(image)
-            self.plot.add_data(data, data.shape)    # the data.shape is dummy - should be spectra_data that might be saved
-            self._image_index+=1
+            self.plot.add_data(data, data.shape)  # the data.shape is dummy - should be spectra_data that might be saved
+            self._image_index += 1
             if self._image_index >= len(self._image_list):
                 self._image_index = 0
         else:
-            print('no images')
-
+            print("no images")
 
 
 import sys
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     # load image filenames
-    with open('images.txt', 'r') as f:
+    with open("images.txt", "r") as f:
         image_list = [line.rstrip() for line in f]
 
     app = QApplication(sys.argv)
     window = MainWindow(image_list)
     window.show()
     sys.exit(app.exec())
-
