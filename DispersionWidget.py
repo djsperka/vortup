@@ -1,7 +1,8 @@
 import sys
-from typing import Tuple
-from PyQt5.QtWidgets import QApplication, QWidget
+
 from PyQt5 import QtCore
+from PyQt5.QtWidgets import QApplication, QWidget
+
 from Ui_DispersionWidget import Ui_DispersionWidget
 
 
@@ -10,7 +11,7 @@ class DispersionWidget(QWidget, Ui_DispersionWidget):
     c2multiplier = 1e-6
     c3multiplier = 1e-9
 
-    def __init__(self, parent: QWidget = None, dsp: Tuple[float, float] = (0, 0)):
+    def __init__(self, parent: QWidget = None, dsp: tuple[float, float] = (0, 0)):
         super().__init__(parent)
         self.setupUi(self)
 
@@ -27,13 +28,13 @@ class DispersionWidget(QWidget, Ui_DispersionWidget):
     def dispersionChanged(self, value):
         self.valueChanged.emit(self.getDispersion())
 
-    def getDispersion(self) -> Tuple[float, float]:
+    def getDispersion(self) -> tuple[float, float]:
         return (
             float(self.dsbDispersion0.value) * self.c2multiplier,
             float(self.dsbDispersion1.value) * self.c3multiplier,
         )
 
-    def setDispersion(self, d: Tuple[float, float]):
+    def setDispersion(self, d: tuple[float, float]):
         self.dsbDispersion0.setValue(d[0] / self.c2multiplier)
         self.dsbDispersion1.setValue(d[1] / self.c3multiplier)
 

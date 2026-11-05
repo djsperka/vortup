@@ -1,9 +1,10 @@
-import sys
 import os
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QMessageBox
+import sys
+
+from PyQt5.QtWidgets import QApplication, QFileDialog, QMessageBox, QWidget
+
 from Ui_CbFileSaveWidget import Ui_CbFileSaveWidget
 from VtxEngineParams import FileSaveConfig
-from typing import Tuple
 
 
 class CbFileSaveWidget(QWidget, Ui_CbFileSaveWidget):
@@ -53,7 +54,7 @@ class CbFileSaveWidget(QWidget, Ui_CbFileSaveWidget):
                     self._extension = extension
         self.__enableDisable()
 
-    def __getFileNameExt(self, filename: str = "") -> Tuple[str, str]:
+    def __getFileNameExt(self, filename: str = "") -> tuple[str, str]:
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
 

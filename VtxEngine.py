@@ -1,17 +1,15 @@
-from VtxBaseEngine import VtxBaseEngine
-from VtxEngineParams import AcquisitionType
 from vortex import get_console_logger
-from vortex.engine import Engine, EngineConfig, SpectraStackEndpoint, VolumeStrobe, Block, EventStrobe
-from vortex.io import DAQmxIO, DAQmxConfig, daqmx
-from vortex.format import StackFormatExecutorConfig, StackFormatExecutor
-from vortex.storage import SimpleStackUInt16
-from typing import Tuple, Any, List
+from vortex.engine import Block, Engine, EngineConfig, VolumeStrobe
+from vortex.io import DAQmxConfig, DAQmxIO, daqmx
+
 from OCTUiParams import OCTUiParams
 from ScanGUIHelper import ScanGUIHelper
+from VtxBaseEngine import VtxBaseEngine
+from VtxEngineParams import AcquisitionType
 
 
 class VtxEngine(VtxBaseEngine):
-    def __init__(self, params: OCTUiParams, helpers: List[ScanGUIHelper]):
+    def __init__(self, params: OCTUiParams, helpers: list[ScanGUIHelper]):
 
         cfg = params.vtx
 
@@ -67,7 +65,7 @@ class VtxEngine(VtxBaseEngine):
                 strobe.initialize(strobec)
                 self._strobe = strobe
             else:
-                self._logger.warn("Strobe is enabled, but no strobe outputs are configured.")
+                self._logger.warning("Strobe is enabled, but no strobe outputs are configured.")
                 self._strobe = None
         else:
             self._strobe = None
@@ -105,4 +103,4 @@ class VtxEngine(VtxBaseEngine):
             self._engine.wait()
             self._logger.info("stopped.")
         else:
-            self._logger.warn("engine is not running")
+            self._logger.warning("engine is not running")

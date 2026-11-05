@@ -1,19 +1,12 @@
-from vortex import Range, get_console_logger
-from vortex.engine import Block, dispersion_phasor
-from vortex.acquire import AlazarConfig, AlazarAcquisition, alazar, FileAcquisitionConfig, FileAcquisition
-from vortex.process import (
-    CUDAProcessor,
-    CUDAProcessorConfig,
-    NullProcessor,
-    NullProcessorConfig,
-    CPUProcessor,
-    CPUProcessorConfig,
-)
-from vortex.io import DAQmxIO, DAQmxConfig, daqmx
-from VtxEngineParams import VtxEngineParams, AcquisitionType
-from DAQConst import getAlazarChannel
 import numpy as np
-from typing import Tuple
+from vortex import get_console_logger
+from vortex.acquire import AlazarAcquisition, AlazarConfig, FileAcquisition, FileAcquisitionConfig, alazar
+from vortex.engine import Block, dispersion_phasor
+from vortex.io import DAQmxConfig, DAQmxIO, daqmx
+from vortex.process import CPUProcessor, CPUProcessorConfig, CUDAProcessor, CUDAProcessorConfig
+
+from DAQConst import getAlazarChannel
+from VtxEngineParams import AcquisitionType, VtxEngineParams
 
 LOGGER = get_console_logger(__name__)
 
@@ -32,7 +25,7 @@ class VtxBaseEngine:
             ac = AlazarConfig()
 
             if cfg.internal_clock:
-                LOGGER.warn("alazar internal clock not tested in this program!")
+                LOGGER.warning("alazar internal clock not tested in this program!")
                 ac.clock = alazar.InternalClock(cfg.clock_samples_per_second)
 
                 # (clock_samples_per_second, clock) = acquire_alazar_clock(cfg.swept_source, ac, cfg.clock_channel, get_logger('acquire', cfg.log_level))
@@ -224,12 +217,12 @@ class VtxBaseEngine:
         else:
             self._io_out = None
 
-    def get_spectral_filter(self, dispersion: Tuple[float, float], samples_per_record: int) -> np.ndarray:
+    def get_spectral_filter(self, dispersion: tuple[float, float], samples_per_record: int) -> np.ndarray:
         window = np.hanning(samples_per_record)
         phasor = dispersion_phasor(len(window), list(dispersion))
         filter = window * phasor
         return filter
 
-    def update_dispersion(self, dispersion: Tuple[float, float]):
+    def update_dispersion(self, dispersion: tuple[float, float]):
         self._processor_config.spectral_filter = self.get_spectral_filter(dispersion, self._samples_per_record)
         self._processor.change(self._processor_config)

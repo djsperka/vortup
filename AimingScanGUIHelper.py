@@ -1,32 +1,31 @@
-from ScanGUIHelper import ScanGUIHelper, ScanGUIHelperComponents
-from typing import Any, Dict
-from ScanConfigWidget import AimingScanConfigWidget
-from ScanParams import AimingScanParams
-from AcqParams import AcqParams
-from OCTUiParams import OCTUiParams
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
-from vortex_tools.ui.display import CrossSectionImageWidget
-from TraceWidget import AscanTraceWidget, SpectraTraceWidget
-import matplotlib as mpl
 from math import radians
+from typing import Any
 
-from vortex.scan import RadialScan, RadialScanConfig
+import matplotlib as mpl
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
+from vortex import get_console_logger as get_logger
 from vortex.engine import (
-    StackDeviceTensorEndpointInt8,
-    SpectraStackHostTensorEndpointUInt16,
-    SpectraStackEndpoint,
     NullEndpoint,
+    SpectraStackEndpoint,
+    SpectraStackHostTensorEndpointUInt16,
 )
 from vortex.format import (
     FormatPlanner,
     FormatPlannerConfig,
-    StackFormatExecutorConfig,
-    StackFormatExecutor,
     SimpleSlice,
+    StackFormatExecutor,
+    StackFormatExecutorConfig,
 )
-from vortex.storage import SimpleStackUInt16
 from vortex.marker import Flags
-from vortex import get_console_logger as get_logger
+from vortex.scan import RadialScan, RadialScanConfig
+from vortex.storage import SimpleStackUInt16
+from vortex_tools.ui.display import CrossSectionImageWidget
+
+from OCTUiParams import OCTUiParams
+from ScanConfigWidget import AimingScanConfigWidget
+from ScanGUIHelper import ScanGUIHelper, ScanGUIHelperComponents
+from ScanParams import AimingScanParams
+from TraceWidget import AscanTraceWidget, SpectraTraceWidget
 
 
 class AimingScanGUIHelper(ScanGUIHelper):
@@ -34,7 +33,7 @@ class AimingScanGUIHelper(ScanGUIHelper):
     GUIHelper for an aiming scan. The config for an aiming scan
     """
 
-    def __init__(self, name: str, flags: int, params: AimingScanParams, settings: Dict[str, Any], octui):
+    def __init__(self, name: str, flags: int, params: AimingScanParams, settings: dict[str, Any], octui):
         super().__init__(name, flags, params, settings, octui)
 
         self._edit_widget = AimingScanConfigWidget()

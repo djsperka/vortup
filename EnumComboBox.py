@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QComboBox
 from enum import Enum
+
+from PyQt5.QtWidgets import QComboBox, QWidget
 
 
 class EnumComboBox(QComboBox):
@@ -23,9 +24,10 @@ class EnumComboBox(QComboBox):
 
 if __name__ == "__main__":
     import sys
+
     from PyQt5.QtWidgets import QApplication
+
     from DAQConst import ATS9350InputRange
-    from vortex.acquire import alazar
 
     app = QApplication(sys.argv)
     w = EnumComboBox()

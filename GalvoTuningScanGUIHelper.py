@@ -1,32 +1,31 @@
-from ScanGUIHelper import ScanGUIHelper, ScanGUIHelperComponents
-from typing import Any, Dict
-from ScanConfigWidget import GalvoTuningScanConfigWidget
-from ScanParams import GalvoTuningScanParams
-from AcqParams import AcqParams
-from OCTUiParams import OCTUiParams
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
-from vortex_tools.ui.display import CrossSectionImageWidget
-from LineScanTraceWidget import LineScanTraceWidget
-import matplotlib as mpl
+from typing import Any
 
+import matplotlib as mpl
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 from vortex import Range
-from vortex.scan import RasterScan, RasterScanConfig
+from vortex import get_console_logger as get_logger
 from vortex.engine import (
-    StackDeviceTensorEndpointInt8,
-    SpectraStackHostTensorEndpointUInt16,
-    SpectraStackEndpoint,
     NullEndpoint,
+    SpectraStackEndpoint,
+    SpectraStackHostTensorEndpointUInt16,
 )
 from vortex.format import (
     FormatPlanner,
     FormatPlannerConfig,
-    StackFormatExecutorConfig,
-    StackFormatExecutor,
     SimpleSlice,
+    StackFormatExecutor,
+    StackFormatExecutorConfig,
 )
-from vortex.storage import SimpleStackUInt16
 from vortex.marker import Flags
-from vortex import get_console_logger as get_logger
+from vortex.scan import RasterScan, RasterScanConfig
+from vortex.storage import SimpleStackUInt16
+from vortex_tools.ui.display import CrossSectionImageWidget
+
+from LineScanTraceWidget import LineScanTraceWidget
+from OCTUiParams import OCTUiParams
+from ScanConfigWidget import GalvoTuningScanConfigWidget
+from ScanGUIHelper import ScanGUIHelper, ScanGUIHelperComponents
+from ScanParams import GalvoTuningScanParams
 
 
 class GalvoTuningScanGUIHelper(ScanGUIHelper):
@@ -34,7 +33,7 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
     GUIHelper for a scan used for tuning galvo delays. Creates a bidirectional line scan, can adjust delay to tune.
     """
 
-    def __init__(self, name: str, flags: int, params: GalvoTuningScanParams, settings: Dict[str, Any], octui):
+    def __init__(self, name: str, flags: int, params: GalvoTuningScanParams, settings: dict[str, Any], octui):
         super().__init__(name, flags, params, settings, octui)
 
         self._edit_widget = GalvoTuningScanConfigWidget()

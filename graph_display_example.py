@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Example QT GUI Showing use of ImageDisplayQT Widget to show a simple graph.
 
@@ -7,19 +6,13 @@ Example QT GUI Showing use of ImageDisplayQT Widget to show a simple graph.
 
 """
 
-import sys
 import os
+import sys
 
 import numpy as np
-from PIL import Image
-from pathlib import Path
-
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+from PyQt5.QtGui import QColor, QPalette, QPixmap
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QPalette, QColor, QImage, QPixmap, QPainter, QPen, QGuiApplication
-from PyQt5.QtGui import QPainter, QBrush, QPen
 
 sys.path.append(os.path.abspath("../src"))
 from image_display import ImageDisplay
@@ -46,7 +39,7 @@ class ImageDisplayExample(QMainWindow):
 
     def __init__(self, parent=None):
 
-        super(ImageDisplayExample, self).__init__(parent)
+        super().__init__(parent)
         self.create_layout()
         self.update_display_settings()
 

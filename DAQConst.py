@@ -1,4 +1,5 @@
-from enum import IntEnum, Enum
+from enum import IntEnum
+
 from vortex.acquire import alazar
 
 

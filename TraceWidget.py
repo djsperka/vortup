@@ -1,13 +1,11 @@
+from collections.abc import Iterable
+
+import cupy
+import numpy
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from qtpy.QtGui import QKeyEvent, QPaintEvent
 from qtpy.QtCore import Qt
-
-import numpy
-import cupy
-from typing import Iterable, List
-from qtpy.QtGui import QPaintEvent
-from typing import Tuple
+from qtpy.QtGui import QKeyEvent, QPaintEvent
 
 # Inheriting from FigureCanvasQTAgg.
 # FigureCanvasQTAgg is a widget. Call update() to invalidate and trigger a paintEvent.
@@ -58,7 +56,7 @@ class SpectraTraceWidget(FigureCanvas):
             self._axes.clear()
             self._line2d = None
 
-    def get_xy_data(self) -> Tuple[bool, bool]:
+    def get_xy_data(self) -> tuple[bool, bool]:
         have_data = False
         must_plot = False
         if self._bidx >= 0:
@@ -218,7 +216,7 @@ class AscanTraceWidget(FigureCanvas):
             self._axes.clear()
             self._line2d = None
 
-    def get_xy_data(self) -> Tuple[bool, bool]:
+    def get_xy_data(self) -> tuple[bool, bool]:
         have_data = False
         must_plot = False
         if self._bidx >= 0:

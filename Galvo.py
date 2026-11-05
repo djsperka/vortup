@@ -1,44 +1,40 @@
-import sys
-from pathlib import Path
 import logging
+import sys
 from textwrap import dedent
-from rainbow_logging_handler import RainbowLoggingHandler
 
-import numpy as np
 import cupy as cp
-
+import numpy as np
+from matplotlib.backends.backend_qt5agg import FigureCanvas
+from matplotlib.figure import Figure
+from myengine import setup_logging
 from PyQt5.QtCore import QTimer, pyqtSignal
 from PyQt5.QtWidgets import (
     QApplication,
-    QWidget,
-    QHBoxLayout,
-    QVBoxLayout,
-    QPushButton,
-    QLabel,
     QDoubleSpinBox,
+    QHBoxLayout,
+    QLabel,
     QMessageBox,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
 )
-
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt5agg import FigureCanvas
-
-from vortex import Range, get_console_logger as get_logger
-from vortex.scan import RasterScanConfig, RasterScan
-from vortex.engine import EngineConfig, Engine, StackDeviceTensorEndpointInt8 as StackDeviceTensorEndpoint
+from rainbow_logging_handler import RainbowLoggingHandler
+from vortex import Range
+from vortex import get_console_logger as get_logger
+from vortex.engine import Engine, EngineConfig
+from vortex.engine import StackDeviceTensorEndpointInt8 as StackDeviceTensorEndpoint
 from vortex.format import (
     FormatPlanner,
     FormatPlannerConfig,
-    StackFormatExecutorConfig,
-    StackFormatExecutor,
     SimpleSlice,
+    StackFormatExecutor,
+    StackFormatExecutorConfig,
 )
-
+from vortex.scan import RasterScan, RasterScanConfig
 from vortex_tools.ui.display import RasterEnFaceWidget
 
-from myengine import setup_logging
-from VtxEngineParams import DEFAULT_VTX_ENGINE_PARAMS, VtxEngineParams
-from VtxEngineParamsDialog import VtxEngineParamsDialog
 from VtxBaseEngine import VtxBaseEngine
+from VtxEngineParams import DEFAULT_VTX_ENGINE_PARAMS, VtxEngineParams
 
 _log = logging.getLogger(__name__)
 

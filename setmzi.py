@@ -1,5 +1,6 @@
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+
 from LaserSource import LaserSource
-from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="write mzi setting to laser", formatter_class=ArgumentDefaultsHelpFormatter)

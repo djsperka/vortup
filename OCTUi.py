@@ -1,30 +1,30 @@
-import sys
+import logging
 import os
-from VtxEngineParams import AcquisitionType
-from VtxEngineParamsDialog import VtxEngineParamsDialog
-from VtxEngine import VtxEngine
-from OCTUiMainWindow import OCTUiMainWindow
-from OCTUiParams import OCTUiParams
-from PyQt5.QtWidgets import QApplication, QMessageBox, QLabel
-from PyQt5.QtCore import QTimer, QDateTime, pyqtSignal, Qt, QObject
-from vortex.engine import Engine, EngineConfig, EngineStatus
-from vortex import get_console_logger, __version__ as vortex_version
-from vortex.storage import SimpleStackConfig, SimpleStackHeader
-from vortex.log import Logger
-from ScanGUIHelper import ScanGUIHelper
-from scanGUIHelperFactory import scanGUIHelperFactory
-from LaserSource import LaserSource
-from serial import SerialException
-from typing import Tuple
+import sys
 import traceback
-import matplotlib as mpl
 from datetime import datetime
 from json import dumps
-from git import Repo
 from pathlib import Path
-import logging
-import numpy
-import cupy
+
+import cupy  # noqa: F401  (kept deliberately: load CUDA/cupy before the engine is built)
+import matplotlib as mpl
+from git import Repo
+from PyQt5.QtCore import QDateTime, QObject, Qt, QTimer, pyqtSignal
+from PyQt5.QtWidgets import QApplication, QLabel, QMessageBox
+from serial import SerialException
+from vortex import __version__ as vortex_version
+from vortex import get_console_logger
+from vortex.engine import Engine
+from vortex.storage import SimpleStackConfig, SimpleStackHeader
+
+from LaserSource import LaserSource
+from OCTUiMainWindow import OCTUiMainWindow
+from OCTUiParams import OCTUiParams
+from ScanGUIHelper import ScanGUIHelper
+from scanGUIHelperFactory import scanGUIHelperFactory
+from VtxEngine import VtxEngine
+from VtxEngineParams import AcquisitionType
+from VtxEngineParamsDialog import VtxEngineParamsDialog
 
 
 class OCTUi(QObject):
@@ -112,7 +112,7 @@ class OCTUi(QObject):
         helper = self._guihelpers[index]
         self.connectCurrentScan(helper)
 
-    def dispersionChanged(self, dispersion: Tuple[float, float]):
+    def dispersionChanged(self, dispersion: tuple[float, float]):
         if self._vtxengine is not None:
             # set updated value in parameters
             # must do this here so the change will trigger "want to save?"
@@ -181,7 +181,7 @@ class OCTUi(QObject):
             # get oct engine ready
             if self._vtxengine:
                 if not self._vtxengine._engine.done:
-                    self._logger.warn("engine is not stopped")
+                    self._logger.warning("engine is not stopped")
                     return
                 del self._vtxengine
             self._vtxengine = None
@@ -369,7 +369,7 @@ class OCTUi(QObject):
                 # now write metadata file (same as conf file)
                 self._params.save(baseFilename + ".conf")
             else:
-                self._logger.warn("Cannot open file {0:s} for saving.".format(baseFilename))
+                self._logger.warning("Cannot open file {0:s} for saving.".format(baseFilename))
                 self._savingVolumesRequested = False
 
     def volumeCallback2(self, arg0, arg1, arg2):
@@ -400,7 +400,7 @@ class OCTUi(QObject):
                 helper.components.storage.close()
                 self._octDialog.gbSaveVolumes.enableSaving(True)
 
-    def checkFileSaveStuff(self) -> Tuple[bool, str]:
+    def checkFileSaveStuff(self) -> tuple[bool, str]:
         """This function will verify that the file save root folder is accessible. If so,
         a new folder with the name yyyy-MM-dd is created (if it doesn't already exist). A new
         filename WITHOUT EXTENSION is generated and returned.

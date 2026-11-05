@@ -1,6 +1,8 @@
 import sys
+
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QDialog, QApplication, QStyle
+from PyQt5.QtWidgets import QApplication, QDialog, QStyle
+
 from Ui_OCTDialog import Ui_OCTDialog
 
 

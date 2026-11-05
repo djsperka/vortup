@@ -1,14 +1,14 @@
-from vortex_tools.ui.display import CrossSectionImageWidget
-from qtpy.QtWidgets import QMainWindow, QApplication
-from qtpy.QtGui import QCursor, QMouseEvent, QEnterEvent, QKeyEvent, QPainter, QTransform, QPaintEvent, QPen, QColor
-from qtpy.QtCore import QEvent, Qt as qt, QPoint, QPointF, Signal
 import sys
-import skimage as ski
-from typing import Iterable, List, Set, Optional
+from collections.abc import Iterable
+from enum import Enum
 from math import floor
 
-
-from enum import Enum
+import skimage as ski
+from qtpy.QtCore import QEvent, QPoint, QPointF, Signal
+from qtpy.QtCore import Qt as qt
+from qtpy.QtGui import QColor, QCursor, QEnterEvent, QKeyEvent, QMouseEvent, QPainter, QPaintEvent, QPen, QTransform
+from qtpy.QtWidgets import QApplication, QMainWindow
+from vortex_tools.ui.display import CrossSectionImageWidget
 
 
 class PlotCmdStates(Enum):
@@ -155,7 +155,7 @@ class CrossSectionDrawingWidget(CrossSectionImageWidget):
     #         # else:
     #         #     print("mouseReleaseEvent, unknown button")
 
-    def _make_draw_transform(self, shape: Optional[Iterable[int]] = None) -> QTransform:
+    def _make_draw_transform(self, shape: Iterable[int] | None = None) -> QTransform:
         if shape is None:
             shape = self.data.shape
         (image_height, image_width) = shape

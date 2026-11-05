@@ -1,24 +1,21 @@
-import numpy
-
 import matplotlib
+import numpy
 
 matplotlib.use("Qt5Agg")
 from matplotlib import pyplot
-
 from vortex import Range
 from vortex.marker import Flags
 from vortex.scan import (
-    RasterScan,
-    RepeatedRasterScan,
-    RadialScan,
-    RepeatedRadialScan,
     FreeformScan,
-    SequentialPattern,
-    RasterScanConfig,
+    RadialScan,
     RadialScanConfig,
+    RasterScan,
+    RasterScanConfig,
+    RepeatedRadialScan,
+    RepeatedRasterScan,
+    SequentialPattern,
 )
-
-from vortex_tools.scan import plot_annotated_waveforms_time, plot_annotated_waveforms_space
+from vortex_tools.scan import plot_annotated_waveforms_space, plot_annotated_waveforms_time
 
 
 def freeform():

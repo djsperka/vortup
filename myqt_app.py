@@ -1,16 +1,11 @@
-import sys
-import math
 import random
-import time
+import sys
 from pathlib import Path
 
 import numpy as np
-from qtpy.QtGui import QImage
-from qtpy.QtWidgets import QApplication, QDialog, QVBoxLayout, QHBoxLayout
-from qtpy.QtCore import QTimer, Qt
-from qtpy.QtGui import QPen, QBrush, QColor
-
-from myqt import MyNumpyImageWidget
+from qtpy.QtCore import Qt
+from qtpy.QtGui import QColor, QImage, QPen
+from qtpy.QtWidgets import QApplication, QDialog, QHBoxLayout
 from vortex_tools.ui.backend.ucdqt import UCDNumpyImageWidget
 
 IMAGE_PATH = Path("/home/dan/work/oct/vortup/pattern.tiff")

@@ -1,11 +1,9 @@
 # This is intial code to read data dimension and extract B-scan data and A-line profile
 # Worked on June 11 2026
-import numpy as np
 import sys
-import os
-import numpy as np
-from pathlib import Path
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 # npy_file = sys.argv[1]
 npy_file = sys.argv[1]

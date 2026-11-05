@@ -1,37 +1,37 @@
-from ScanGUIHelper import ScanGUIHelper, ScanGUIHelperComponents
-from typing import Any, Dict
-from ScanConfigWidget import RasterScanConfigWidget
-from ScanParams import RasterScanParams
-from OCTUiParams import OCTUiParams
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QTabWidget
-from vortex_tools.ui.display import RasterEnFaceWidget, CrossSectionImageWidget
-from TraceWidget import AscanTraceWidget, SpectraTraceWidget
-from CrossSectionDrawingWidget import CrossSectionDrawingWidget
-from MultiPlotSelectWidget import MPSW, MPSWData
-import matplotlib as mpl
 from math import radians
+from typing import Any
+
+import matplotlib as mpl
 import numpy as np
-from vortex.scan import RasterScan, RasterScanConfig
+from PyQt5.QtWidgets import QHBoxLayout, QTabWidget, QVBoxLayout, QWidget
+from vortex import get_console_logger as get_logger
 from vortex.engine import (
-    StackDeviceTensorEndpointInt8,
-    SpectraStackHostTensorEndpointUInt16,
-    SpectraStackEndpoint,
     NullEndpoint,
+    SpectraStackEndpoint,
+    SpectraStackHostTensorEndpointUInt16,
 )
 from vortex.format import (
     FormatPlanner,
     FormatPlannerConfig,
-    StackFormatExecutorConfig,
-    StackFormatExecutor,
     SimpleSlice,
+    StackFormatExecutor,
+    StackFormatExecutorConfig,
 )
-from vortex.storage import SimpleStackUInt16
 from vortex.marker import Flags
-from vortex import get_console_logger as get_logger
+from vortex.scan import RasterScan, RasterScanConfig
+from vortex.storage import SimpleStackUInt16
+from vortex_tools.ui.display import CrossSectionImageWidget, RasterEnFaceWidget
+
+from MultiPlotSelectWidget import MPSW
+from OCTUiParams import OCTUiParams
+from ScanConfigWidget import RasterScanConfigWidget
+from ScanGUIHelper import ScanGUIHelper, ScanGUIHelperComponents
+from ScanParams import RasterScanParams
+from TraceWidget import SpectraTraceWidget
 
 
 class RasterScanGUIHelper(ScanGUIHelper):
-    def __init__(self, name: str, flags: int, params: RasterScanParams, settings: Dict[str, Any], octui):
+    def __init__(self, name: str, flags: int, params: RasterScanParams, settings: dict[str, Any], octui):
         super().__init__(name, flags, params, settings, octui)
 
         self._edit_widget = RasterScanConfigWidget()

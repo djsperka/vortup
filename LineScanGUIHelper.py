@@ -1,38 +1,33 @@
-from ScanGUIHelper import ScanGUIHelper, ScanGUIHelperComponents
-from typing import Any, Dict
-from ScanConfigWidget import LineScanConfigWidget
-from ScanParams import LineScanParams
-from AcqParams import AcqParams
-from OCTUiParams import OCTUiParams
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
-from vortex_tools.ui.display import CrossSectionImageWidget
-from TraceWidget import AscanTraceWidget
+from typing import Any
+
 import matplotlib as mpl
-import numpy as np
-
-
+from PyQt5.QtWidgets import QHBoxLayout, QWidget
 from vortex import Range
-from vortex.scan import RasterScanConfig, FreeformScan, FreeformScanConfig
+from vortex import get_console_logger as get_logger
 from vortex.engine import (
-    StackDeviceTensorEndpointInt8,
-    SpectraStackHostTensorEndpointUInt16,
-    SpectraStackEndpoint,
-    NullEndpoint,
     EventStrobe,
+    NullEndpoint,
     ScanQueue,
+    SpectraStackEndpoint,
+    SpectraStackHostTensorEndpointUInt16,
 )
 from vortex.format import (
     FormatPlanner,
     FormatPlannerConfig,
-    StackFormatExecutorConfig,
-    StackFormatExecutor,
     SimpleSlice,
+    StackFormatExecutor,
+    StackFormatExecutorConfig,
 )
+from vortex.marker import Event, Flags
+from vortex.scan import FreeformScan, FreeformScanConfig, RasterScanConfig
 from vortex.storage import SimpleStackUInt16
-from vortex.marker import Flags, Event
-from vortex import get_console_logger as get_logger
+from vortex_tools.ui.display import CrossSectionImageWidget
 
-from MultiPlotSelectWidget import MPSW
+from OCTUiParams import OCTUiParams
+from ScanConfigWidget import LineScanConfigWidget
+from ScanGUIHelper import ScanGUIHelper, ScanGUIHelperComponents
+from ScanParams import LineScanParams
+from TraceWidget import AscanTraceWidget
 
 
 class LineScanGUIHelper(ScanGUIHelper):
@@ -40,7 +35,7 @@ class LineScanGUIHelper(ScanGUIHelper):
     GUIHelper for a line scan.
     """
 
-    def __init__(self, name: str, number: int, params: LineScanParams, settings: Dict[str, Any], octui):
+    def __init__(self, name: str, number: int, params: LineScanParams, settings: dict[str, Any], octui):
         super().__init__(name, number, params, settings, octui)
 
         self._edit_widget = LineScanConfigWidget()
@@ -125,7 +120,7 @@ class LineScanGUIHelper(ScanGUIHelper):
         if doStrobe:
             if params.strobe_bscan_index < 0 or params.strobe_bscan_index > (params.lines_per_volume - 1):
                 # TODO: should do this check in the edit widget, and disallow setting strobe index to an invalid value
-                self._logger.warn(
+                self._logger.warning(
                     "Cannot add strobe trigger at bscan index {0:d}: must be in less than lines per volume ({1:d})".format(
                         params.strobe_bscan_index, params.lines_per_volume
                     )

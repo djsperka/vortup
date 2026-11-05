@@ -1,28 +1,25 @@
-from typing import List, Tuple, Iterable, Optional, Callable
+from collections.abc import Iterable
 from enum import Enum, IntFlag
-from math import floor, ceil
+from math import ceil, floor
 from pathlib import Path
 from warnings import warn
 
 import numpy as np
-
-from qtpy.QtWidgets import QWidget, QFileDialog
+from qtpy.QtCore import QPoint, QPointF, QRectF, Qt, Signal
 from qtpy.QtGui import (
+    QColor,
     QCursor,
-    QMouseEvent,
-    QEnterEvent,
-    QWheelEvent,
-    QKeyEvent,
-    QPainter,
-    QTransform,
     QImage,
-    QPixmap,
+    QKeyEvent,
+    QMouseEvent,
+    QPainter,
     QPaintEvent,
     QPen,
-    QColor,
+    QPixmap,
+    QTransform,
+    QWheelEvent,
 )
-from qtpy.QtCore import Qt, QEvent, QPoint, QPointF, QRectF, Signal
-
+from qtpy.QtWidgets import QFileDialog, QWidget
 from vortex_tools.ui.backend.base import BaseImageWidget
 
 __all__ = ["MyNumpyImageWidget"]
@@ -108,7 +105,7 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
 
         self._statistics: bool = kwargs.pop("statistics", False)
 
-        self._pan: Tuple[float, float] = kwargs.pop("pan", (0, 0))
+        self._pan: tuple[float, float] = kwargs.pop("pan", (0, 0))
         self._angle: float = kwargs.pop("angle", 0)
         self._zoom: float = kwargs.pop("zoom", 1)
         self._flip: int = kwargs.pop("flip", 0)
@@ -127,8 +124,8 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         self._vmin = 0
         self._vmax = 0
 
-        self.__pixmap: Optional[QPixmap] = None
-        self.__pixmap_draw_rect: Optional[QRectF] = None
+        self.__pixmap: QPixmap | None = None
+        self.__pixmap_draw_rect: QRectF | None = None
 
         super().__init__(*args, **kwargs)
 
@@ -137,9 +134,9 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         self.__safe_update.connect(self.update)
         self.update(safe=True)
 
-        self._mouse_down_position: Optional[QPoint] = None
-        self._mouse_down_pan: Optional[Tuple[float, float]] = None
-        self._mouse_down_angle: Optional[float] = None
+        self._mouse_down_position: QPoint | None = None
+        self._mouse_down_pan: tuple[float, float] | None = None
+        self._mouse_down_angle: float | None = None
 
         self._cmdstate = PlotCmdStates.NOTHING
         self._slice_y = []
@@ -393,10 +390,10 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         try:
             painter.drawPixmap(self.__pixmap_draw_rect, self.pixmap, QRectF(self.pixmap.rect()))
         except TypeError:
-            warn(f"unable to draw pixmap due to strange TypeError")
+            warn("unable to draw pixmap due to strange TypeError")
         painter.restore()
 
-    def _draw_inverted_lines(self, painter: QPainter, point: QPointF, style: Optional[Qt.PenStyle] = None) -> None:
+    def _draw_inverted_lines(self, painter: QPainter, point: QPointF, style: Qt.PenStyle | None = None) -> None:
         painter.save()
         painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Exclusion)
         pen = QPen(QColor(255, 255, 255))
@@ -503,7 +500,7 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
             -shape[1] / 2, -shape[0] / 2
         )
 
-    def _get_drawn_image_dimensions(self, shape: Optional[Iterable[int]] = None) -> Tuple[float, float]:
+    def _get_drawn_image_dimensions(self, shape: Iterable[int] | None = None) -> tuple[float, float]:
         """Determine the size of the image that will be drawn, given current widget
         size (self.width(), self.height()), sizing mode (self._size_mode), and image aspect ratio (self._aspect).
         If shape passed is None, then the current data shape is used.
@@ -557,7 +554,7 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
 
         return (width, height)
 
-    def _make_draw_transform(self, shape: Optional[Iterable[int]] = None) -> QTransform:
+    def _make_draw_transform(self, shape: Iterable[int] | None = None) -> QTransform:
         if shape is None:
             shape = self.data.shape
         (image_height, image_width) = shape
@@ -584,7 +581,7 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         # return composed with user transform
         return xform * self._transform
 
-    def _make_additional_stats(self) -> List[str]:
+    def _make_additional_stats(self) -> list[str]:
         lines = []
         if self.__pixmap is None:
             lines += ["Image: None"]
@@ -618,7 +615,7 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         col = int(floor(image_point.x()))
         return (row, col)
 
-    def _map_data_to_window(self, data_point: QPointF) -> Tuple[float, float]:
+    def _map_data_to_window(self, data_point: QPointF) -> tuple[float, float]:
         """Given a point in data coordinates, return the point in current window (widget, really) coords
 
         Args:

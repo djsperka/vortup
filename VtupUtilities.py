@@ -1,7 +1,7 @@
-from vortex import Range
 from PyQt5.QtCore import QRegExp
+from vortex import Range
 
-_regexForExtents = QRegExp("((-?\d+)[\s,]+(-?\d+))|(-?\d+)")
+_regexForExtents = QRegExp(r"((-?\d+)[\s,]+(-?\d+))|(-?\d+)")
 
 
 def getRangeFromTextEntry(txt) -> Range:

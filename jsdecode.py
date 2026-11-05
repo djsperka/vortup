@@ -1,18 +1,5 @@
-import json
-from dataclasses import asdict, dataclass
-from dataclasses_json import dataclass_json
-from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
-from vortex import Range
-from vortex.engine import Source
-from vortex.acquire import alazar
-from vortex.scan import RasterScanConfig
-from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, AcquisitionType
-
-
 # Example of replacing an obj like {"a": 1, "b": 2, "c": 3}, which has specific keys, with something else.
-
 # json_data = '{"name": "Bob", "age": 25, "city": "Los Angeles", "other": {"a": 1, "b": 2, "c": 3}}'
-
 # # Custom function to convert JSON to a custom object
 # def custom_decoder(dct):
 #     print("in decoder: ", dct)
@@ -21,13 +8,9 @@ from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, Acquisit
 #     elif dct.keys() & {'a', 'b', 'c'}:
 #         return 'REPLACEMENT OBJECT'
 #     return dct
-
 # decoder = json.JSONDecoder(object_hook=custom_decoder)
 # python_obj = decoder.decode(json_data)
-
 # print(python_obj)
-
-
 # acq=DEFAULT_ACQ_PARAMS
 # dct = asdict(acq)
 # print(dct)
@@ -35,24 +18,26 @@ from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, Acquisit
 # print(" acq2:", acq2)
 # assert(acq == acq2)
 # print("ok")
-
-
 # convert acq2 to dict using facgtory
-
 # def factory(data):
 #     print("factory: ", data)
 #     return data
-
 # d2 = asdict(acq2, dict_factory = factory)
 # print(d2)
-
 # print("\n\n\nVtxEngineParams: \n", params)
-
-
 # This stuff is needed for when we call asdict() on a VtxEngineParams object.
 # It contains things that cannot be "pickled", and these functions tell the pickler
 # process how to do it. Seems counter-intuitive to need to do this.
 import copyreg
+import json
+from dataclasses import asdict, dataclass
+
+from vortex import Range
+from vortex.acquire import alazar
+from vortex.engine import Source
+
+from AcqParams import DEFAULT_ACQ_PARAMS, AcqParams
+from VtxEngineParams import DEFAULT_VTX_ENGINE_PARAMS, AcquisitionType, VtxEngineParams
 
 
 def pickle_range(r: Range):

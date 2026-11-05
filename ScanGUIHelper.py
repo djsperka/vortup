@@ -1,24 +1,26 @@
-from dataclasses import dataclass, field
-from typing import Union
 from abc import ABC, abstractmethod
-from typing import List, Any, Dict, Tuple
-from OCTUiParams import OCTUiParams
+from typing import Any
 
-# from OCTUi import OCTUi
-from VtxEngineParams import VtxEngineParams, AcquisitionType
-from vortex.engine import NullEndpoint, VolumeStrobe, SegmentStrobe, SampleStrobe, EventStrobe
+from qtpy.QtWidgets import QWidget
+from vortex import get_console_logger
 from vortex.engine import (
+    EventStrobe,
+    NullEndpoint,
+    SampleStrobe,
+    SegmentStrobe,
+    SpectraStackEndpoint,
+    SpectraStackHostTensorEndpointUInt16,
     StackDeviceTensorEndpointInt8,
     StackHostTensorEndpointInt8,
-    SpectraStackHostTensorEndpointUInt16,
-    SpectraStackEndpoint,
-    NullEndpoint,
-    EventStrobe,
+    VolumeStrobe,
 )
 from vortex.format import FormatPlanner, StackFormatExecutor
 from vortex.storage import SimpleStackUInt16
-from qtpy.QtWidgets import QWidget
-from vortex import get_console_logger
+
+from OCTUiParams import OCTUiParams
+
+# from OCTUi import OCTUi
+from VtxEngineParams import AcquisitionType, VtxEngineParams
 
 
 class ScanGUIHelperComponents:
@@ -42,7 +44,7 @@ class ScanGUIHelperComponents:
         self._null_endpoint2 = NullEndpoint()
 
     @property
-    def endpoints(self) -> List[Any]:
+    def endpoints(self) -> list[Any]:
         return [
             self._null_endpoint,
             self._storage_endpoint,
@@ -195,7 +197,7 @@ class ScanGUIHelper(ABC):
         pass
 
     def _createAscanEndpoint(
-        self, sfe: StackFormatExecutor, shape: Tuple[int, int, int], vtx: VtxEngineParams, logger
+        self, sfe: StackFormatExecutor, shape: tuple[int, int, int], vtx: VtxEngineParams, logger
     ) -> StackDeviceTensorEndpointInt8 | StackHostTensorEndpointInt8:
         """
         Subclasses should call this to get the endpoint for ascans. Checks the acquisition type and returns the

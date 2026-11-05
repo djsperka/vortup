@@ -1,10 +1,12 @@
 import sys
+
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
-from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog
-from DAQConst import ATS9350InputRange
-from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, AcquisitionType
-from Ui_VtxEngineParamsDialog import Ui_VtxEngineParamsDialog
+from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog
 from vortex import Range
+
+from DAQConst import ATS9350InputRange
+from Ui_VtxEngineParamsDialog import Ui_VtxEngineParamsDialog
+from VtxEngineParams import DEFAULT_VTX_ENGINE_PARAMS, AcquisitionType, VtxEngineParams
 
 
 class VtxEngineParamsDialog(QDialog, Ui_VtxEngineParamsDialog):

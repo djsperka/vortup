@@ -1,10 +1,10 @@
-import sys
 import math
+import sys
+
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPen, QBrush, QColor
+from PyQt5.QtGui import QBrush, QColor, QPen
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from QCustomPlot_PyQt5 import *
-
 
 app = QApplication(sys.argv)
 window = QMainWindow()

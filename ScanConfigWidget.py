@@ -1,20 +1,19 @@
-import sys
-import math
-from ScanParams import ScanParams, RasterScanParams, AimingScanParams, LineScanParams, GalvoTuningScanParams
-from vortex.scan import RasterScanConfig, RasterScan, Limits
-from vortex import Range
-from PyQt5.QtWidgets import QGroupBox, QApplication, QWidget
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QRegExpValidator
-from PyQt5.QtCore import QRegExp, pyqtSignal
-from Ui_ScanConfigWidget import Ui_ScanConfigWidget
-from Ui_RasterScanConfigWidget import Ui_RasterScanConfigWidget
-from Ui_AimingScanConfigWidget import Ui_AimingScanConfigWidget
-from Ui_LineScanConfigWidget import Ui_LineScanConfigWidget
-from Ui_GalvoTuningScanConfigWidget import Ui_GalvoTuningScanConfigWidget
-from vortex_tools.scan import plot_annotated_waveforms_time, plot_annotated_waveforms_space
-from matplotlib import pyplot
 import traceback
 
+from matplotlib import pyplot
+from PyQt5.QtCore import QRegExp, pyqtSignal
+from PyQt5.QtGui import QIntValidator, QRegExpValidator
+from PyQt5.QtWidgets import QApplication, QGroupBox, QWidget
+from vortex import Range
+from vortex.scan import RasterScan
+from vortex_tools.scan import plot_annotated_waveforms_space, plot_annotated_waveforms_time
+
+from ScanParams import AimingScanParams, GalvoTuningScanParams, LineScanParams, RasterScanParams, ScanParams
+from Ui_AimingScanConfigWidget import Ui_AimingScanConfigWidget
+from Ui_GalvoTuningScanConfigWidget import Ui_GalvoTuningScanConfigWidget
+from Ui_LineScanConfigWidget import Ui_LineScanConfigWidget
+from Ui_RasterScanConfigWidget import Ui_RasterScanConfigWidget
+from Ui_ScanConfigWidget import Ui_ScanConfigWidget
 
 f_sFloat = "([+-]?([0-9]*[.])?[0-9]+)"
 RegexForExtents = QRegExp("({0:s}[\\s,]{1:s})|{2:s}".format(f_sFloat, f_sFloat, f_sFloat))
@@ -266,7 +265,7 @@ class GalvoTuningScanConfigWidget(
 
 
 if __name__ == "__main__":
-    from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+    from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
     parser = ArgumentParser(description="save volume to disk", formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("--type", choices=["raster", "aim", "line", "galvo"], default="raster", help="dlg type")

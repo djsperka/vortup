@@ -1,13 +1,11 @@
+from collections.abc import Iterable
+
+import cupy as cp
+import numpy as np
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from qtpy.QtGui import QKeyEvent, QPaintEvent
 from qtpy.QtCore import Qt
-
-import numpy as np
-import cupy as cp
-from typing import Iterable, List
-from qtpy.QtGui import QPaintEvent
-from typing import Tuple
+from qtpy.QtGui import QKeyEvent, QPaintEvent
 
 # Inheriting from FigureCanvasQTAgg.
 # FigureCanvasQTAgg is a widget. Call update() to invalidate and trigger a paintEvent.

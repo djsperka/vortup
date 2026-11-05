@@ -1,17 +1,18 @@
-from ScanGUIHelper import ScanGUIHelper
-from RasterScanGuiHelper import RasterScanGUIHelper
-from LineScanGUIHelper import LineScanGUIHelper
+from typing import Any
+
 from AimingScanGUIHelper import AimingScanGUIHelper
 from GalvoTuningScanGUIHelper import GalvoTuningScanGUIHelper
-from typing import Any, Dict
-from ScanParams import RasterScanParams, AimingScanParams, LineScanParams, GalvoTuningScanParams
+from LineScanGUIHelper import LineScanGUIHelper
+from RasterScanGuiHelper import RasterScanGUIHelper
+from ScanGUIHelper import ScanGUIHelper
+from ScanParams import AimingScanParams, GalvoTuningScanParams, LineScanParams, RasterScanParams
 
 
 def scanGUIHelperFactory(
     name: str,
     number: int,
     params: RasterScanParams | AimingScanParams | LineScanParams | GalvoTuningScanParams,
-    settings: Dict[str, Any],
+    settings: dict[str, Any],
     octui,
 ) -> ScanGUIHelper:
     if isinstance(params, RasterScanParams):

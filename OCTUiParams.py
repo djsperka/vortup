@@ -1,16 +1,15 @@
-from VtxEngineParams import VtxEngineParams, DEFAULT_VTX_ENGINE_PARAMS, AcquisitionType
-from ScanParams import ScanParams, RasterScanParams, AimingScanParams, LineScanParams, GalvoTuningScanParams
-from platformdirs import site_config_dir
-from pathlib import Path, PurePath
+import copyreg
 import json
 import logging
-from dataclasses import asdict, dataclass, field
-import copyreg
-from vortex import Range, get_console_logger
-from vortex.acquire import alazar
-from typing import Tuple, Any, Dict
-import os
 import sys
+from dataclasses import asdict, dataclass, field
+from pathlib import Path
+from typing import Any
+
+from vortex import Range, get_console_logger
+
+from ScanParams import AimingScanParams, GalvoTuningScanParams, LineScanParams, RasterScanParams, ScanParams
+from VtxEngineParams import AcquisitionType, VtxEngineParams
 
 local_logger = get_console_logger("OCTUiParams")
 
@@ -34,7 +33,7 @@ class UiParams:
     # vtx: VtxEngineParams = DEFAULT_VTX_ENGINE_PARAMS
     vtx: VtxEngineParams = field(default_factory=VtxEngineParams)
     scn: ScanParams = field(default_factory=lambda: ScanParams())
-    settings: Dict[str, Any] = field(default_factory=lambda: {})
+    settings: dict[str, Any] = field(default_factory=lambda: {})
 
 
 def pickle_uiparams(u: UiParams):
@@ -140,7 +139,7 @@ class OCTUiParams:
         if len(config_file):
             maybepath = Path(config_file)
             if not maybepath.exists():
-                local_logger.warn("Config file {0:s} not found.".format(config_file))
+                local_logger.warning("Config file {0:s} not found.".format(config_file))
             self.__cfgpath = maybepath
         else:
             self.__cfgpath = default_config_path
@@ -262,7 +261,7 @@ class OCTUiParams:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
 
-    from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+    from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
     parser = ArgumentParser(
         description="Initialize/update OCTUi config file.", formatter_class=ArgumentDefaultsHelpFormatter

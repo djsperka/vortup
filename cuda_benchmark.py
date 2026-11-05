@@ -1,20 +1,15 @@
-from time import time, sleep
+from time import sleep, time
 
-import numpy
 import cupy
-
-from vortex import Range, get_console_logger as get_logger
-from vortex.scan import RasterScan, warp
-from vortex.engine import (
-    EngineConfig,
-    Engine,
-    dispersion_phasor,
-    StackDeviceTensorEndpointInt8 as StackDeviceTensorEndpoint,
-)
-
+import numpy
+from vortex import Range
+from vortex import get_console_logger as get_logger
 from vortex.acquire import NullAcquisition
+from vortex.engine import Engine, EngineConfig, dispersion_phasor
+from vortex.engine import StackDeviceTensorEndpointInt8 as StackDeviceTensorEndpoint
+from vortex.format import FormatPlanner, SimpleSlice, StackFormatExecutor, StackFormatExecutorConfig
 from vortex.process import CUDAProcessor
-from vortex.format import FormatPlanner, StackFormatExecutor, StackFormatExecutorConfig, SimpleSlice
+from vortex.scan import RasterScan, warp
 
 
 class cfg:

@@ -1,7 +1,7 @@
-import sys
+from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import QGroupBox, QWidget
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QRegExpValidator
-from AcqParams import AcqParams, DEFAULT_ACQ_PARAMS
+
+from AcqParams import DEFAULT_ACQ_PARAMS, AcqParams
 from Ui_AcqParamsWidget import Ui_AcqParamsWidget
 
 

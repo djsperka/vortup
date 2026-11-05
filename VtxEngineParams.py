@@ -1,9 +1,7 @@
-from vortex import Range
-from vortex.acquire import alazar
-from vortex.engine import source, Source
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Tuple
+
+from vortex import Range
 
 
 class AcquisitionType(Enum):
@@ -42,7 +40,7 @@ class VtxEngineParams:
     strobe_device_channel: str = "Dev1/port0"
 
     # dispersion
-    dispersion: Tuple = (-1.8e-05, 0)
+    dispersion: tuple = (-1.8e-05, 0)
 
     # hardware configuration
     ssrc_triggers_per_second: int = 100000

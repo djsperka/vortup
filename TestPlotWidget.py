@@ -1,27 +1,24 @@
-from vortex_tools.ui.display import BackendImageWidget
-from qtpy.QtWidgets import QMainWindow, QApplication
+import sys
+from collections.abc import Iterable
+from enum import Enum
+from math import floor
+
+import skimage as ski
+from qtpy.QtCore import QEvent, QPoint, QPointF, Signal
+from qtpy.QtCore import Qt as qt
 from qtpy.QtGui import (
+    QColor,
     QCursor,
-    QMouseEvent,
     QEnterEvent,
-    QWheelEvent,
     QKeyEvent,
+    QMouseEvent,
     QPainter,
-    QTransform,
-    QImage,
-    QPixmap,
     QPaintEvent,
     QPen,
-    QColor,
+    QTransform,
 )
-from qtpy.QtCore import QEvent, Qt as qt, QPoint, QPointF, Signal
-import sys
-import skimage as ski
-from typing import Iterable, List, Set, Optional
-from math import floor, ceil
-
-
-from enum import Enum
+from qtpy.QtWidgets import QApplication, QMainWindow
+from vortex_tools.ui.display import BackendImageWidget
 
 
 class PlotCmdStates(Enum):
@@ -166,7 +163,7 @@ class TestPlotWidget(BackendImageWidget):
     #         # else:
     #         #     print("mouseReleaseEvent, unknown button")
 
-    def _make_draw_transform(self, shape: Optional[Iterable[int]] = None) -> QTransform:
+    def _make_draw_transform(self, shape: Iterable[int] | None = None) -> QTransform:
         if shape is None:
             shape = self.data.shape
         (image_height, image_width) = shape

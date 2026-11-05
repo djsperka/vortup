@@ -3,7 +3,8 @@
 # Retrieved 2025-11-07, License - CC BY-SA 4.0
 
 import sys
-from PyQt5.QtWidgets import QDoubleSpinBox, QMainWindow, QApplication, QLabel
+
+from PyQt5.QtWidgets import QApplication, QDoubleSpinBox, QMainWindow
 
 
 class MyQDoubleSpinBox(QDoubleSpinBox):

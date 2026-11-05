@@ -1,11 +1,10 @@
-from qtpy.QtWidgets import QApplication, QMainWindow, QWidget, QGridLayout, QLabel
-from qtpy.QtCore import QTimer, Signal, Qt
-from qtpy.QtGui import QPixmap, QImage, QPen, QColor, QPainter
-from image_display import ImageDisplay
-from PIL import Image
+from dataclasses import dataclass
 
 import numpy as np
-from dataclasses import dataclass
+from PIL import Image
+from qtpy.QtCore import Qt, QTimer, Signal
+from qtpy.QtGui import QColor, QImage, QPainter, QPen, QPixmap
+from qtpy.QtWidgets import QApplication, QGridLayout, QLabel, QMainWindow, QWidget
 
 
 class MyImageWidget(QLabel):
@@ -227,7 +226,7 @@ import sys
 
 if __name__ == "__main__":
     # load image filenames
-    with open("images.txt", "r") as f:
+    with open("images.txt") as f:
         image_list = [line.rstrip() for line in f]
 
     app = QApplication(sys.argv)
