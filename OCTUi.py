@@ -34,7 +34,7 @@ class OCTUi(QObject):
 
         # self._testlogger = get_console_logger("OCTUI-Main")
         self._logger = logging.getLogger("OCTUi")
-        self._vtxengine = None
+        self._vtxengine : VtxEngine | None = None
         self._cross_widget = None
         self._trace_widget = None
         self._savingVolumesNow = False
@@ -205,11 +205,11 @@ class OCTUi(QObject):
             self._logger.info("Setting up OCT engine...")
             self._vtxengine = VtxEngine(self._params, self._guihelpers)
             self._vtxengine._engine.event_callback = self.engineEventCallback
-            self.stopengine.connect(self._engineErrorCallback, Qt.QueuedConnection)
+            self.stopengine.connect(self._engineErrorCallback, Qt.ConnectionType.QueuedConnection)
 
             # Clear out widgets previously located in the stacked widget, then add
             # newly-created plots.
-            for i in range(self._octDialog.stackedWidgetDummy.count()):
+            for _i in range(self._octDialog.stackedWidgetDummy.count()):
                 self._octDialog.stackedWidgetDummy.removeWidget(self._octDialog.stackedWidgetDummy.widget(0))
 
             for helper in self._guihelpers:
