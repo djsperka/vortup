@@ -30,12 +30,11 @@ class LaserSource(serial.Serial):
         p = re.compile(r"(\d{3}): (.+)")
         m = p.match(response)
         if m:
-            print
             raise RuntimeError("Error received: {:s}".format(response))
         else:
             raise ValueError("Invalid response format")
 
-    def parse_write_response(self, response: str) -> tuple[int, str, str]:
+    def parse_write_response(self, response: str) -> tuple[int, str]:
         p = re.compile(r"(\d{3}): (\w+)")
         m = p.match(response)
         if m:
@@ -82,7 +81,7 @@ class LaserSource(serial.Serial):
         if len(v) == 2:
             return v[0].strip()
         else:
-            raise RuntimeError("read_param returned value {value}, expecting format 'param_value,param_status'")
+            raise RuntimeError(f"read_param returned value {value}, expecting format 'param_value,param_status'")
 
     def write_param(self, param: str, value: str):
         self.command("write_param {} {}".format(param, value))
@@ -106,24 +105,23 @@ class LaserSource(serial.Serial):
         state_str = self.read_param("laser_state")
         try:
             return LaserSource.LaserState(int(state_str))
-        except KeyError:
+        except ValueError:
+            # int() of a non-numeric string, or a code not in LaserState
             return LaserSource.LaserState.UNKNOWN
 
     def sweep_mode(self) -> tuple[int, int]:
-        try:
-            sweep_mode_str = self.read_param("sweep_mode")
-            i = int(sweep_mode_str)
-            if i == 1:
-                mzi_str = self.read_param("mzi_delay")
-            elif i == 2:
-                mzi_str = self.read_param("mzi_delay.2")
-            elif i == 3:
-                mzi_str = self.read_param("mzi_delay.3")
-            else:
-                raise (ValueError("Got sweep mode {sweep_mode_str}. Expecting 1,2, or 3"))
-            j = int(mzi_str)
-        finally:
-            return (i, j)
+        sweep_mode_str = self.read_param("sweep_mode")
+        i = int(sweep_mode_str)
+        if i == 1:
+            mzi_str = self.read_param("mzi_delay")
+        elif i == 2:
+            mzi_str = self.read_param("mzi_delay.2")
+        elif i == 3:
+            mzi_str = self.read_param("mzi_delay.3")
+        else:
+            raise ValueError(f"Got sweep mode {sweep_mode_str}. Expecting 1,2, or 3")
+        j = int(mzi_str)
+        return (i, j)
 
     def is_on(self) -> bool:
         return self.laser_state() == LaserSource.LaserState.ON

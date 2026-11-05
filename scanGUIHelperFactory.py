@@ -15,6 +15,7 @@ def scanGUIHelperFactory(
     settings: dict[str, Any],
     octui,
 ) -> ScanGUIHelper:
+    g: ScanGUIHelper
     if isinstance(params, RasterScanParams):
         g = RasterScanGUIHelper(name, number, params, settings, octui)
     elif isinstance(params, AimingScanParams):

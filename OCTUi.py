@@ -256,7 +256,7 @@ class OCTUi(QObject):
         status = self._vtxengine._engine.status()
         if status.active:
             self._labelEngineStatus.setText(
-                "Active: blk_util {0:f} disp_blks {2:d}".format(
+                "Active: blk_util {0:f} disp_blks {1:d} inflight_blks {2:d}".format(
                     status.block_utilization, status.dispatched_blocks, status.inflight_blocks
                 )
             )
@@ -302,7 +302,7 @@ class OCTUi(QObject):
         self._stopGUI(True)
 
     def scanCallback(self, arg0, arg1):
-        self._logger.info("scanCallback({0:d}, {1:d}, {2:d}, {3:d})".format(arg0, arg1))
+        self._logger.info("scanCallback({0:d}, {1:d})".format(arg0, arg1))
 
     def segmentCallback(self, arg0, arg1, arg2, arg3):
         self._logger.info("segmentCallback({0:d}, {1:d}, {2:d}, {3:d})".format(arg0, arg1, arg2, arg3))
