@@ -1,10 +1,10 @@
+import importlib.metadata
 import logging
 import os
 import sys
 from datetime import datetime
 from json import dumps
 from pathlib import Path
-import importlib.metadata
 
 import cupy  # noqa: F401  (kept deliberately: load CUDA/cupy before the engine is built)
 import matplotlib as mpl
@@ -53,7 +53,7 @@ class OCTUi(QObject):
             "OCTUi {0:s} starting...".format(repo.git.describe(tags=True, always=True, dirty=True, long=True))
         )
         version = importlib.metadata.version("vortex-oct.cuda12x")
-        self._logger.info(f"Using vortex {version}")
+        self._logger.info("Using vortex %s", version)
 
         # load config file - default file only!
         # TODO - make it configurable, or be able to load a diff't config.
@@ -285,19 +285,19 @@ class OCTUi(QObject):
             self._logger.error("Error event from engine.")
             self.stopengine.emit()
 
-    def printStatus(self, s):
-        if self._vtxengine is not None:
-            status = self._vtxengine._engine.status()
-            self._logger.info(
-                s
-                + "\nactive? {0:d}\nblock_utilization {1:f}\ndispatch_completion {2:f}\ndispatched_blocks {3:d}\ninflight_blocks {4:d}\n".format(
-                    status.active,
-                    status.block_utilization,
-                    status.dispatch_completion,
-                    status.dispatched_blocks,
-                    status.inflight_blocks,
-                )
-            )
+    # def printStatus(self, s):
+    #     if self._vtxengine is not None:
+    #         status = self._vtxengine._engine.status()
+    #         self._logger.info(
+    #             s
+    #             + "\nactive? {0:d}\nblock_utilization {1:f}\ndispatch_completion {2:f}\ndispatched_blocks {3:d}\ninflight_blocks {4:d}\n".format(
+    #                 status.active,
+    #                 status.block_utilization,
+    #                 status.dispatch_completion,
+    #                 status.dispatched_blocks,
+    #                 status.inflight_blocks,
+    #             )
+    #         )
 
     def _stopGUI(self, bStopEngineToo):
         self._timer.stop()
@@ -368,7 +368,7 @@ class OCTUi(QObject):
                         arg0, arg1, arg2, helper.name, shape[0], shape[1], shape[2]
                     )
                 )
-                npsc.shape = (shape[0], shape[1], shape[2], 1)
+                npsc.shape = [shape[0], shape[1], shape[2], 1]
                 npsc.header = SimpleStackHeader.NumPy
                 npsc.path = baseFilename + ".npy"
                 self._logger.info("Open storage at {0:s}.".format(baseFilename))
