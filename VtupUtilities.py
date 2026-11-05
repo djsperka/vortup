@@ -1,3 +1,5 @@
+import logging
+
 from PyQt5.QtCore import QRegExp
 from vortex import Range
 
@@ -19,3 +21,21 @@ def getRangeFromTextEntry(txt) -> Range:
             "Cannot parse X extents: ",
         )
     return r
+
+
+def python_log_level(vortex_level: int) -> int:
+    """Convert a vortex (spdlog) log level to a Python logging level.
+
+    vortex levels run the opposite way to Python's: lower is more verbose
+    (0=trace, 1=debug, 2=info, 3=warn, 4=error, 5=critical). Python has no
+    trace level, so 0 and 1 both map to DEBUG.
+    """
+    if vortex_level <= 1:
+        return logging.DEBUG
+    if vortex_level == 2:
+        return logging.INFO
+    if vortex_level == 3:
+        return logging.WARNING
+    if vortex_level == 4:
+        return logging.ERROR
+    return logging.CRITICAL

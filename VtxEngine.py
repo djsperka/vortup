@@ -38,6 +38,7 @@ class VtxEngine(VtxBaseEngine):
         # TODO make this part of config
         strobes = [VolumeStrobe(7)]
         for helper in helpers:
+            helper.log_level = cfg.log_level
             helper.createEngineComponents(params, self._processor.config.samples_per_record)
             ec.add_processor(self._processor, [helper.components.format_planner])
             ec.add_formatter(helper.components.format_planner, helper.components.endpoints)

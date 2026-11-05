@@ -21,6 +21,7 @@ from OCTUiMainWindow import OCTUiMainWindow
 from OCTUiParams import OCTUiParams
 from ScanGUIHelper import ScanGUIHelper
 from scanGUIHelperFactory import scanGUIHelperFactory
+from VtupUtilities import python_log_level
 from VtxEngine import VtxEngine
 from VtxEngineParams import AcquisitionType
 from VtxEngineParamsDialog import VtxEngineParamsDialog
@@ -57,6 +58,7 @@ class OCTUi(QObject):
         # load config file - default file only!
         # TODO - make it configurable, or be able to load a diff't config.
         self._params = OCTUiParams()
+        self._applyLogLevel()
 
         self._octDialog = OCTUiMainWindow()
 
@@ -141,9 +143,15 @@ class OCTUi(QObject):
         self._cfgDialog.finished.connect(self.etcFinished)
         self._cfgDialog.show()
 
+    def _applyLogLevel(self):
+        # vortex-scale log_level (0=trace ... 3=warn) -> Python logging level for app loggers.
+        # vortex components get cfg.log_level directly when the engine is built.
+        logging.getLogger().setLevel(python_log_level(self._params.vtx.log_level))
+
     def etcFinished(self, v):
         if v == 1:
             self._params.vtx = self._cfgDialog.getEngineParameters()
+            self._applyLogLevel()
 
     def _getAllParams(self):
         # fetch current configuration for acq and scan params. The items
@@ -437,7 +445,7 @@ def setup_logging():
     # format
     DATE_FORMAT = "%d-%b-%Y %H:%M:%S"
     # FORMAT = '%(asctime)s.%(msecs)03d [%(name)s] %(filename)s:%(lineno)d\t%(levelname)s:\t%(message)s'
-    FORMAT = "[%(asctime)s.%(msecs)d] %(name)s\t(%(levelname).1s) %(message)s"
+    FORMAT = "[%(asctime)s.%(msecs)03d] %(name)s\t(%(levelname).1s) %(message)s"
     logging.basicConfig(format=FORMAT, datefmt=DATE_FORMAT, level=logging.DEBUG)
 
     # This was in  the examples, not sure why.

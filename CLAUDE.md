@@ -71,7 +71,7 @@ The hand-written widget class (`Foo.py`) inherits from both the Qt base class an
 **Logging**: there are two systems.
 - App code (`OCTUi`, `OCTUiParams`, `VtxEngine`, `VtxBaseEngine`, `ScanGUIHelper` and subclasses) uses Python `logging.getLogger(...)`, configured by `OCTUi.setup_logging()`.
 - vortex components (`Engine`, acquisition, processors, `DAQmxIO`, `FormatPlanner`, endpoints, storage) take a C++ spdlog logger from `vortex.get_console_logger(name, level)`. It writes straight to stderr and ignores Python logging config.
-- vortex loggers have `.warn()` but **no `.warning()`**. Their levels run the opposite way to Python's: 0 = trace, 1 = debug, 2 = info, 3 = warn, so lower means more verbose. The `log_level` engine setting uses this vortex scale.
+- vortex loggers have `.warn()` but **no `.warning()`**. Their levels run the opposite way to Python's: 0 = trace, 1 = debug, 2 = info, 3 = warn, so lower means more verbose. The `log_level` engine setting uses this vortex scale and controls both systems: `VtxEngine` passes it to every vortex component (including scan helpers via `helper.log_level`), and `OCTUi._applyLogLevel()` maps it to the Python root level with `VtupUtilities.python_log_level`.
 
 **Hardware helpers**: `LaserSource.py` (a `serial.Serial` subclass used as a context manager; Start refuses to run if the laser is off, Alazar mode only), `DAQConst.py` (Alazar channel mapping), `Galvo.py` and `setmzi.py` (standalone utilities).
 
