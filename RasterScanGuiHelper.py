@@ -120,6 +120,16 @@ class RasterScanGUIHelper(ScanGUIHelper):
             # print("volume cb_volume() spectra shape ", spectra_data.shape, " ascan shape ", ascan_data.shape)
             self._mpsw.add_data(ascan_data, spectra_data)
 
+    def volume(self, sample_idx: int, scan_idx: int, volume_idx: int) -> None:
+        """volume callback for managing plots
+
+        Args:
+            sample_idx (int): sample index
+            scan_idx (int): scan index
+            volume_idx (int): volume index
+        """
+        pass
+
     def getStrobe(self):
         return super().getStrobe()
 

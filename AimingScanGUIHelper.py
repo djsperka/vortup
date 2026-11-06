@@ -88,6 +88,16 @@ class AimingScanGUIHelper(ScanGUIHelper):
         scan.initialize(cfg)
         return scan
 
+    def volume(self, sample_idx: int, scan_idx: int, volume_idx: int) -> None:
+        """volume callback for managing plots
+
+        Args:
+            sample_idx (int): sample index
+            scan_idx (int): scan index
+            volume_idx (int): volume index
+        """
+        pass
+
     def getStrobe(self):
         return super().getStrobe()
 
