@@ -80,7 +80,7 @@ class OCTUi(QObject):
             else:
                 s = {}
 
-            self._guihelpers.append(scanGUIHelperFactory(name, flag, cfg, s, self, log_level=self._params.vtx.log_level))
+            self._guihelpers.append(scanGUIHelperFactory(name, flag, cfg, s, self))
             self._octDialog.widgetScanConfig.addScanType(name, self._guihelpers[-1].edit_widget)
 
         self._octDialog.widgetScanConfig.setCurrentIndex(self._params.scn.current_index)
