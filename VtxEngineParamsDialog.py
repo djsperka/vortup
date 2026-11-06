@@ -197,7 +197,6 @@ if __name__ == "__main__":
     dlg = VtxEngineParamsDialog(DEFAULT_VTX_ENGINE_PARAMS)
     dlg.show()
     app.exec_()
-    print("exec() done")
     params = dlg._cfg
     dlg2 = VtxEngineParamsDialog(params)
     dlg2.exec()

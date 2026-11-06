@@ -1,4 +1,4 @@
-import warnings
+import logging
 from datetime import datetime
 from pathlib import Path
 
@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QApplication, QFileDialog, QGroupBox, QWidget
 
 from Ui_SaveVolumeGroupBox import Ui_SaveVolumeGroupBox
 
+logger = logging.getLogger("SaveVolumeGroupBox")
 
 class SaveVolumeGroupBox(QGroupBox, Ui_SaveVolumeGroupBox):
     # signal emitted with dialog is closing
@@ -29,7 +30,7 @@ class SaveVolumeGroupBox(QGroupBox, Ui_SaveVolumeGroupBox):
         else:
             p = Path(root_folder)
             if not p.is_dir():
-                warnings.warn("SaveVolumeGroupBox: given folder is not a folder: {0:s}".format(root_folder))
+                logger.warning("SaveVolumeGroupBox: given folder is not a folder: {0:s}".format(root_folder))
                 self.pathDataRoot = Path(user_data_dir())
             else:
                 self.pathDataRoot = p

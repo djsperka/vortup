@@ -1,9 +1,11 @@
+import logging
 import re
 import time
 from enum import Enum
 
 import serial
 
+logger = logging.getLogger("LaserSource")
 
 class LaserNotOnError(RuntimeError):
     """The laser source is connected but not switched on."""
@@ -49,7 +51,7 @@ class LaserSource(serial.Serial):
     def command(self, cmd: str):
         if not self.is_open:
             raise RuntimeError("Serial port is not open - not connected to laser source?")
-        num = self.write((cmd + "\r\n").encode("utf-8"))
+        self.write((cmd + "\r\n").encode("utf-8"))
 
     def get_read_response(self, sleep_ms: int = 100) -> tuple[int, str, str]:
         t = None
@@ -142,17 +144,17 @@ if __name__ == "__main__":
     try:
         laser = LaserSource("COM3")  # Update with your actual port
         if laser.is_open:
-            print("Serial port opened successfully")
+            logger.info("Serial port opened successfully")
         laser.command("serial")
         # time.sleep(0.1)  # Wait a bit for the response to be ready
         (a, b, serial_number) = laser.get_read_response()
-        print(f"Response: {a}, {b}, {serial_number}")
+        logger.info("Response: {0}, {1}, {2}".format(a, b, serial_number))
         laser.command("firmware_version")
         (a, b, fw_version) = laser.get_read_response()
-        print(f"Response: {a}, {b}, {fw_version}")
-        print("Laser serial number:", serial_number, "Firmware version:", fw_version)
-        print("Laser state", laser.laser_state())
+        logger.info("Response: {0}, {1}, {2}".format(a, b, fw_version))
+        logger.info("Laser serial number: {0:s}, Firmware version: {1:s}".format(serial_number, fw_version))
+        logger.info("Laser state: {0:s}".format(laser.laser_state().name))
         (mode, mzi) = laser.sweep_mode()
-        print("sweep mode: {:d}, mzi_delay: {:d}".format(mode, mzi))
+        logger.info("sweep mode: {0:d}, mzi_delay: {1:d}".format(mode, mzi))
     except Exception as e:
-        print("Error:", e)
+        logger.exception("Error:", e)

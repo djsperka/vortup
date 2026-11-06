@@ -52,7 +52,6 @@ class CrossSectionDrawingWidget(CrossSectionImageWidget):
             if self._cmdstate == PlotCmdStates.NOTHING:
                 self._cmdstate = PlotCmdStates.PLACING_FIRST_SLICE
                 _logger.debug("keyPress - cmd started")
-            bUpdate = True
 
         if needsUpdate:
             self.update(True)
@@ -196,13 +195,13 @@ class Window(QMainWindow):
         self.resize(800, 600)
 
         # Create a central widget
-        self.plot = TestPlotWidget(self)
+        self.plot = CrossSectionDrawingWidget(self)
         self.setCentralWidget(self.plot)
 
         self.plot.new_slice.connect(self.slice)
 
     def slice(self, y0, y1):
-        print("Got slice signal {0:f}-{1:f}".format(y0, y1))
+        _logger.info("Got slice signal {0:f}-{1:f}".format(y0, y1))
 
 
 if __name__ == "__main__":

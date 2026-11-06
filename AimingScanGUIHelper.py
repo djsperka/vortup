@@ -130,7 +130,6 @@ class AimingScanGUIHelper(ScanGUIHelper):
         spectra_endpoint = SpectraStackHostTensorEndpointUInt16(sfe_spectra, shape_spectra, get_logger('aim-spectra-endpoint-plot', self.log_level))
 
         # make an endpoint for saving spectra data
-        shape = (self.params.bscans_per_volume, self.params.ascans_per_bscan, samples_per_record, 1)
         spectra_storage = SimpleStackUInt16(get_logger('aim-spectra-storage', self.log_level))
         sfec = StackFormatExecutorConfig()
         sfe = StackFormatExecutor()

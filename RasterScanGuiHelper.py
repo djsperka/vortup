@@ -103,7 +103,6 @@ class RasterScanGUIHelper(ScanGUIHelper):
         if self._tabwidget.currentIndex() == 1:
             # print("raster cb_volume({0:d},{1:d},{2:d})".format(sample_idx, scan_idx, volume_idx))
             with self.components.spectra_endpoint.tensor as volume:
-                shape = volume.shape
                 if isinstance(volume, np.ndarray):
                     spectra_data = volume.copy()
                 else:
@@ -112,7 +111,6 @@ class RasterScanGUIHelper(ScanGUIHelper):
 
             # ascan_data is a current en face image
             with self.components.ascan_endpoint.tensor as volume:
-                shape = volume.shape
                 # self._logger.info("ascan shape {0:d} x {1:d} x {2:d}, type {3:s}".format(shape[0], shape[1], shape[2], str(type(volume))))
                 if isinstance(volume, np.ndarray):
                     ascan_data = volume.max(axis=2).transpose().copy()
@@ -167,7 +165,6 @@ class RasterScanGUIHelper(ScanGUIHelper):
         spectra_endpoint = SpectraStackHostTensorEndpointUInt16(sfe_spectra, shape_spectra, get_logger('raster-spectra-endpoint-plot', self.log_level))
 
         # make an endpoint for saving spectra data
-        shape = (self.params.bscans_per_volume, self.params.ascans_per_bscan, samples_per_record, 1)
         spectra_storage = SimpleStackUInt16(get_logger('raster-spectra-storage', self.log_level))
         sfec = StackFormatExecutorConfig()
         sfe = StackFormatExecutor()

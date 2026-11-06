@@ -1,3 +1,4 @@
+# ruff: noqa: T201
 import os
 import sys
 
@@ -70,9 +71,8 @@ class CbFileSaveWidget(QWidget, Ui_CbFileSaveWidget):
                 options=options,
             )
             if fileName:
-                d = os.path.dirname(fileName)
                 b = os.path.basename(fileName)
-                n, ext = os.path.splitext(b)
+                _, ext = os.path.splitext(b)
                 if ext:
                     match ext.lower():
                         case ".mat":

@@ -213,10 +213,10 @@ class AscanTraceWidget(FigureCanvas):
 
         # Figure out a nice set of limits....
         if lim[0]>0 and lim[1]>0:
-            low = log10(lim[0])
-            low_power = floor(low)
-            hi = log10(lim[1])
-            hi_power = ceil(hi)
+            low = numpy.log10(lim[0])
+            low_power = numpy.floor(low)
+            hi = numpy.log10(lim[1])
+            hi_power = numpy.ceil(hi)
             self._axes.set_ylim(10**low_power, 10**hi_power)
 
 

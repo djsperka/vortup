@@ -360,7 +360,7 @@ class OCTUi(QObject):
                     tmpFilename = baseFilename + ".dat"
                     with open(tmpFilename, 'wb') as f:
                         np.save(f, volume) 
-                        print(f"Saved data to {tmpFilename}")
+                        self._logger.info("Saved data to {0:s}".format(tmpFilename))
 
 
 

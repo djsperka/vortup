@@ -146,6 +146,7 @@ class ScanGUIHelper(ABC):
         """
         return self._edit_widget
 
+    @abstractmethod
     def volume(self, arg0: int, arg1: int, arg2: int) -> None:
         pass
 

@@ -191,7 +191,6 @@ class LineScanGUIHelper(ScanGUIHelper):
         )
 
         # make an endpoint for saving spectra data
-        shape = (self.params.lines_per_volume, self.params.ascans_per_bscan, samples_per_record, 1)
         spectra_storage = SimpleStackUInt16(get_logger("line-spectra-storage", self.log_level))
         sfec = StackFormatExecutorConfig()
         sfe = StackFormatExecutor()

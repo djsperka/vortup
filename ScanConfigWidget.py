@@ -1,3 +1,4 @@
+# ruff: noqa: T201 -> ignore `print` found rules
 from PyQt5.QtCore import QRegExp, pyqtSignal
 from PyQt5.QtGui import QIntValidator, QRegExpValidator
 from PyQt5.QtWidgets import QApplication, QGroupBox, QWidget

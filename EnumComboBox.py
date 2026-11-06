@@ -1,3 +1,4 @@
+#ruff: noqa: T201
 from enum import Enum
 
 from PyQt5.QtWidgets import QComboBox, QWidget

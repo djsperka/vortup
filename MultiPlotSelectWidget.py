@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 
 import numpy as np
@@ -6,6 +7,8 @@ from qtpy.QtCore import Qt, QTimer, Signal
 from qtpy.QtGui import QColor, QImage, QPainter, QPen, QPixmap
 from qtpy.QtWidgets import QApplication, QGridLayout, QLabel, QMainWindow, QWidget
 
+logger = logging.getLogger(__name__)
+COLOR_WHITE = QColor(255, 255, 255)
 
 class MyImageWidget(QLabel):
     __clicked_signal = Signal(int, int, name="clicked")
@@ -63,7 +66,7 @@ class MyImageWidget(QLabel):
 
     def mouseDoubleClickEvent(self, ev):
         (r, c) = self.userdata
-        # print("double click at {:d},{:d}".format(r, c))
+        logger.info("double click at {:d},{:d}".format(r, c))
         self.__doubleclicked_signal.emit(r, c)
 
     def paintEvent(self, ev):
@@ -78,7 +81,7 @@ class MyImageWidget(QLabel):
             self._drawOutlineBox(painter, self.__latest_color, self.__latest_width)
         painter.end()
 
-    def _drawOutlineBox(self, painter: QPainter, color: QColor = QColor(255, 255, 255), width: int = 8):
+    def _drawOutlineBox(self, painter: QPainter, color: QColor = COLOR_WHITE, width: int = 8):
         painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Source)
         pen = QPen(color)
         pen.setWidth(width)
@@ -165,10 +168,10 @@ class MPSW(QWidget):
 
     def image_clicked(self, r, c):
         self._update_selected(r, c)
-        # print("Image clicked r={:d} c={:d}, width={:d} height={:d}".format(r, c, self._widgets[r][c].width(), self._widgets[r][c].height()))
+        #logger.info("Image clicked r={:d} c={:d}, width={:d} height={:d}".format(r, c, self._widgets[r][c].width(), self._widgets[r][c].height()))
 
     def image_doubleclicked(self, r, c):
-        # print("Image doubleclicked r={:d} c={:d}, width={:d} height={:d}".format(r, c, self._widgets[r][c].width(), self._widgets[r][c].height()))
+        # logger.info("Image doubleclicked r={:d} c={:d}, width={:d} height={:d}".format(r, c, self._widgets[r][c].width(), self._widgets[r][c].height()))
         self.__save_signal.emit(r, c)
 
     def _ind2sub(self, ind):
@@ -194,9 +197,9 @@ class MPSW(QWidget):
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, list=[]):
+    def __init__(self, list=None):
         super().__init__()
-        self._image_list = list
+        self._image_list = list if list is not None else []
         self._image_index = 0
         self.setWindowTitle("PyQt5 Matplotlib 2D Image Example")
         self.plot = MPSW(self, rows=3, columns=5)
@@ -207,7 +210,7 @@ class MainWindow(QMainWindow):
         self.timer.start(1000)  # might not actually start until event loop starts
 
     def savedata(self, r, c):
-        print("save data {:d},{:d}".format(r, c))
+        logger.info("save data {:d},{:d}".format(r, c))
 
     def timeout(self):
         if len(self._image_list) > 0:
@@ -219,7 +222,7 @@ class MainWindow(QMainWindow):
             if self._image_index >= len(self._image_list):
                 self._image_index = 0
         else:
-            print("no images")
+            logger.info("no images")
 
 
 import sys
