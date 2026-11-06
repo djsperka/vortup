@@ -1,8 +1,10 @@
-from PyQt5.QtWidgets import QWidget, QComboBox
 from enum import Enum
 
+from PyQt5.QtWidgets import QComboBox, QWidget
+
+
 class EnumComboBox(QComboBox):
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: QWidget = None):
         super().__init__(parent)
         self._E = None
 
@@ -10,7 +12,7 @@ class EnumComboBox(QComboBox):
         if not isinstance(e, type):
             raise RuntimeError("Expecting a type (e.g. an Enum class name).")
         self._E = e
-        setToThisIndex=-1
+        setToThisIndex = -1
         for t in list(self._E):
             if v == t.value:
                 setToThisIndex = self.count()
@@ -19,12 +21,14 @@ class EnumComboBox(QComboBox):
             setToThisIndex = 0
         self.setCurrentIndex(setToThisIndex)
 
-    
+
 if __name__ == "__main__":
     import sys
+
     from PyQt5.QtWidgets import QApplication
+
     from DAQConst import ATS9350InputRange
-    from vortex.acquire import alazar
+
     app = QApplication(sys.argv)
     w = EnumComboBox()
     w.initialize(ATS9350InputRange, 1)

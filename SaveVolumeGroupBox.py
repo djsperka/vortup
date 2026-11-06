@@ -1,19 +1,22 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QGroupBox
-from PyQt5.QtCore import pyqtSignal
-from Ui_SaveVolumeGroupBox import Ui_SaveVolumeGroupBox
-from platformdirs import user_data_dir
-from pathlib import Path
-from datetime import datetime
 import warnings
+from datetime import datetime
+from pathlib import Path
+
+from platformdirs import user_data_dir
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QApplication, QFileDialog, QGroupBox, QWidget
+
+from Ui_SaveVolumeGroupBox import Ui_SaveVolumeGroupBox
+
 
 class SaveVolumeGroupBox(QGroupBox, Ui_SaveVolumeGroupBox):
-
     # signal emitted with dialog is closing
     saveContVolumes = pyqtSignal()
     saveNVolumes = pyqtSignal(int)
     saveContText = "Save Continuous"
     stopContText = "STOP Save Continuous"
-    def __init__(self, parent: QWidget=None, root_folder: str=None):
+
+    def __init__(self, parent: QWidget = None, root_folder: str = None):
         """Instantiate class
 
         Args:
@@ -36,7 +39,6 @@ class SaveVolumeGroupBox(QGroupBox, Ui_SaveVolumeGroupBox):
 
     def __saveFixedN(self):
         self.saveNVolumes.emit(self.sbN.value())
-
 
     # def getFileSaveConfig(self):
     #     cfg = FileSaveConfig(self._saveDataType)
@@ -68,18 +70,18 @@ class SaveVolumeGroupBox(QGroupBox, Ui_SaveVolumeGroupBox):
     #                 self._extension = extension
     #     self.__enableDisable()
 
-    def __getFolder(self, folder: str=''):
+    def __getFolder(self, folder: str = ""):
         selected_folder = QFileDialog.getExistingDirectory(self, "Select folder")
-        if len(selected_folder)>0:
+        if len(selected_folder) > 0:
             self.pathDataRoot = Path(selected_folder)
         self.__updateLabels()
 
     def __updateLabels(self):
         self.labelFolder.setText(str(self.pathDataRoot))
-        self.pathDataActual = self.pathDataRoot / datetime.today().strftime('%Y-%m-%d')
-        #self.labelStatus.setText("Data will be saved to folder {0:s}".format(str(self.pathDataActual)))
+        self.pathDataActual = self.pathDataRoot / datetime.today().strftime("%Y-%m-%d")
+        # self.labelStatus.setText("Data will be saved to folder {0:s}".format(str(self.pathDataActual)))
 
-    def enableSaving(self, bEnable: bool=True, bEnableStop = False):
+    def enableSaving(self, bEnable: bool = True, bEnableStop=False):
         self.sbN.setEnabled(bEnable)
         self.pbSaveFixedN.setEnabled(bEnable)
         self.pbSaveContinuous.setEnabled(bEnable)
@@ -89,8 +91,10 @@ class SaveVolumeGroupBox(QGroupBox, Ui_SaveVolumeGroupBox):
             self.pbSaveContinuous.setEnabled(bEnableStop)
             self.pbSaveContinuous.setText(self.stopContText)
 
+
 if __name__ == "__main__":
     import sys
+
     app = QApplication(sys.argv)
     w = SaveVolumeGroupBox(None)
     w.show()

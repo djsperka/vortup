@@ -1,18 +1,28 @@
-from typing import List, Tuple, Iterable, Optional, Callable
+from collections.abc import Iterable
 from enum import Enum, IntFlag
-from math import floor, ceil
+from math import ceil, floor
 from pathlib import Path
 from warnings import warn
 
 import numpy as np
-
-from qtpy.QtWidgets import QWidget, QFileDialog
-from qtpy.QtGui import QCursor, QMouseEvent, QEnterEvent, QWheelEvent, QKeyEvent, QPainter, QTransform, QImage, QPixmap, QPaintEvent, QPen, QColor
-from qtpy.QtCore import Qt, QEvent, QPoint, QPointF, QRectF, Signal
-
+from qtpy.QtCore import QPoint, QPointF, QRectF, Qt, Signal
+from qtpy.QtGui import (
+    QColor,
+    QCursor,
+    QImage,
+    QKeyEvent,
+    QMouseEvent,
+    QPainter,
+    QPaintEvent,
+    QPen,
+    QPixmap,
+    QTransform,
+    QWheelEvent,
+)
+from qtpy.QtWidgets import QFileDialog, QWidget
 from vortex_tools.ui.backend.base import BaseImageWidget
 
-__all__ = ['MyNumpyImageWidget']
+__all__ = ["MyNumpyImageWidget"]
 
 
 class PlotCmdStates(Enum):
@@ -20,8 +30,6 @@ class PlotCmdStates(Enum):
     PLACING_FIRST_SLICE = 2
     PLACING_SECOND_SLICE = 3
     DOING_TEST = 4
-
-
 
 
 class MyNumpyImageWidget(BaseImageWidget, QWidget):
@@ -39,11 +47,11 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         Horizontal = 2**0
         Vertical = 2**1
 
-    __safe_update = Signal(bool, name='request_update')
-    __new_slice_signal = Signal(float, float, name='new_slice')
+    __safe_update = Signal(bool, name="request_update")
+    __new_slice_signal = Signal(float, float, name="new_slice")
 
     def __init__(self, *args, **kwargs):
-        '''
+        """
         Efficiently display a Numpy array as a color-mapped image.
 
         Set the displayed array using the `data` property.
@@ -84,38 +92,40 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
             Relative zoom factor per wheel step.
         range_step `int`: `1`
             Value to adjust range bounds per key press.
-        '''
+        """
 
-        self._transform = kwargs.pop('transform', None)
+        self._transform = kwargs.pop("transform", None)
         if not self._transform:
             self._transform = QTransform()
 
-        self._range_mode: MyNumpyImageWidget.Scaling = kwargs.pop('scaling', MyNumpyImageWidget.Scaling.Absolute)
-        self._size_mode: Iterable[MyNumpyImageWidget.Sizing] = kwargs.pop('sizing', [MyNumpyImageWidget.Sizing.Fit, MyNumpyImageWidget.Sizing.Fit])
+        self._range_mode: MyNumpyImageWidget.Scaling = kwargs.pop("scaling", MyNumpyImageWidget.Scaling.Absolute)
+        self._size_mode: Iterable[MyNumpyImageWidget.Sizing] = kwargs.pop(
+            "sizing", [MyNumpyImageWidget.Sizing.Fit, MyNumpyImageWidget.Sizing.Fit]
+        )
 
-        self._statistics: bool = kwargs.pop('statistics', False)
+        self._statistics: bool = kwargs.pop("statistics", False)
 
-        self._pan: Tuple[float, float] = kwargs.pop('pan', (0, 0))
-        self._angle: float = kwargs.pop('angle', 0)
-        self._zoom: float = kwargs.pop('zoom', 1)
-        self._flip: int = kwargs.pop('flip', 0)
+        self._pan: tuple[float, float] = kwargs.pop("pan", (0, 0))
+        self._angle: float = kwargs.pop("angle", 0)
+        self._zoom: float = kwargs.pop("zoom", 1)
+        self._flip: int = kwargs.pop("flip", 0)
 
-        self._cursor_width_hint: int = kwargs.pop('cursor_width_hint', 16)
+        self._cursor_width_hint: int = kwargs.pop("cursor_width_hint", 16)
 
-        self._enable_keyboard: bool = kwargs.pop('enable_keyboard', True)
+        self._enable_keyboard: bool = kwargs.pop("enable_keyboard", True)
 
-        self._angle_key_step: float = kwargs.pop('angle_key_step', 30)
-        self._angle_mouse_step: float = kwargs.pop('angle_mouse_step', 0.2)
-        self._zoom_key_step: float = kwargs.pop('zoom_key_step', 0.1)
-        self._zoom_mouse_step: float = kwargs.pop('zoom_mouse_step', 0.001)
+        self._angle_key_step: float = kwargs.pop("angle_key_step", 30)
+        self._angle_mouse_step: float = kwargs.pop("angle_mouse_step", 0.2)
+        self._zoom_key_step: float = kwargs.pop("zoom_key_step", 0.1)
+        self._zoom_mouse_step: float = kwargs.pop("zoom_mouse_step", 0.001)
 
-        self._range_step: int = kwargs.pop('range_step', 1)
+        self._range_step: int = kwargs.pop("range_step", 1)
 
         self._vmin = 0
         self._vmax = 0
 
-        self.__pixmap: Optional[QPixmap] = None
-        self.__pixmap_draw_rect: Optional[QRectF] = None
+        self.__pixmap: QPixmap | None = None
+        self.__pixmap_draw_rect: QRectF | None = None
 
         super().__init__(*args, **kwargs)
 
@@ -124,9 +134,9 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         self.__safe_update.connect(self.update)
         self.update(safe=True)
 
-        self._mouse_down_position: Optional[QPoint]=None
-        self._mouse_down_pan: Optional[Tuple[float, float]]=None
-        self._mouse_down_angle: Optional[float]=None
+        self._mouse_down_position: QPoint | None = None
+        self._mouse_down_pan: tuple[float, float] | None = None
+        self._mouse_down_angle: float | None = None
 
         self._cmdstate = PlotCmdStates.NOTHING
         self._slice_y = []
@@ -137,7 +147,6 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
 
         self.setMouseTracking(True)
         # self.update(safe=True)
-
 
     def paintEvent(self, e: QPaintEvent) -> None:
 
@@ -157,7 +166,7 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         if self._debug or self._statistics:
             self._draw_stats(painter)
 
-       # slice lines? 
+        # slice lines?
         if self._has_slice:
             # draw existing slice
             painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Source)
@@ -215,7 +224,12 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
             # export image
             elif e.key() == Qt.Key.Key_E:
                 if self.pixmap:
-                    (path, _) = QFileDialog.getSaveFileName(self, f'Export {self.windowTitle()}...', Path().as_posix(), "Images (*.png *.jpg *.gif *.bmp *.tiff *.webp)")
+                    (path, _) = QFileDialog.getSaveFileName(
+                        self,
+                        f"Export {self.windowTitle()}...",
+                        Path().as_posix(),
+                        "Images (*.png *.jpg *.gif *.bmp *.tiff *.webp)",
+                    )
                     if path:
                         self.pixmap.save(path, quality=100)
 
@@ -234,7 +248,7 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
                 if self._cmdstate == PlotCmdStates.NOTHING:
                     self._cmdstate = PlotCmdStates.PLACING_FIRST_SLICE
                     print("keyPress - cmd started")
-            
+
             elif e.key() == Qt.Key.Key_T:
                 if self._cmdstate == PlotCmdStates.NOTHING:
                     self._cmdstate = PlotCmdStates.DOING_TEST
@@ -257,8 +271,13 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
                 self._maybe_slice_first_y = e.position().y()
             elif self._cmdstate == PlotCmdStates.PLACING_SECOND_SLICE:
                 # second point placed. Command done. Make sure min&max are right
-                self._slice_y = [min(self._maybe_slice_first_y, e.position().y()), max(self._maybe_slice_first_y, e.position().y())]
-                print("mousePressEvent = placing second slice at {0:f}-{1:f}".format(self._slice_y[0], self._slice_y[1]))
+                self._slice_y = [
+                    min(self._maybe_slice_first_y, e.position().y()),
+                    max(self._maybe_slice_first_y, e.position().y()),
+                ]
+                print(
+                    "mousePressEvent = placing second slice at {0:f}-{1:f}".format(self._slice_y[0], self._slice_y[1])
+                )
                 self._has_slice = True
                 self._cmdstate = PlotCmdStates.NOTHING
 
@@ -284,16 +303,16 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
             elif self._cmdstate == PlotCmdStates.DOING_TEST:
                 print("mousePressEvent = doing test, printing data coords")
                 (y, x) = self._map_window_to_data(e.position())
-                print("mapped xy {0:f},{1:f} to data coordinates {2:f},{3:f}".format(e.position().x(), e.position().y(), x, y))
+                print(
+                    "mapped xy {0:f},{1:f} to data coordinates {2:f},{3:f}".format(
+                        e.position().x(), e.position().y(), x, y
+                    )
+                )
 
                 (yw, xw) = self._map_data_to_window(QPointF(x, y))
                 print("mapping data coords {0:f},{1:f} back to window coords {2:f},{3:f}".format(x, y, xw, yw))
 
         e.accept()
-
-
-
-
 
     # def mouseReleaseEvent(self, e: QMouseEvent) -> None:
     #     self._mouse_down_position = None
@@ -324,9 +343,9 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         delta = e.angleDelta().y()
 
         if delta >= 0:
-            factor = (1 + self._zoom_mouse_step)**delta
+            factor = (1 + self._zoom_mouse_step) ** delta
         else:
-            factor = (1 - self._zoom_mouse_step)**-delta
+            factor = (1 - self._zoom_mouse_step) ** -delta
         self._zoom *= factor
         self._pan = [self._pan[0] * factor, self._pan[1] * factor]
         self.invalidate()
@@ -337,20 +356,20 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         self.update(safe=True)
 
     def invalidate(self) -> None:
-        '''
+        """
         Clear the cached image.
         This is required for changes to the underlying data buffer to display.
-        '''
+        """
         self.__pixmap = None
         self.__pixmap_draw_rect = None
 
     def update(self, safe=False) -> None:
-        '''
+        """
         Call `update()` through the signal/slot mechanism by default.
         This simplifies calling update from background threads.
-        '''
+        """
         if safe:
-            #self.setMouseTracking(self._mouse_responsive)
+            # self.setMouseTracking(self._mouse_responsive)
 
             super().update()
         else:
@@ -358,7 +377,7 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
 
     @property
     def pixmap(self) -> QPixmap:
-        '''QPixmap representation of drawn image'''
+        """QPixmap representation of drawn image"""
         if self.__pixmap is None:
             self._make_and_cache_image()
 
@@ -371,10 +390,10 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         try:
             painter.drawPixmap(self.__pixmap_draw_rect, self.pixmap, QRectF(self.pixmap.rect()))
         except TypeError:
-            warn(f'unable to draw pixmap due to strange TypeError')
+            warn("unable to draw pixmap due to strange TypeError")
         painter.restore()
 
-    def _draw_inverted_lines(self, painter: QPainter, point: QPointF, style: Optional[Qt.PenStyle]=None) -> None:
+    def _draw_inverted_lines(self, painter: QPainter, point: QPointF, style: Qt.PenStyle | None = None) -> None:
         painter.save()
         painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Exclusion)
         pen = QPen(QColor(255, 255, 255))
@@ -411,23 +430,27 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         img_roi_rect = xform.inverted()[0].mapRect(win_roi_rect)
         img_roi_rect.translate(shape[1] / 2.0, shape[0] / 2.0)
 
-        start = np.asanyarray([
-            np.clip(floor(img_roi_rect.topLeft().y()), 0, shape[0]),
-            np.clip(floor(img_roi_rect.topLeft().x()), 0, shape[1])
-        ])
-        end = np.asanyarray([
-            np.clip(ceil(img_roi_rect.bottomRight().y()), 0, shape[0]),
-            np.clip(ceil(img_roi_rect.bottomRight().x()), 0, shape[1])
-        ])
+        start = np.asanyarray(
+            [
+                np.clip(floor(img_roi_rect.topLeft().y()), 0, shape[0]),
+                np.clip(floor(img_roi_rect.topLeft().x()), 0, shape[1]),
+            ]
+        )
+        end = np.asanyarray(
+            [
+                np.clip(ceil(img_roi_rect.bottomRight().y()), 0, shape[0]),
+                np.clip(ceil(img_roi_rect.bottomRight().x()), 0, shape[1]),
+            ]
+        )
 
         # check if nothing to draw
         if (end - start).min() <= 0 or win_roi_rect.width() <= 0 or win_roi_rect.width() <= 0:
             return
 
         # extract region of interest
-        step = (end - start + 1) // np.asanyarray([ win_roi_rect.height(), win_roi_rect.width() ]).round().astype(int)
+        step = (end - start + 1) // np.asanyarray([win_roi_rect.height(), win_roi_rect.width()]).round().astype(int)
         step = np.where(step < 1, 1, step)
-        data = self.data[start[0]:end[0]:step[0], start[1]:end[1]:step[1], ...]
+        data = self.data[start[0] : end[0] : step[0], start[1] : end[1] : step[1], ...]
 
         # determine scale bounds on full data
         if self._range_mode == MyNumpyImageWidget.Scaling.Absolute:
@@ -438,7 +461,7 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         elif self._range_mode == MyNumpyImageWidget.Scaling.Percentile:
             (self._vmin, self._vmax) = np.percentile(self.data, self._range)
         else:
-            raise ValueError(f'unknown data range mode: {self._range_mode}')
+            raise ValueError(f"unknown data range mode: {self._range_mode}")
 
         # apply scale and colormap
         data = (data.astype(np.float32) - self._vmin) / (self._vmax - self._vmin)
@@ -453,7 +476,7 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
             color = data.shape[2] >= 3
             alpha = data.shape[2] in [2, 4]
         else:
-            raise ValueError(f'invalid image dimensions: {data.ndim}')
+            raise ValueError(f"invalid image dimensions: {data.ndim}")
 
         # match Qt optimized image format
         data = np.atleast_3d(data)
@@ -473,11 +496,12 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         # data = cbook._unmultiplied_rgba8888_to_premultiplied_argb32(memoryview(data))
         # self.__pixmap = QPixmap.fromImage(QImage(data, data.shape[1], data.shape[0], QImage.Format_ARGB32_Premultiplied))
         self.__pixmap = QPixmap.fromImage(QImage(data, data.shape[1], data.shape[0], QImage.Format_RGBA8888))
-        self.__pixmap_draw_rect = QRectF(QPointF(start[1], start[0]), QPointF(end[1], end[0])).translated(-shape[1] / 2, -shape[0] / 2)
+        self.__pixmap_draw_rect = QRectF(QPointF(start[1], start[0]), QPointF(end[1], end[0])).translated(
+            -shape[1] / 2, -shape[0] / 2
+        )
 
-
-    def _get_drawn_image_dimensions(self, shape: Optional[Iterable[int]]=None) -> Tuple[float, float]:
-        """Determine the size of the image that will be drawn, given current widget 
+    def _get_drawn_image_dimensions(self, shape: Iterable[int] | None = None) -> tuple[float, float]:
+        """Determine the size of the image that will be drawn, given current widget
         size (self.width(), self.height()), sizing mode (self._size_mode), and image aspect ratio (self._aspect).
         If shape passed is None, then the current data shape is used.
 
@@ -505,7 +529,7 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         elif xs == MyNumpyImageWidget.Sizing.Fit:
             width = None
         else:
-            raise ValueError(f'unknown size mode: {xs}')
+            raise ValueError(f"unknown size mode: {xs}")
 
         if ys == MyNumpyImageWidget.Sizing.Fixed:
             height = image_height
@@ -514,7 +538,7 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         elif ys == MyNumpyImageWidget.Sizing.Fit:
             height = None
         else:
-            raise ValueError(f'unknown size mode: {ys}')
+            raise ValueError(f"unknown size mode: {ys}")
 
         if height and width:
             pass
@@ -530,7 +554,7 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
 
         return (width, height)
 
-    def _make_draw_transform(self, shape: Optional[Iterable[int]]=None) -> QTransform:
+    def _make_draw_transform(self, shape: Iterable[int] | None = None) -> QTransform:
         if shape is None:
             shape = self.data.shape
         (image_height, image_width) = shape
@@ -545,30 +569,30 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         xform.rotate(self._angle)
         xform.scale(
             self._zoom * _sign(MyNumpyImageWidget.Flip.Horizontal) / image_width,
-            self._zoom * _sign(MyNumpyImageWidget.Flip.Vertical) / image_height
+            self._zoom * _sign(MyNumpyImageWidget.Flip.Vertical) / image_height,
         )
 
         (width, height) = self._get_drawn_image_dimensions(shape)
 
-        #print(f'make_draw_transform: image size {image_width}x{image_height} -> draw size {width}x{height}')
+        # print(f'make_draw_transform: image size {image_width}x{image_height} -> draw size {width}x{height}')
         # scale up to actual display size
         xform.scale(width, height)
 
         # return composed with user transform
         return xform * self._transform
 
-    def _make_additional_stats(self) -> List[str]:
+    def _make_additional_stats(self) -> list[str]:
         lines = []
         if self.__pixmap is None:
-            lines += ['Image: None']
+            lines += ["Image: None"]
         else:
-            lines += [f'Image: {self.__pixmap.height()} x {self.__pixmap.width()}']
-        lines += ['']
-        lines += [f'Range: {self._vmin} - {self._vmax}']
-        lines += [f'Pan: ({self._pan[0]}, {self._pan[1]})']
-        lines += [f'Angle: {self._angle}']
-        lines += [f'Flip: {self._flip % 4}']
-        lines += [f'Zoom: {self._zoom:.2g}']
+            lines += [f"Image: {self.__pixmap.height()} x {self.__pixmap.width()}"]
+        lines += [""]
+        lines += [f"Range: {self._vmin} - {self._vmax}"]
+        lines += [f"Pan: ({self._pan[0]}, {self._pan[1]})"]
+        lines += [f"Angle: {self._angle}"]
+        lines += [f"Flip: {self._flip % 4}"]
+        lines += [f"Zoom: {self._zoom:.2g}"]
         return lines
 
     def _make_window_transform(self) -> QTransform:
@@ -578,7 +602,7 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         return xform
 
     def _map_window_to_data(self, window_point: QPointF) -> QPointF:
-        """Given a point in window coordinates, returns same point in data coordinates. 
+        """Given a point in window coordinates, returns same point in data coordinates.
 
         Args:
             window_point (QPointF): Data point in window coordinates, where (0, 0) is the top-left of the widget and (width, height) is the bottom-right.
@@ -590,8 +614,8 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         row = int(floor(image_point.y()))
         col = int(floor(image_point.x()))
         return (row, col)
-    
-    def _map_data_to_window(self, data_point: QPointF) -> Tuple[float, float]:
+
+    def _map_data_to_window(self, data_point: QPointF) -> tuple[float, float]:
         """Given a point in data coordinates, return the point in current window (widget, really) coords
 
         Args:
@@ -601,7 +625,6 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
             QPointF: Point in widget coords
         """
 
-
         # translate to data center before rotation and scaling, so that those operations are about the image center.
         shape = self.data.shape
         tr1 = QTransform()
@@ -610,11 +633,11 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
 
         # Rotation and scale
         (drawn_width, drawn_height) = self._get_drawn_image_dimensions(shape)
-        tr2 = QTransform()  
+        tr2 = QTransform()
         tr2.rotate(self._angle)
         tr2.scale(
             self._zoom * (-1 if (self._flip & MyNumpyImageWidget.Flip.Horizontal) else 1) * drawn_width / shape[1],
-            self._zoom * (-1 if (self._flip & MyNumpyImageWidget.Flip.Vertical) else 1) * drawn_height / shape[0]
+            self._zoom * (-1 if (self._flip & MyNumpyImageWidget.Flip.Vertical) else 1) * drawn_height / shape[0],
         )
         print("tr2 m11 {0:f}, m22 {1:f}".format(tr2.m11(), tr2.m22()))
 
@@ -622,7 +645,6 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         tr3 = QTransform()
         tr3.translate(self.width() / 2 + self._pan[0], self.height() / 2 + self._pan[1])
         print("tr3 {0:f}, {1:f}".format(tr3.dx(), tr3.dy()))
-
 
         ptr1 = tr1.map(data_point)
         ptr2 = tr2.map(ptr1)
@@ -632,14 +654,14 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
         print("ptr3 {0:f}, {1:f}".format(ptr3.x(), ptr3.y()))
 
         # Now build full transform.
-        xf = tr1 * tr2 * tr3    
+        xf = tr1 * tr2 * tr3
         window_point = xf.map(data_point)
         return (window_point.y(), window_point.x())
-
 
     @property
     def flip(self) -> Flip:
         return self._flip
+
     @flip.setter
     def flip(self, value: Flip):
         self._flip = value
@@ -648,6 +670,7 @@ class MyNumpyImageWidget(BaseImageWidget, QWidget):
     @property
     def angle(self) -> float:
         return self._angle
+
     @angle.setter
     def angle(self, value: float):
         self._angle = value

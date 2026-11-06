@@ -1,14 +1,18 @@
-from vortex_tools.ui.display import CrossSectionImageWidget
-from qtpy.QtWidgets import QMainWindow, QApplication
-from qtpy.QtGui import QCursor, QMouseEvent, QEnterEvent, QKeyEvent, QPainter, QTransform, QPaintEvent, QPen, QColor
-from qtpy.QtCore import QEvent, Qt as qt, QPoint, QPointF, Signal
+import logging
 import sys
-import skimage as ski
-from typing import Iterable, List, Set, Optional
+from collections.abc import Iterable
+from enum import Enum
 from math import floor
 
+import skimage as ski
+from qtpy.QtCore import QEvent, QPoint, QPointF, Signal
+from qtpy.QtCore import Qt as qt
+from qtpy.QtGui import QColor, QCursor, QEnterEvent, QKeyEvent, QMouseEvent, QPainter, QPaintEvent, QPen, QTransform
+from qtpy.QtWidgets import QApplication, QMainWindow
+from vortex_tools.ui.display import CrossSectionImageWidget
 
-from enum import Enum
+_logger = logging.getLogger(__name__)
+
 
 class PlotCmdStates(Enum):
     NOTHING = 1
@@ -17,17 +21,15 @@ class PlotCmdStates(Enum):
 
 
 class CrossSectionDrawingWidget(CrossSectionImageWidget):
-
-    __new_slice_signal = Signal(float, float, name='new_slice')
-
+    __new_slice_signal = Signal(float, float, name="new_slice")
 
     def __init__(self, *args, **kwargs):
 
-        # clobber args 
-        kwargs['probe'] = True
-        kwargs['crosshairs'] = False
-        kwargs['centerlines'] = False
-        kwargs['statistics'] = False
+        # clobber args
+        kwargs["probe"] = True
+        kwargs["crosshairs"] = False
+        kwargs["centerlines"] = False
+        kwargs["statistics"] = False
 
         # now init superclass
         super().__init__(*args, **kwargs)
@@ -39,21 +41,21 @@ class CrossSectionDrawingWidget(CrossSectionImageWidget):
         self._placing_slice_color = QColor(255, 0, 0)
         self._placed_slice_color = QColor(0, 255, 0)
 
-        print("responsive? {0:s}", self._mouse_responsive)
+        _logger.debug("responsive? %s", self._mouse_responsive)
         self.setMouseTracking(True)
         self.update(safe=True)
-        print("responsive? {0:s}", self._mouse_responsive)
-
+        _logger.debug("responsive? %s", self._mouse_responsive)
 
     def keyPressEvent(self, e: QKeyEvent) -> None:
         needsUpdate = False
         if e.key() == qt.Key.Key_S:
             if self._cmdstate == PlotCmdStates.NOTHING:
                 self._cmdstate = PlotCmdStates.PLACING_FIRST_SLICE
-                print("keyPress - cmd started")
+                _logger.debug("keyPress - cmd started")
             bUpdate = True
 
-        if needsUpdate: self.update(True)
+        if needsUpdate:
+            self.update(True)
 
     def paintEvent(self, e: QPaintEvent) -> None:
 
@@ -65,7 +67,7 @@ class CrossSectionDrawingWidget(CrossSectionImageWidget):
         painter = QPainter()
         painter.begin(self)
 
-        # slice lines? 
+        # slice lines?
         if self._has_slice:
             # draw existing slice
             painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Source)
@@ -84,7 +86,6 @@ class CrossSectionDrawingWidget(CrossSectionImageWidget):
             painter.drawLine(QPointF(0, self._maybe_slice_first_y), QPointF(self.width(), self._maybe_slice_first_y))
 
         painter.end()
-
 
     def enterEvent(self, e: QEnterEvent) -> None:
         if self._cmdstate is not PlotCmdStates.NOTHING:
@@ -122,17 +123,20 @@ class CrossSectionDrawingWidget(CrossSectionImageWidget):
     def mousePressEvent(self, e: QMouseEvent) -> None:
         # right button is reset/quit command
         if e.buttons() & qt.MouseButton.RightButton:
-            print("mousePressEvent = right button")
+            _logger.debug("mousePressEvent = right button")
             self._cmdstate = PlotCmdStates.NOTHING
         elif e.buttons() & qt.MouseButton.LeftButton:
             if self._cmdstate == PlotCmdStates.PLACING_FIRST_SLICE:
-                print("mousePressEvent = placing first slice")
+                _logger.debug("mousePressEvent = placing first slice")
                 self._cmdstate = PlotCmdStates.PLACING_SECOND_SLICE
                 self._maybe_slice_first_y = e.position().y()
             elif self._cmdstate == PlotCmdStates.PLACING_SECOND_SLICE:
                 # second point placed. Command done. Make sure min&max are right
-                self._slice_y = [min(self._maybe_slice_first_y, e.position().y()), max(self._maybe_slice_first_y, e.position().y())]
-                print("mousePressEvent = placing second slice at {0:f}-{1:f}".format(self._slice_y[0], self._slice_y[1]))
+                self._slice_y = [
+                    min(self._maybe_slice_first_y, e.position().y()),
+                    max(self._maybe_slice_first_y, e.position().y()),
+                ]
+                _logger.debug("mousePressEvent = placing second slice at %f-%f", self._slice_y[0], self._slice_y[1])
                 (row0, _) = self._map_window_to_data(QPointF(0, self._slice_y[0]))
                 (row1, _) = self._map_window_to_data(QPointF(0, self._slice_y[1]))
                 self._has_slice = True
@@ -140,7 +144,7 @@ class CrossSectionDrawingWidget(CrossSectionImageWidget):
                 self.__new_slice_signal.emit(row0, row1)
         e.accept()
 
-        #super().mousePressEvent(e)
+        # super().mousePressEvent(e)
 
     # def mouseReleaseEvent(self, e: QMouseEvent) -> None:
     #     if self._state == 1:
@@ -152,7 +156,7 @@ class CrossSectionDrawingWidget(CrossSectionImageWidget):
     #         # else:
     #         #     print("mouseReleaseEvent, unknown button")
 
-    def _make_draw_transform(self, shape: Optional[Iterable[int]]=None) -> QTransform:
+    def _make_draw_transform(self, shape: Iterable[int] | None = None) -> QTransform:
         if shape is None:
             shape = self.data.shape
         (image_height, image_width) = shape
@@ -163,10 +167,11 @@ class CrossSectionDrawingWidget(CrossSectionImageWidget):
         xform.translate(self.width() / 2, self.height() / 2)
 
         # scale
-        s = min([self.width()/image_width, self.height()/image_height])
-        #xform.scale(self.width()/image_width, self.height()/image_height)
-        xform.scale(s,s)
+        s = min([self.width() / image_width, self.height() / image_height])
+        # xform.scale(self.width()/image_width, self.height()/image_height)
+        xform.scale(s, s)
         return xform
+
     #     # return composed with user transform
     #     return xform * self._transform
 
@@ -183,14 +188,13 @@ class CrossSectionDrawingWidget(CrossSectionImageWidget):
         return (row, col)
 
 
-
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
 
         self.setWindowTitle("QMainWindow Example")
         self.resize(800, 600)
-   
+
         # Create a central widget
         self.plot = TestPlotWidget(self)
         self.setCentralWidget(self.plot)
@@ -199,6 +203,7 @@ class Window(QMainWindow):
 
     def slice(self, y0, y1):
         print("Got slice signal {0:f}-{1:f}".format(y0, y1))
+
 
 if __name__ == "__main__":
     App = QApplication(sys.argv)
@@ -210,4 +215,3 @@ if __name__ == "__main__":
     window.plot.data = image
 
     sys.exit(App.exec())
-

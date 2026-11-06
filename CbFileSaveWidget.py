@@ -1,16 +1,18 @@
-import sys
 import os
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QMessageBox
+import sys
+
+from PyQt5.QtWidgets import QApplication, QFileDialog, QMessageBox, QWidget
+
 from Ui_CbFileSaveWidget import Ui_CbFileSaveWidget
 from VtxEngineParams import FileSaveConfig
-from typing import Tuple
+
 
 class CbFileSaveWidget(QWidget, Ui_CbFileSaveWidget):
-    def __init__(self, saveDataType: str, parent: QWidget=None, filename: str=''):
+    def __init__(self, saveDataType: str, parent: QWidget = None, filename: str = ""):
         super().__init__(parent)
         self.setupUi(self)
         self._filename = filename
-        self._extension = ''
+        self._extension = ""
         self._saveDataType = saveDataType
 
         # text
@@ -52,40 +54,49 @@ class CbFileSaveWidget(QWidget, Ui_CbFileSaveWidget):
                     self._extension = extension
         self.__enableDisable()
 
-    def __getFileNameExt(self, filename: str='') -> Tuple[str,str]:
+    def __getFileNameExt(self, filename: str = "") -> tuple[str, str]:
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
 
-        selectedFileName = ''
-        selectedFileExtension = ''
+        selectedFileName = ""
+        selectedFileExtension = ""
         bTryAgain = True
         while bTryAgain:
-            fileName, _ = QFileDialog.getSaveFileName(self,"Select filename for {0:s}".format(self._saveDataType),filename,"MATLAB (*.mat);;HD5 (*.h5);;Numpy (*.npy)", options=options)
+            fileName, _ = QFileDialog.getSaveFileName(
+                self,
+                "Select filename for {0:s}".format(self._saveDataType),
+                filename,
+                "MATLAB (*.mat);;HD5 (*.h5);;Numpy (*.npy)",
+                options=options,
+            )
             if fileName:
                 d = os.path.dirname(fileName)
                 b = os.path.basename(fileName)
-                n,ext = os.path.splitext(b)
+                n, ext = os.path.splitext(b)
                 if ext:
                     match ext.lower():
-                        case '.mat':
-                            selectedFileExtension = 'mat'
+                        case ".mat":
+                            selectedFileExtension = "mat"
                             bTryAgain = False
-                        case '.h5':
-                            selectedFileExtension = 'h5'
+                        case ".h5":
+                            selectedFileExtension = "h5"
                             bTryAgain = False
-                        case '.npy':
-                            selectedFileExtension = 'npy'
+                        case ".npy":
+                            selectedFileExtension = "npy"
                             bTryAgain = False
                 else:
                     bTryAgain = True
             else:
                 bTryAgain = False
             if bTryAgain:
-               QMessageBox.information(self, "Oops", "Cannot determine file type. Please choose a file with extension \".mat\", \".h5\", or \".npy\".")
+                QMessageBox.information(
+                    self,
+                    "Oops",
+                    'Cannot determine file type. Please choose a file with extension ".mat", ".h5", or ".npy".',
+                )
             else:
                 selectedFileName = fileName
         return selectedFileName, selectedFileExtension
-
 
     def __selectFileClicked(self):
         filename, extension = self.__getFileNameExt(self._filename)
@@ -94,16 +105,20 @@ class CbFileSaveWidget(QWidget, Ui_CbFileSaveWidget):
             self._extension = extension
         self.__enableDisable()
 
+
 class CbAscansFileSaveWidget(CbFileSaveWidget):
-    def __init__(self, parent: QWidget=None, filename: str=''):
-        super().__init__('ascans', parent, filename)
+    def __init__(self, parent: QWidget = None, filename: str = ""):
+        super().__init__("ascans", parent, filename)
+
 
 class CbSpectraFileSaveWidget(CbFileSaveWidget):
-    def __init__(self, parent: QWidget=None, filename: str=''):
-        super().__init__('spectra', parent, filename)
+    def __init__(self, parent: QWidget = None, filename: str = ""):
+        super().__init__("spectra", parent, filename)
+
 
 if __name__ == "__main__":
     import sys
+
     app = QApplication(sys.argv)
     w = CbFileSaveWidget()
     ui = Ui_CbFileSaveWidget()

@@ -1,27 +1,27 @@
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+
 from LaserSource import LaserSource
-from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 if __name__ == "__main__":
-    parser = ArgumentParser(description='write mzi setting to laser', formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('mzi', type=int, help='MZI delay to set (in ns)')
-    parser.add_argument('--port', default='COM3', help='serial port for laser source')
+    parser = ArgumentParser(description="write mzi setting to laser", formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument("mzi", type=int, help="MZI delay to set (in ns)")
+    parser.add_argument("--port", default="COM3", help="serial port for laser source")
     args = parser.parse_args()
 
     with LaserSource(args.port) as laser:
-        print('Initial: {}'.format(laser.info()))
+        print("Initial: {}".format(laser.info()))
         laser_initially_on = laser.is_on()
         if laser_initially_on:
-            print('Turning laser off to set MZI delay...')
+            print("Turning laser off to set MZI delay...")
             laser.laser_off()
             if laser.is_on():
-                raise RuntimeError("Failed to turn laser off") 
-  
-        laser.write_param('mzi_delay', str(args.mzi))
+                raise RuntimeError("Failed to turn laser off")
+
+        laser.write_param("mzi_delay", str(args.mzi))
 
         if laser_initially_on:
-            print('Turning laser on...')
+            print("Turning laser on...")
             laser.laser_on()
             if not laser.is_on():
-                raise RuntimeError("Failed to turn laser on") 
-        print('Final: {}'.format(laser.info())) 
-
+                raise RuntimeError("Failed to turn laser on")
+        print("Final: {}".format(laser.info()))

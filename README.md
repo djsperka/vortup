@@ -156,7 +156,7 @@ The strobes are digital signals that the engine can generate for synchronization
 #### Other
 
 - **log level**
-: Set to 1 for normal log output. Set to a higher number for more verbose output.
+: Verbosity of log output, for both the vortex engine components and the application. *Lower numbers are more verbose*: 0 = trace, 1 = debug (default), 2 = info, 3 = warnings only, 4 = errors only.
 - **Save profiler data**
 : If checked, will save profiler data (in a file called *profiler.log*) for analysis of engine performance. Vortex provides a [tool](https://www.vortex-oct.dev/rel/v0.5.1/doc/develop/profiler/) for analyzing this file.
 

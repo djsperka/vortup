@@ -1,13 +1,13 @@
-from vortex import Range
-from vortex.acquire import alazar
-from vortex.engine import source, Source
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Tuple
+
+from vortex import Range
+
 
 class AcquisitionType(Enum):
     ALAZAR_ACQUISITION = 1
-    FILE_ACQUISITION= 2
+    FILE_ACQUISITION = 2
+
 
 @dataclass
 class VtxEngineParams:
@@ -15,11 +15,11 @@ class VtxEngineParams:
     acquisition_type: AcquisitionType = AcquisitionType.ALAZAR_ACQUISITION
 
     # Acquisition params
-    ascans_per_block: int=0
-    samples_per_ascan: int=0
-    blocks_to_acquire: int=0
-    trigger_delay_samples: int=0
-    laser_port: str = 'COM3'
+    ascans_per_block: int = 0
+    samples_per_ascan: int = 0
+    blocks_to_acquire: int = 0
+    trigger_delay_samples: int = 0
+    laser_port: str = "COM3"
 
     # left over from scan parameters
     galvo_delay: float = 0.0
@@ -40,8 +40,8 @@ class VtxEngineParams:
     strobe_device_channel: str = "Dev1/port0"
 
     # dispersion
-    dispersion: Tuple = (-1.8e-05, 0)
-    
+    dispersion: tuple = (-1.8e-05, 0)
+
     # hardware configuration
     ssrc_triggers_per_second: int = 100000
     ssrc_clock_rising_edges_per_trigger: int = 1280
@@ -49,8 +49,8 @@ class VtxEngineParams:
     internal_clock: bool = False
     clock_samples_per_second: int = int(500e6)
     external_clock_level_pct: int = 50
-    clock_channel: str = 'B'
-    input_channel: str = 'A'
+    clock_channel: str = "B"
+    input_channel: str = "A"
     input_channel_range_millivolts: int = 1000
     trigger_range_millivolts: int = 5000
     trigger_level_fraction: float = 0.1
@@ -66,73 +66,63 @@ class VtxEngineParams:
     log_level: int = 1
 
     # only when FILE_ACQUISITION is used
-    input_file: str=""
+    input_file: str = ""
 
     # other
     save_profiler_data: bool = False
 
+
 DEFAULT_VTX_ENGINE_PARAMS = VtxEngineParams(
-
     acquisition_type=AcquisitionType.ALAZAR_ACQUISITION,
-
     ascans_per_block=1000,
     samples_per_ascan=1280,
     blocks_to_acquire=0,
     trigger_delay_samples=0,
-
-    # galvo 
+    # galvo
     galvo_delay=0.0,
     galvo_enabled=True,
-    galvo_clock_source='pfi12',
-    galvo_slow_voltage_range=Range(-3,3),
-    galvo_fast_voltage_range=Range(-3,3),
+    galvo_clock_source="pfi12",
+    galvo_slow_voltage_range=Range(-3, 3),
+    galvo_fast_voltage_range=Range(-3, 3),
     galvo_slow_units_per_volt=1.5,
     galvo_fast_units_per_volt=1.5,
-    galvo_slow_device_channel='Dev1/ao0',
-    galvo_fast_device_channel='Dev1/ao1',
-
+    galvo_slow_device_channel="Dev1/ao0",
+    galvo_fast_device_channel="Dev1/ao1",
     # strobe
     strobe_enabled=True,
-    strobe_clock_source='pfi12',
-    strobe_device_channel='Dev1/port0',
-
+    strobe_clock_source="pfi12",
+    strobe_device_channel="Dev1/port0",
     # dispersion
     dispersion=(-1.8e-05, 0),
-
-
-    # These are probably rig-specific? Hasn't been an issue to use these. 
+    # These are probably rig-specific? Hasn't been an issue to use these.
     blocks_to_allocate=128,
     preload_count=32,
-
     # hardware configuration
-    #swept_source=source.Axsun100k,
+    # swept_source=source.Axsun100k,
     ssrc_triggers_per_second=100000,
     ssrc_clock_rising_edges_per_trigger=1280,
     internal_clock=False,
-    clock_samples_per_second=int(500e6),    # ATS 9350 - applies to internal clock only
-    external_clock_level_pct=50,        # only relevant if internal_clock is False
-    clock_channel='B',
-    input_channel='A',
+    clock_samples_per_second=int(500e6),  # ATS 9350 - applies to internal clock only
+    external_clock_level_pct=50,  # only relevant if internal_clock is False
+    clock_channel="B",
+    input_channel="A",
     input_channel_range_millivolts=1000,
     trigger_range_millivolts=5000,
     trigger_level_fraction=0.10,
-
     # engine memory parameters
-    process_slots=2,                    # I think this is for in-stream processing?
-
+    process_slots=2,  # I think this is for in-stream processing?
     # logging
-    log_level=1,                        # 1 is normal, 0 is debug-level
-
+    log_level=1,  # 1 is normal, 0 is debug-level
     # only when FILE_ACQUISITION is used
-    input_file='',
-
+    input_file="",
     # other
-    save_profiler_data=False
+    save_profiler_data=False,
 )
+
 
 @dataclass
 class FileSaveConfig:
-    type: str       # should be 'ascans' or 'spectra'
+    type: str  # should be 'ascans' or 'spectra'
     save: bool = False
-    filename: str = ''
-    extension: str = ''
+    filename: str = ""
+    extension: str = ""

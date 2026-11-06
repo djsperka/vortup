@@ -1,24 +1,27 @@
+import logging
+from collections.abc import Iterable
+
+import cupy
+import numpy
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from qtpy.QtGui import QKeyEvent, QPaintEvent
 from qtpy.QtCore import Qt
+from qtpy.QtGui import QKeyEvent, QPaintEvent
 
-import numpy
-import cupy
-from typing import Iterable, List
-from qtpy.QtGui import QPaintEvent
-from typing import Tuple
+_logger = logging.getLogger(__name__)
 
-# Inheriting from FigureCanvasQTAgg. 
+# Inheriting from FigureCanvasQTAgg.
 # FigureCanvasQTAgg is a widget. Call update() to invalidate and trigger a paintEvent.
 
-class SpectraTraceWidget(FigureCanvas):
 
-    def __init__(self, endpoint, parent=None, width=5, height=4, dpi=100, title=None, factor=800/2**16, zsubplot=True):
+class SpectraTraceWidget(FigureCanvas):
+    def __init__(
+        self, endpoint, parent=None, width=5, height=4, dpi=100, title=None, factor=800 / 2**16, zsubplot=True
+    ):
         self._endpoint = endpoint
         fig = Figure(figsize=(width, height), dpi=dpi)
         self._axes = fig.add_subplot(111)
-        #self._axes.get_yaxis().set_visible(False)
+        # self._axes.get_yaxis().set_visible(False)
         if title:
             self._axes.set_title(title)
         fig.tight_layout()
@@ -31,16 +34,16 @@ class SpectraTraceWidget(FigureCanvas):
         self._update_ylim_last_idx = -1
         self._update_ylim = False
         self._update_ylim_ready = False
-        self._ylim_temp = [999999,-999999]
+        self._ylim_temp = [999999, -999999]
         self._factor = factor
         self._zsubplot = zsubplot
-        self._axes.set_ylabel('mV')
-        self._axes.set_xlabel('K-clock sample')
+        self._axes.set_ylabel("mV")
+        self._axes.set_xlabel("K-clock sample")
 
         # call flush() to force a re-draw of the line (including re-doing range)
         self._is_flushed = False
 
-        # Will check if tensor is a cupy or numpy array on first time 
+        # Will check if tensor is a cupy or numpy array on first time
         # accessing ydata. After that, assume the endpoint does not change.
         self._is_cuda_known = False
         self._is_cuda = False
@@ -56,14 +59,11 @@ class SpectraTraceWidget(FigureCanvas):
             self._axes.clear()
             self._line2d = None
 
-
-    def get_xy_data(self) -> Tuple[bool, bool]:
+    def get_xy_data(self) -> tuple[bool, bool]:
         have_data = False
         must_plot = False
         if self._bidx >= 0:
-
             with self._endpoint.tensor as volume:
-
                 if not self._is_cuda_known:
                     # Do this just one time - check data type
                     if isinstance(volume, cupy.ndarray):
@@ -74,38 +74,37 @@ class SpectraTraceWidget(FigureCanvas):
 
                 if self._is_cuda:
                     with self._endpoint.stream:
-                        s=slice(100,111)
+                        s = slice(100, 111)
                         ztmp = volume[self._bidx, s, :].get()
                         zavg = ztmp.mean(axis=0)
                         if self._zsubplot:
-                            self._ydata = (ztmp-zavg)*self._factor
-                        else:   
+                            self._ydata = (ztmp - zavg) * self._factor
+                        else:
                             self._ydata = zavg[0:100] * self._factor
 
                 else:
                     # look at ascan #105
                     # get ascans 100-110
-                    s=slice(100,111)
+                    s = slice(100, 111)
                     ztmp = volume[self._bidx, s, :]
                     zavg = ztmp.mean(axis=0)
-                    self._ydata = (ztmp[5]-zavg)*self._factor
+                    self._ydata = (ztmp[5] - zavg) * self._factor
 
                 if self._update_ylim and not self._update_ylim_ready:
-
                     # This is true on the first time only.
-                    # 'start_idx' is the bscan index right now. We will watch the indices, 
+                    # 'start_idx' is the bscan index right now. We will watch the indices,
                     # and look for when the _new_ incoming index is LESS THAN the last one --
                     # this is when the bscan finished a volume and started the next one.
-                    # Once we see that, we wait until the index is GREATER THAN the first one -- 
+                    # Once we see that, we wait until the index is GREATER THAN the first one --
                     # that means we've cycled through an entire volume.
 
-                    if self._update_ylim_start_idx<0:
+                    if self._update_ylim_start_idx < 0:
                         self._update_ylim_start_idx = self._bidx
                         self._update_ylim_last_idx = self._bidx
                         self._update_ylim_lap = False
-                        self._ylim_temp = [999999,-999999]
+                        self._ylim_temp = [999999, -999999]
 
-                    # check how far we've cycled for ylim. Important that on first time through, 
+                    # check how far we've cycled for ylim. Important that on first time through,
                     # the last_idx is set to current _bidx
                     if not self._update_ylim_lap:
                         if self._bidx < self._update_ylim_last_idx:
@@ -125,7 +124,7 @@ class SpectraTraceWidget(FigureCanvas):
 
             # check for x data
             if self._xdata is None or len(self._ydata) != len(self._xdata):
-                self._xdata = list(range(1,len(self._ydata)+1))
+                self._xdata = list(range(1, len(self._ydata) + 1))
                 must_plot = True
 
             # flushed?
@@ -135,7 +134,6 @@ class SpectraTraceWidget(FigureCanvas):
 
         return (have_data, must_plot)
 
-
     def paintEvent(self, e: QPaintEvent) -> None:
         if not self._invalidated:
             return
@@ -143,7 +141,7 @@ class SpectraTraceWidget(FigureCanvas):
         (have_data, must_plot) = self.get_xy_data()
         if not have_data:
             return
-        
+
         if must_plot:
             line2ds = self._axes.plot(self._xdata, self._ydata)
             self._line2d = line2ds[0]
@@ -161,7 +159,6 @@ class SpectraTraceWidget(FigureCanvas):
         self.draw()
         super().paintEvent(e)
 
-
     def update_trace(self, bscan_idxs: Iterable[int] = []):
         # Set _invalidated to true and call update(). The update() call will move the actual update
         # to the gui thread, not the daq thread.
@@ -180,16 +177,13 @@ class SpectraTraceWidget(FigureCanvas):
                 self._update_ylim = True
 
 
-
-
 class AscanTraceWidget(FigureCanvas):
-
     def __init__(self, endpoint, parent=None, width=5, height=4, dpi=100, title=None):
         self._endpoint = endpoint
         fig = Figure(figsize=(width, height), dpi=dpi)
         self._axes = fig.add_subplot(111)
 
-        #self._axes.get_yaxis().set_visible(False)
+        # self._axes.get_yaxis().set_visible(False)
         if title:
             self._axes.set_title(title)
         fig.tight_layout()
@@ -202,13 +196,13 @@ class AscanTraceWidget(FigureCanvas):
         self._update_ylim_last_idx = -1
         self._update_ylim = False
         self._update_ylim_ready = False
-        self._ylim_temp = [999999,-999999]
-        self._aidx = 100        # this is the ascan, within the bscan at _bidx, that we will display
+        self._ylim_temp = [999999, -999999]
+        self._aidx = 100  # this is the ascan, within the bscan at _bidx, that we will display
 
         # call flush() to force a re-draw of the line (including re-doing range)
         self._is_flushed = False
 
-        # Will check if tensor is a cupy or numpy array on first time 
+        # Will check if tensor is a cupy or numpy array on first time
         # accessing ydata. After that, assume the endpoint does not change.
         self._is_cuda_known = False
         self._is_cuda = False
@@ -216,8 +210,15 @@ class AscanTraceWidget(FigureCanvas):
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
 
     def set_ylim(self, lim):
-        #self._axes.set_ylim(lim[0], lim[1])
-        self._axes.set_ylim(10**-1, 10**3)
+
+        # Figure out a nice set of limits....
+        if lim[0]>0 and lim[1]>0:
+            low = log10(lim[0])
+            low_power = floor(low)
+            hi = log10(lim[1])
+            hi_power = ceil(hi)
+            self._axes.set_ylim(10**low_power, 10**hi_power)
+
 
 
     def flush(self):
@@ -226,14 +227,11 @@ class AscanTraceWidget(FigureCanvas):
             self._axes.clear()
             self._line2d = None
 
-
-    def get_xy_data(self) -> Tuple[bool, bool]:
+    def get_xy_data(self) -> tuple[bool, bool]:
         have_data = False
         must_plot = False
         if self._bidx >= 0:
-
             with self._endpoint.tensor as volume:
-
                 if not self._is_cuda_known:
                     # Do this just one time - check data type
                     if isinstance(volume, cupy.ndarray):
@@ -242,7 +240,6 @@ class AscanTraceWidget(FigureCanvas):
                         self._is_cuda = False
                     self._is_cuda_known = True
 
-
                 # get y values.  These are not normalized or anything, straight from CUDA OCT calc.
                 if self._is_cuda:
                     with self._endpoint.stream:
@@ -250,24 +247,24 @@ class AscanTraceWidget(FigureCanvas):
                 else:
                     ytmp = volume[self._bidx].mean(axis=0)
 
+                # TODO: Should this factor be here? Convert from log10 to 20*log10?
                 self._ydata = 20 * ytmp
 
                 if self._update_ylim and not self._update_ylim_ready:
-
                     # This is true on the first time only.
-                    # 'start_idx' is the bscan index right now. We will watch the indices, 
+                    # 'start_idx' is the bscan index right now. We will watch the indices,
                     # and look for when the _new_ incoming index is LESS THAN the last one --
                     # this is when the bscan finished a volume and started the next one.
-                    # Once we see that, we wait until the index is GREATER THAN the first one -- 
+                    # Once we see that, we wait until the index is GREATER THAN the first one --
                     # that means we've cycled through an entire volume.
 
-                    if self._update_ylim_start_idx<0:
+                    if self._update_ylim_start_idx < 0:
                         self._update_ylim_start_idx = self._bidx
                         self._update_ylim_last_idx = self._bidx
                         self._update_ylim_lap = False
-                        self._ylim_temp = [999999,-999999]
+                        self._ylim_temp = [999999, -999999]
 
-                    # check how far we've cycled for ylim. Important that on first time through, 
+                    # check how far we've cycled for ylim. Important that on first time through,
                     # the last_idx is set to current _bidx
                     if not self._update_ylim_lap:
                         if self._bidx < self._update_ylim_last_idx:
@@ -283,12 +280,18 @@ class AscanTraceWidget(FigureCanvas):
                         self._ylim_temp[0] = ylow
                     if yhi > self._ylim_temp[1]:
                         self._ylim_temp[1] = yhi
-                    print("ylim update first {0:d} last {1:d}, lap , lim ({2:f},{3:f})".format(self._update_ylim_start_idx, self._update_ylim_last_idx, self._ylim_temp[0], self._ylim_temp[1]))
+                    _logger.debug(
+                        "ylim update first %d last %d, lim (%f,%f)",
+                        self._update_ylim_start_idx,
+                        self._update_ylim_last_idx,
+                        self._ylim_temp[0],
+                        self._ylim_temp[1],
+                    )
             have_data = True
 
             # check for x data
             if self._xdata is None or len(self._ydata) != len(self._xdata):
-                self._xdata = list(range(1,len(self._ydata)+1))
+                self._xdata = list(range(1, len(self._ydata) + 1))
                 must_plot = True
 
             # flushed?
@@ -298,7 +301,6 @@ class AscanTraceWidget(FigureCanvas):
 
         return (have_data, must_plot)
 
-
     def paintEvent(self, e: QPaintEvent) -> None:
         if not self._invalidated:
             return
@@ -306,16 +308,16 @@ class AscanTraceWidget(FigureCanvas):
         (have_data, must_plot) = self.get_xy_data()
         if not have_data:
             return
-        
+
         if must_plot:
-            line2ds = self._axes.semilogy(self._xdata, self._ydata, 'r')
+            line2ds = self._axes.semilogy(self._xdata, self._ydata, "r")
             self._axes.grid()
-            self._axes.grid(which="minor", color="0.5")            
-            self._axes.grid(which="major", color="0.5")            
-            #self._axes.set_ylim(10**-1, 10**2)
-            #self._axes.set_ylim(10, 100)
-            self._axes.set_ylabel('log')
-            
+            self._axes.grid(which="minor", color="0.5")
+            self._axes.grid(which="major", color="0.5")
+            # self._axes.set_ylim(10**-1, 10**2)
+            # self._axes.set_ylim(10, 100)
+            self._axes.set_ylabel("log")
+
             self._line2d = line2ds[0]
         else:
             self._line2d.set_ydata(self._ydata)
@@ -324,21 +326,20 @@ class AscanTraceWidget(FigureCanvas):
             self._update_ylim = False
             self._update_ylim_ready = False
             self._update_ylim_start_idx = -1
-            #self._axes.set_ylim(self._ylim_temp[0], self._ylim_temp[1])
-            self._axes.set_ylim(10**-1, 10**2)
+            self.set_ylim(self._ylim_temp)
 
         self._invalidated = False
 
-        # find max/min of current data, and update ylim if needed
-        ylow = numpy.min(self._ydata)
-        yhi = numpy.max(self._ydata)
-        logylow = numpy.log10(ylow)
-        logyhi = numpy.log10(yhi)
-        #print("current y range: ({0:f}, {1:f}), log10 range ({2:f}, {3:f})".format(ylow, yhi, logylow, logyhi))
+
+            #    # find max/min of current data, and update ylim if needed
+            #     ylow = numpy.min(self._ydata)
+            #     yhi = numpy.max(self._ydata)
+            #     logylow = numpy.log10(ylow)
+            #     logyhi = numpy.log10(yhi)
+            #     # print("current y range: ({0:f}, {1:f}), log10 range ({2:f}, {3:f})".format(ylow, yhi, logylow, logyhi))
 
         self.draw()
         super().paintEvent(e)
-
 
     def update_trace(self, bscan_idxs: Iterable[int] = []):
         # Set _invalidated to true and call update(). The update() call will move the actual update
@@ -356,4 +357,3 @@ class AscanTraceWidget(FigureCanvas):
         if e.key() == Qt.Key.Key_Y:
             if not self._update_ylim:
                 self._update_ylim = True
-

@@ -1,44 +1,53 @@
-from ScanGUIHelper import ScanGUIHelper, ScanGUIHelperComponents
-from typing import Any, Dict
-from ScanConfigWidget import GalvoTuningScanConfigWidget
-from ScanParams import GalvoTuningScanParams
-from AcqParams import AcqParams
-from OCTUiParams import OCTUiParams
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
-from vortex_tools.ui.display import CrossSectionImageWidget
-from LineScanTraceWidget import LineScanTraceWidget
-import matplotlib as mpl
+from typing import Any
 
+import matplotlib as mpl
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 from vortex import Range
-from vortex.scan import RasterScan, RasterScanConfig
-from vortex.engine import StackDeviceTensorEndpointInt8, SpectraStackHostTensorEndpointUInt16, SpectraStackEndpoint, NullEndpoint
-from vortex.format import FormatPlanner, FormatPlannerConfig, StackFormatExecutorConfig, StackFormatExecutor, SimpleSlice
-from vortex.storage import SimpleStackUInt16
-from vortex.marker import Flags
 from vortex import get_console_logger as get_logger
+from vortex.engine import (
+    NullEndpoint,
+    SpectraStackEndpoint,
+    SpectraStackHostTensorEndpointUInt16,
+)
+from vortex.format import (
+    FormatPlanner,
+    FormatPlannerConfig,
+    SimpleSlice,
+    StackFormatExecutor,
+    StackFormatExecutorConfig,
+)
+from vortex.marker import Flags
+from vortex.scan import RasterScan, RasterScanConfig
+from vortex.storage import SimpleStackUInt16
+from vortex_tools.ui.display import CrossSectionImageWidget
+
+from LineScanTraceWidget import LineScanTraceWidget
+from OCTUiParams import OCTUiParams
+from ScanConfigWidget import GalvoTuningScanConfigWidget
+from ScanGUIHelper import ScanGUIHelper, ScanGUIHelperComponents
+from ScanParams import GalvoTuningScanParams
 
 
 class GalvoTuningScanGUIHelper(ScanGUIHelper):
-    '''
+    """
     GUIHelper for a scan used for tuning galvo delays. Creates a bidirectional line scan, can adjust delay to tune.
-    '''
-    def __init__(self, name: str, flags: int, params: GalvoTuningScanParams, settings: Dict[str, Any], octui):
-        super().__init__(name, flags, params, settings, octui)
+    """
 
+    def __init__(self, name: str, flags: int, params: GalvoTuningScanParams, settings: dict[str, Any], octui):
+        super().__init__(name, flags, params, settings, octui)
 
         self._edit_widget = GalvoTuningScanConfigWidget()
         self._edit_widget.setGalvoTuningScanParams(self.params)
         self._cross_widget_1 = None
         self._cross_widget_2 = None
         self._linescan_trace_widget = None
-        #self._plot_widget = self.galvoTuningPlotWidget()
-
+        # self._plot_widget = self.galvoTuningPlotWidget()
 
     def cb_ascan(self, v):
         # with self.spectra_endpoint.tensor as volume:
         #     print("{0:d}, ({1:d},{2:d},{3:d})".format(v[-1], volume.shape[0], volume.shape[1], volume.shape[2]))
         if v:
-            if v[-1]%2:
+            if v[-1] % 2:
                 self._cross_widget_1.notify_segments(v)
             else:
                 self._cross_widget_2.notify_segments(v)
@@ -51,8 +60,8 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
     #         self._spectra_trace_widget.update_trace(v)
 
     def cb_volume(self, sample_idx, scan_idx, volume_idx):
-        """volume callback that is (should be) called prior to other volume callbacks. 
-        Because of that arrangement, this callback will open storage. Same storage is closed 
+        """volume callback that is (should be) called prior to other volume callbacks.
+        Because of that arrangement, this callback will open storage. Same storage is closed
         in volumeCallback2
 
         Args:
@@ -60,25 +69,23 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
             scan_idx (int): scan index
             volume_idx (int): volume index
         """
-        print("galvo cb_volume({0:d},{1:d},{2:d})".format(sample_idx, scan_idx, volume_idx))
+        self._logger.debug("cb_volume(%d, %d, %d)", sample_idx, scan_idx, volume_idx)
 
-
-
-    def getParams(self):
+    def getParams(self) -> GalvoTuningScanParams:
         params = self._edit_widget.getGalvoTuningScanParams()
         return params
 
-    def clear(self):
-        print("GalvoTuningingScanGUIHelper::clear")
+    def clear(self) -> None:
+        self._logger.debug("clear")
 
-    def getSettings(self):
+    def getSettings(self) -> dict[str, Any]:
         settings = {}
-        settings['cross1.range'] = self._cross_widget_1._range
-        settings['cross2.range'] = self._cross_widget_2._range
-        settings['linescan.ylim'] = list(self._linescan_trace_widget._axes.get_ylim())
+        settings["cross1.range"] = self._cross_widget_1._range
+        settings["cross2.range"] = self._cross_widget_2._range
+        settings["linescan.ylim"] = list(self._linescan_trace_widget._axes.get_ylim())
         return settings
-    
-    def getScan(self):
+
+    def getScan(self) -> RasterScan:
         params = self.getParams()
         cfg = RasterScanConfig()
         cfg.bscans_per_volume = params.lines_per_volume
@@ -95,7 +102,6 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
     def getStrobe(self):
         return super().getStrobe()
 
-
     def createEngineComponents(self, octuiparams: OCTUiParams, samples_per_record: int):
 
         # Create engine parts for this scan
@@ -105,17 +111,17 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
         fc.adapt_shape = False
         fc.mask = Flags(self.flags)
 
-        format_planner = FormatPlanner(get_logger('galvo tuning format', self.log_level))
+        format_planner = FormatPlanner(get_logger("galvo tuning format", self.log_level))
         format_planner.initialize(fc)
 
-        # For saving volumes, this NullEndpoint is used. The volume_callback for this 
+        # For saving volumes, this NullEndpoint is used. The volume_callback for this
         # endpoint will be called before that of the other endpoints. If needed, we open
-        # the storage in the volume_callback for this endpoint when needed. The storage 
-        # is closed in the volume_callback for the SpectraStackEndpoint, which does the 
+        # the storage in the volume_callback for this endpoint when needed. The storage
+        # is closed in the volume_callback for the SpectraStackEndpoint, which does the
         # saving/writing of volumes.
-        null_endpoint = NullEndpoint(get_logger('Traffic cop(aiming)', self.log_level))
+        null_endpoint = NullEndpoint(get_logger("Traffic cop(aiming)", self.log_level))
 
-        # For DISPLAYING ascans (oct-processed data), slice away half the data. 
+        # For DISPLAYING ascans (oct-processed data), slice away half the data.
         # This stack format executor isn't used with the other endpoints.
         sfec = StackFormatExecutorConfig()
         sfec.sample_slice = SimpleSlice(samples_per_record // 2)
@@ -128,7 +134,7 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
         ascan_endpoint = self._createAscanEndpoint(sfe, vshape, octuiparams.vtx, get_logger('galvo-ascan-endpoint-plot', self.log_level))
 
         sfec_spectra = StackFormatExecutorConfig()
-        sfe_spectra  = StackFormatExecutor()
+        sfe_spectra = StackFormatExecutor()
         sfe_spectra.initialize(sfec_spectra)
         shape_spectra = (self.params.lines_per_volume, self.params.ascans_per_bscan, samples_per_record)
         self._logger.info('Create SpectraStackHostTensorEndpointUInt16 with shape {0:s}'.format(str(shape_spectra)))
@@ -144,26 +150,35 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
 
         self._components = ScanGUIHelperComponents(format_planner=format_planner, null_endpoint=null_endpoint, storage_endpoint=storage_endpoint, spectra_endpoint=spectra_endpoint, storage=spectra_storage, ascan_endpoint=ascan_endpoint, plot_widget=self.getPlotWidget(ascan_endpoint))
 
+        self._components = ScanGUIHelperComponents(
+            format_planner=format_planner,
+            null_endpoint=null_endpoint,
+            storage_endpoint=storage_endpoint,
+            spectra_endpoint=spectra_endpoint,
+            storage=spectra_storage,
+            ascan_endpoint=ascan_endpoint,
+            plot_widget=self.getPlotWidget(ascan_endpoint),
+        )
 
     def getPlotWidget(self, ascan_endpoint) -> QWidget:
-        self._cross_widget_1 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="one way")
-        self._cross_widget_2 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps['gray'], title="other way")
+        self._cross_widget_1 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps["gray"], title="one way")
+        self._cross_widget_2 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps["gray"], title="other way")
         self._linescan_trace_widget = LineScanTraceWidget(ascan_endpoint, title="Galvo tuning")
 
         # apply settings
-        if 'cross1.range' in self.settings:
-            self._cross_widget_1._range = self.settings['cross1.range']
+        if "cross1.range" in self.settings:
+            self._cross_widget_1._range = self.settings["cross1.range"]
 
-        if 'cross2.range' in self.settings:
-            self._cross_widget_2._range = self.settings['cross2.range']
+        if "cross2.range" in self.settings:
+            self._cross_widget_2._range = self.settings["cross2.range"]
 
-        if 'linescan.ylim' in self.settings:
-            self._linescan_trace_widget.set_ylim(self.settings['linescan.ylim'])
+        if "linescan.ylim" in self.settings:
+            self._linescan_trace_widget.set_ylim(self.settings["linescan.ylim"])
 
         # callbacks
         ascan_endpoint.aggregate_segment_callback = self.cb_ascan
 
-        # 
+        #
         hbox = QHBoxLayout()
         vbox_left = QVBoxLayout()
         vbox_left.addWidget(self._cross_widget_1)
