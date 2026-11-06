@@ -1,0 +1,416 @@
+[06-Nov-2026 11:57:47.581] OCTUi        (I) Laser OEM: SVM10G-9402, state: ON, Sweep mode: 1, MZI delay: 1300
+[06-Nov-2026 11:57:47.584] OCTUi        (I) Setting up OCT engine...
+[06-Nov-2026 11:57:47.585] VtxBaseEngine        (I) Using input channel Channel.A for input "A"
+d-Nov-2026 11:57:47.586103] acquire    (D) initializing Alazar board
+d-Nov-2026 11:57:47.586372] acquire    (D) worker thread entered
+d-Nov-2026 11:57:47.586410] acquire    (I) using ATS9373 (981141) PCIe x8 @ 7.5 Gbps
+d-Nov-2026 11:57:47.586528] acquire    (D) calibrating ADC using internal clock at 50000000 samples/second
+d-Nov-2026 11:57:47.746061] acquire    (D) configuring dual edge sampling off for input A
+d-Nov-2026 11:57:47.746348] acquire    (D) configuring external clock on rising edge with level 50% and AC coupling
+d-Nov-2026 11:57:47.927510] acquire    (D) configuring single external trigger on positive edge with range 0 mV (0V is TTL), DC coupling, level 10%, and delay of 127 samples
+d-Nov-2026 11:57:47.935071] acquire    (D) configuring input A with range 400 mV, impedance 50 Ohms, and DC coupling
+d-Nov-2026 11:57:47.942776] acquire    (D) configuring auxiliary I/O to pass trigger
+d-Nov-2026 11:57:47.944022] process    (D) initializing CUDA OCT processor
+d-Nov-2026 11:57:47.944139] process    (I) using NVIDIA GeForce RTX 4080 SUPER (device 0) with compute capability 8.9 and 17170956288 bytes of memory
+d-Nov-2026 11:57:47.944420] process    (D) beginning heavyweight recalculation
+d-Nov-2026 11:57:47.944352] process    (D) worker thread entered
+d-Nov-2026 11:57:47.944530] process    (D) allocating average record history buffer with [8000 x 1024] elements
+d-Nov-2026 11:57:47.944796] process    (D) allocating complex filter with [1024] elements
+d-Nov-2026 11:57:47.945398] process    (D) slot 0 allocating spectral buffer with [4000 x 1024] elements
+d-Nov-2026 11:57:47.945727] process    (D) slot 0 allocating spectral average buffer with [1024] elements
+d-Nov-2026 11:57:47.945998] process    (D) slot 0 allocating complex buffer with [4000 x 1024] elements
+d-Nov-2026 11:57:47.946197] process    (D) slot 0 planning FFT of length 1024
+d-Nov-2026 11:57:47.964070] process    (D) slot 1 allocating spectral buffer with [4000 x 1024] elements
+d-Nov-2026 11:57:47.964273] process    (D) slot 1 allocating spectral average buffer with [1024] elements
+d-Nov-2026 11:57:47.964391] process    (D) slot 1 allocating complex buffer with [4000 x 1024] elements
+d-Nov-2026 11:57:47.964571] process    (D) slot 1 planning FFT of length 1024
+d-Nov-2026 11:57:47.970134] process    (D) recalculation complete for block size 4000 x 1024 (A-scans x samples)
+[06-Nov-2026 11:57:47.969] VtxBaseEngine        (I) Galvo slow axis output on "Dev1/ao0", 2.500000 units/volt
+[06-Nov-2026 11:57:47.969] VtxBaseEngine        (I) Galvo fast axis output on "Dev1/ao1", 2.500000 units/volt
+d-Nov-2026 11:57:47.970555] output     (D) creating analog output Dev1/ao0 with range [-3 V, 3 V] and scale 2.5 lu/v
+d-Nov-2026 11:57:47.971394] output     (D) creating analog output Dev1/ao1 with range [-3 V, 3 V] and scale 2.5 lu/v
+d-Nov-2026 11:57:47.971539] output     (D) configuring sample clock from pfi12 expecting 400000 samples/second with 1x upsampling and 4000 samples/block
+d-Nov-2026 11:57:47.971635] output     (D) disabling regeneration
+d-Nov-2026 11:57:47.971709] output     (D) setting output buffer of 128000 samples/channel
+d-Nov-2026 11:57:47.972032] output     (D) NI DAQmx Worker thread entered
+[06-Nov-2026 11:57:47.971] GUIHelper(raster)    (I) Create StackDeviceTensorEndpointInt8 with shape (400, 400, 512)
+[06-Nov-2026 11:57:47.971] GUIHelper(raster)    (I) Create SpectraStackHostTensorEndpointUInt16 with shape (400, 400, 1024)
+[06-Nov-2026 11:57:48.002] GUIHelper(raster)    (I) tab 0 has index 0
+[06-Nov-2026 11:57:48.002] GUIHelper(raster)    (I) tab 1 has index 1
+[06-Nov-2026 11:57:48.031] GUIHelper(raster)    (I) tab 0 has index 0
+[06-Nov-2026 11:57:48.031] GUIHelper(raster)    (I) tab 1 has index 1
+[06-Nov-2026 11:57:48.031] GUIHelper(aiming)    (I) Create StackDeviceTensorEndpointInt8 with shape (1500, 500, 512)
+[06-Nov-2026 11:57:48.032] GUIHelper(aiming)    (I) Create SpectraStackHostTensorEndpointUInt16 with shape (1500, 500, 1024)
+[06-Nov-2026 11:57:48.090] GUIHelper(galvo)     (I) Create StackDeviceTensorEndpointInt8 with shape (500, 500, 512)
+[06-Nov-2026 11:57:48.090] GUIHelper(galvo)     (I) Create SpectraStackHostTensorEndpointUInt16 with shape (500, 500, 1024)
+[06-Nov-2026 11:57:48.216] GUIHelper(line)      (I) Create StackDeviceTensorEndpointInt8 with shape (1600, 250, 512)
+[06-Nov-2026 11:57:48.216] GUIHelper(line)      (I) Create StackDeviceTensorEndpointInt8 with shape (1600, 250, 512)
+[06-Nov-2026 11:57:48.216] GUIHelper(line)      (I) Create SpectraStackHostTensorEndpointUInt16 with shape (1600, 250, 1024)
+[06-Nov-2026 11:57:48.307] VtxEngine    (I) Scan line has strobe output on device line 0 with flags 8
+[06-Nov-2026 11:57:48.307] VtxEngine    (I) Adding DigitalOutput channel for strobes on device Dev1/port0
+d-Nov-2026 11:57:48.307758] strobe     (D) creating digital output Dev1/port0
+d-Nov-2026 11:57:48.308894] strobe     (D) configuring sample clock from pfi12 expecting 400000 samples/second with 1x upsampling and 4000 samples/block
+d-Nov-2026 11:57:48.309014] strobe     (D) disabling regeneration
+d-Nov-2026 11:57:48.309102] strobe     (D) setting output buffer of 128000 samples/channel
+[06-Nov-2026 11:57:48.309] VtxEngine    (I) Strobe type VolumeStrobe, line 7, flags ffffffffffffffff
+[06-Nov-2026 11:57:48.309] VtxEngine    (I) Strobe type EventStrobe, line 0, flags 8
+d-Nov-2026 11:57:48.309472] strobe     (D) NI DAQmx Worker thread entered
+d-Nov-2026 11:57:48.309492] engine     (D) requesting [4000 x 1024 x 1] buffer on host in block for spectra
+d-Nov-2026 11:57:48.309639] engine     (D) requesting [4000 x 1024 x 1] buffer on device 0 in block for spectra
+d-Nov-2026 11:57:48.309739] engine     (D) requesting [4000 x 1024 x 1] buffer on device 0 in block for A-scans
+d-Nov-2026 11:57:48.309814] line-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on device 0 for formatting
+d-Nov-2026 11:57:48.309900] line-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on host for formatting
+d-Nov-2026 11:57:48.310144] raster-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on device 0 for formatting
+d-Nov-2026 11:57:48.310275] raster-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on host for formatting
+d-Nov-2026 11:57:48.310425] galvo-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on device 0 for formatting
+d-Nov-2026 11:57:48.310509] galvo-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on host for formatting
+d-Nov-2026 11:57:48.310587] aim-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on device 0 for formatting
+d-Nov-2026 11:57:48.310661] aim-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on host for formatting
+d-Nov-2026 11:57:48.310737] galvo-spectra-endpoint-plot (D) allocating [500 x 500 x 1024] buffer on device 0 for formatting
+d-Nov-2026 11:57:48.311290] galvo-spectra-endpoint-plot (D) allocating [500 x 500 x 1024] buffer on host for endpoint
+d-Nov-2026 11:57:48.361175] stack      (D) allocating [1600 x 250 x 1024] buffer on device 0 for formatting
+d-Nov-2026 11:57:48.362180] stack      (D) allocating [1600 x 250 x 1024] buffer on host for endpoint
+d-Nov-2026 11:57:48.449313] aim-spectra-endpoint-plot (D) allocating [1500 x 500 x 1024] buffer on device 0 for formatting
+d-Nov-2026 11:57:48.450858] aim-spectra-endpoint-plot (D) allocating [1500 x 500 x 1024] buffer on host for endpoint
+d-Nov-2026 11:57:48.658575] raster-spectra-endpoint-plot (D) allocating [400 x 400 x 1024] buffer on device 0 for formatting
+d-Nov-2026 11:57:48.659113] raster-spectra-endpoint-plot (D) allocating [400 x 400 x 1024] buffer on host for endpoint
+d-Nov-2026 11:57:48.788936] raster-ascan-endpoint-plot (D) allocating [400 x 400 x 512] buffer on device 0 for endpoint
+d-Nov-2026 11:57:48.789316] line-ascan-endpoint-plot (D) allocating [1600 x 250 x 512] buffer on device 0 for endpoint
+d-Nov-2026 11:57:48.790416] aim-ascan-endpoint-plot (D) allocating [1500 x 500 x 512] buffer on device 0 for endpoint
+d-Nov-2026 11:57:48.791180] galvo-ascan-endpoint-plot (D) allocating [500 x 500 x 512] buffer on device 0 for endpoint
+d-Nov-2026 11:57:48.791599] engine     (D) allocating 128 blocks
+d-Nov-2026 11:57:50.196378] engine     (D) finished allocating blocks
+[06-Nov-2026 11:57:50.197] OCTUi        (I) Connect scan 'galvo' to engine.
+d-Nov-2026 11:57:50.219019] engine     (I) starting engine
+d-Nov-2026 11:57:50.219983] engine     (D) session starting
+d-Nov-2026 11:57:50.220527] acquire    (D) configuring acquisition on channels A with 1024 samples/record and 4000 records/block
+d-Nov-2026 11:57:50.243520] engine     (D) recycle loop entered
+d-Nov-2026 11:57:50.243650] engine     (D) format loop 0 entered
+d-Nov-2026 11:57:50.243753] engine     (D) format loop 1 entered
+d-Nov-2026 11:57:50.243859] engine     (D) format loop 2 entered
+d-Nov-2026 11:57:50.244113] engine     (D) process loop entered
+d-Nov-2026 11:57:50.244209] engine     (D) format loop 3 entered
+d-Nov-2026 11:57:50.244283] engine     (D) acquire loop entered
+d-Nov-2026 11:57:50.261771] output     (I) starting I/O
+d-Nov-2026 11:57:50.262293] strobe     (I) starting I/O
+d-Nov-2026 11:57:50.262509] acquire    (I) starting acquisition
+d-Nov-2026 11:57:50.969153] strobe     (E) error during I/O for block 34: digital write failed: (-200290) buffer underflow
+d-Nov-2026 11:57:50.969538] strobe     (I) stopping I/O
+d-Nov-2026 11:57:50.969155] output     (E) error during I/O for block 34: analog write failed: (-200290) buffer underflow
+d-Nov-2026 11:57:50.969676] output     (I) stopping I/O
+d-Nov-2026 11:57:50.969689] strobe     (W) exception while stopping: stop task: (-200290) buffer underflow
+d-Nov-2026 11:57:50.969787] output     (W) exception while stopping: stop task: (-200290) buffer underflow
+d-Nov-2026 11:57:51.440161] engine     (E) during acquisition of job 34 (block 34): analog write failed: (-200290) buffer underflow
+[06-Nov-2026 11:57:51.437] OCTUi        (E) Error event from engine.
+d-Nov-2026 11:57:51.440958] engine     (E) during acquisition of job 34 (block 34): digital write failed: (-200290) buffer underflow
+[06-Nov-2026 11:57:51.437] OCTUi        (E) Error event from engine.
+d-Nov-2026 11:57:51.441339] engine     (W) shutdown requested
+d-Nov-2026 11:57:51.443383] engine     (I) dispatching of blocks completed
+d-Nov-2026 11:57:51.443933] engine     (D) acquire loop waiting for inflight tasks to finish
+d-Nov-2026 11:57:51.443936] engine     (D) waiting for pending jobs to finish
+d-Nov-2026 11:57:51.444849] output     (E) error during I/O for block 67: analog write failed: (-200293)
+The generation is not yet started, and not enough space is available in the buffer.
+
+Configure a larger buffer, or start the generation before writing more data than will fit in the buffer.
+d-Nov-2026 11:57:51.447395] strobe     (E) error during I/O for block 67: digital write failed: (-200293)
+The generation is not yet started, and not enough space is available in the buffer.
+
+Configure a larger buffer, or start the generation before writing more data than will fit in the buffer.
+d-Nov-2026 11:57:51.451461] strobe     (E) error during I/O for block 68: digital write failed: (-200293)
+The generation is not yet started, and not enough space is available in the buffer.
+
+Configure a larger buffer, or start the generation before writing more data than will fit in the buffer.
+d-Nov-2026 11:57:51.452605] output     (E) error during I/O for block 68: analog write failed: (-200293)
+The generation is not yet started, and not enough space is available in the buffer.
+
+Configure a larger buffer, or start the generation before writing more data than will fit in the buffer.
+d-Nov-2026 11:57:51.953596] engine     (E) during acquisition of job 67 (block 67): analog write failed: (-200293)
+The generation is not yet started, and not enough space is available in the buffer.
+
+Configure a larger buffer, or start the generation before writing more data than will fit in the buffer.
+[06-Nov-2026 11:57:51.944] OCTUi        (E) Error event from engine.
+d-Nov-2026 11:57:51.953906] engine     (E) during acquisition of job 67 (block 67): digital write failed: (-200293)
+The generation is not yet started, and not enough space is available in the buffer.
+
+Configure a larger buffer, or start the generation before writing more data than will fit in the buffer.
+[06-Nov-2026 11:57:51.944] OCTUi        (E) Error event from engine.
+d-Nov-2026 11:57:51.954099] engine     (E) during acquisition of job 68 (block 68): analog write failed: (-200293)
+The generation is not yet started, and not enough space is available in the buffer.
+
+Configure a larger buffer, or start the generation before writing more data than will fit in the buffer.
+[06-Nov-2026 11:57:51.944] OCTUi        (E) Error event from engine.
+d-Nov-2026 11:57:51.954260] engine     (E) during acquisition of job 68 (block 68): digital write failed: (-200293)
+The generation is not yet started, and not enough space is available in the buffer.
+
+Configure a larger buffer, or start the generation before writing more data than will fit in the buffer.
+[06-Nov-2026 11:57:51.944] OCTUi        (E) Error event from engine.
+d-Nov-2026 11:57:51.965886] engine     (D) acquire loop exited
+d-Nov-2026 11:57:51.965891] acquire    (I) stopping acquisition
+d-Nov-2026 11:57:52.037796] engine     (D) shutting down session
+d-Nov-2026 11:57:52.037925] engine     (D) process loop exited
+d-Nov-2026 11:57:52.037927] engine     (D) format loop 0 exited
+d-Nov-2026 11:57:52.037931] engine     (D) format loop 1 exited
+d-Nov-2026 11:57:52.037933] engine     (D) format loop 2 exited
+d-Nov-2026 11:57:52.037937] engine     (D) recycle loop exited
+d-Nov-2026 11:57:52.037944] engine     (D) format loop 3 exited
+d-Nov-2026 11:57:52.038749] engine     (D) session exited
+[06-Nov-2026 11:57:56.829] OCTUi        (I) Connect scan 'raster' to engine.
+d-Nov-2026 11:57:58.474301] engine     (I) stopping engine
+d-Nov-2026 11:57:58.474476] engine     (W) exception suppressed in engine destructor: analog write failed: (-200290) buffer underflow
+d-Nov-2026 11:57:58.474615] strobe     (D) NI DAQmx Worker thread exited
+d-Nov-2026 11:57:58.475737] output     (D) NI DAQmx Worker thread exited
+d-Nov-2026 11:57:58.476573] process    (D) worker thread exited
+d-Nov-2026 11:57:58.479373] acquire    (D) worker thread exited
+[06-Nov-2026 11:57:59.266] OCTUi        (I) Laser OEM: SVM10G-9402, state: ON, Sweep mode: 1, MZI delay: 1300
+[06-Nov-2026 11:57:59.271] OCTUi        (I) Setting up OCT engine...
+[06-Nov-2026 11:57:59.271] VtxBaseEngine        (I) Using input channel Channel.A for input "A"
+d-Nov-2026 11:57:59.271599] acquire    (D) initializing Alazar board
+d-Nov-2026 11:57:59.271959] acquire    (D) worker thread entered
+d-Nov-2026 11:57:59.272381] acquire    (I) using ATS9373 (981141) PCIe x8 @ 7.5 Gbps
+d-Nov-2026 11:57:59.272809] acquire    (D) calibrating ADC using internal clock at 50000000 samples/second
+d-Nov-2026 11:57:59.432293] acquire    (D) configuring dual edge sampling off for input A
+d-Nov-2026 11:57:59.432687] acquire    (D) configuring external clock on rising edge with level 50% and AC coupling
+d-Nov-2026 11:57:59.613720] acquire    (D) configuring single external trigger on positive edge with range 0 mV (0V is TTL), DC coupling, level 10%, and delay of 127 samples
+d-Nov-2026 11:57:59.621757] acquire    (D) configuring input A with range 400 mV, impedance 50 Ohms, and DC coupling
+d-Nov-2026 11:57:59.629293] acquire    (D) configuring auxiliary I/O to pass trigger
+d-Nov-2026 11:57:59.629898] process    (D) initializing CUDA OCT processor
+d-Nov-2026 11:57:59.630094] process    (I) using NVIDIA GeForce RTX 4080 SUPER (device 0) with compute capability 8.9 and 17170956288 bytes of memory
+d-Nov-2026 11:57:59.630217] process    (D) beginning heavyweight recalculation
+d-Nov-2026 11:57:59.630219] process    (D) worker thread entered
+d-Nov-2026 11:57:59.630316] process    (D) allocating average record history buffer with [8000 x 1024] elements
+d-Nov-2026 11:57:59.630629] process    (D) allocating complex filter with [1024] elements
+d-Nov-2026 11:57:59.630838] process    (D) slot 0 allocating spectral buffer with [4000 x 1024] elements
+d-Nov-2026 11:57:59.630992] process    (D) slot 0 allocating spectral average buffer with [1024] elements
+d-Nov-2026 11:57:59.631127] process    (D) slot 0 allocating complex buffer with [4000 x 1024] elements
+d-Nov-2026 11:57:59.631270] process    (D) slot 0 planning FFT of length 1024
+d-Nov-2026 11:57:59.639022] process    (D) slot 1 allocating spectral buffer with [4000 x 1024] elements
+d-Nov-2026 11:57:59.639179] process    (D) slot 1 allocating spectral average buffer with [1024] elements
+d-Nov-2026 11:57:59.639352] process    (D) slot 1 allocating complex buffer with [4000 x 1024] elements
+d-Nov-2026 11:57:59.640417] process    (D) slot 1 planning FFT of length 1024
+d-Nov-2026 11:57:59.671944] process    (D) recalculation complete for block size 4000 x 1024 (A-scans x samples)
+[06-Nov-2026 11:57:59.671] VtxBaseEngine        (I) Galvo slow axis output on "Dev1/ao0", 2.500000 units/volt
+[06-Nov-2026 11:57:59.671] VtxBaseEngine        (I) Galvo fast axis output on "Dev1/ao1", 2.500000 units/volt
+d-Nov-2026 11:57:59.672405] output     (D) creating analog output Dev1/ao0 with range [-3 V, 3 V] and scale 2.5 lu/v
+d-Nov-2026 11:57:59.673336] output     (D) creating analog output Dev1/ao1 with range [-3 V, 3 V] and scale 2.5 lu/v
+d-Nov-2026 11:57:59.673463] output     (D) configuring sample clock from pfi12 expecting 400000 samples/second with 1x upsampling and 4000 samples/block
+d-Nov-2026 11:57:59.673591] output     (D) disabling regeneration
+d-Nov-2026 11:57:59.673671] output     (D) setting output buffer of 128000 samples/channel
+d-Nov-2026 11:57:59.674021] output     (D) NI DAQmx Worker thread entered
+[06-Nov-2026 11:57:59.673] GUIHelper(raster)    (I) Create StackDeviceTensorEndpointInt8 with shape (400, 400, 512)
+[06-Nov-2026 11:57:59.673] GUIHelper(raster)    (I) Create SpectraStackHostTensorEndpointUInt16 with shape (400, 400, 1024)
+[06-Nov-2026 11:57:59.787] GUIHelper(raster)    (I) tab 0 has index 0
+[06-Nov-2026 11:57:59.788] GUIHelper(raster)    (I) tab 1 has index 1
+[06-Nov-2026 11:57:59.816] GUIHelper(raster)    (I) tab 0 has index 0
+[06-Nov-2026 11:57:59.816] GUIHelper(raster)    (I) tab 1 has index 1
+[06-Nov-2026 11:57:59.816] GUIHelper(aiming)    (I) Create StackDeviceTensorEndpointInt8 with shape (1500, 500, 512)
+[06-Nov-2026 11:57:59.817] GUIHelper(aiming)    (I) Create SpectraStackHostTensorEndpointUInt16 with shape (1500, 500, 1024)
+[06-Nov-2026 11:57:59.872] GUIHelper(galvo)     (I) Create StackDeviceTensorEndpointInt8 with shape (500, 500, 512)
+[06-Nov-2026 11:57:59.872] GUIHelper(galvo)     (I) Create SpectraStackHostTensorEndpointUInt16 with shape (500, 500, 1024)
+[06-Nov-2026 11:57:59.951] GUIHelper(line)      (I) Create StackDeviceTensorEndpointInt8 with shape (1600, 250, 512)
+[06-Nov-2026 11:57:59.951] GUIHelper(line)      (I) Create StackDeviceTensorEndpointInt8 with shape (1600, 250, 512)
+[06-Nov-2026 11:57:59.951] GUIHelper(line)      (I) Create SpectraStackHostTensorEndpointUInt16 with shape (1600, 250, 1024)
+[06-Nov-2026 11:57:59.996] VtxEngine    (I) Scan line has strobe output on device line 0 with flags 8
+[06-Nov-2026 11:57:59.997] VtxEngine    (I) Adding DigitalOutput channel for strobes on device Dev1/port0
+d-Nov-2026 11:57:59.997601] strobe     (D) creating digital output Dev1/port0
+d-Nov-2026 11:57:59.998613] strobe     (D) configuring sample clock from pfi12 expecting 400000 samples/second with 1x upsampling and 4000 samples/block
+d-Nov-2026 11:57:59.998717] strobe     (D) disabling regeneration
+d-Nov-2026 11:57:59.998806] strobe     (D) setting output buffer of 128000 samples/channel
+[06-Nov-2026 11:57:59.998] VtxEngine    (I) Strobe type VolumeStrobe, line 7, flags ffffffffffffffff
+[06-Nov-2026 11:57:59.998] VtxEngine    (I) Strobe type EventStrobe, line 0, flags 8
+d-Nov-2026 11:57:59.999156] strobe     (D) NI DAQmx Worker thread entered
+d-Nov-2026 11:57:59.999289] engine     (D) requesting [4000 x 1024 x 1] buffer on host in block for spectra
+d-Nov-2026 11:57:59.999389] engine     (D) requesting [4000 x 1024 x 1] buffer on device 0 in block for spectra
+d-Nov-2026 11:57:59.999475] engine     (D) requesting [4000 x 1024 x 1] buffer on device 0 in block for A-scans
+d-Nov-2026 11:57:59.999556] raster-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on device 0 for formatting
+d-Nov-2026 11:57:59.999636] raster-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on host for formatting
+d-Nov-2026 11:57:59.999711] aim-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on device 0 for formatting
+d-Nov-2026 11:57:59.999781] aim-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on host for formatting
+d-Nov-2026 11:57:59.999848] galvo-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on device 0 for formatting
+d-Nov-2026 11:57:59.999916] galvo-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on host for formatting
+d-Nov-2026 11:57:59.999979] line-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on device 0 for formatting
+d-Nov-2026 11:58:00.000048] line-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on host for formatting
+d-Nov-2026 11:58:00.000122] raster-spectra-endpoint-plot (D) allocating [400 x 400 x 1024] buffer on device 0 for formatting
+d-Nov-2026 11:58:00.000570] raster-spectra-endpoint-plot (D) allocating [400 x 400 x 1024] buffer on host for endpoint
+d-Nov-2026 11:58:00.029987] aim-spectra-endpoint-plot (D) allocating [1500 x 500 x 1024] buffer on device 0 for formatting
+d-Nov-2026 11:58:00.031532] aim-spectra-endpoint-plot (D) allocating [1500 x 500 x 1024] buffer on host for endpoint
+d-Nov-2026 11:58:00.209518] galvo-spectra-endpoint-plot (D) allocating [500 x 500 x 1024] buffer on device 0 for formatting
+d-Nov-2026 11:58:00.210360] galvo-spectra-endpoint-plot (D) allocating [500 x 500 x 1024] buffer on host for endpoint
+d-Nov-2026 11:58:00.325171] stack      (D) allocating [1600 x 250 x 1024] buffer on device 0 for formatting
+d-Nov-2026 11:58:00.326872] stack      (D) allocating [1600 x 250 x 1024] buffer on host for endpoint
+d-Nov-2026 11:58:00.569363] line-ascan-endpoint-plot (D) allocating [1600 x 250 x 512] buffer on device 0 for endpoint
+d-Nov-2026 11:58:00.588570] galvo-ascan-endpoint-plot (D) allocating [500 x 500 x 512] buffer on device 0 for endpoint
+d-Nov-2026 11:58:00.620477] raster-ascan-endpoint-plot (D) allocating [400 x 400 x 512] buffer on device 0 for endpoint
+d-Nov-2026 11:58:00.620767] aim-ascan-endpoint-plot (D) allocating [1500 x 500 x 512] buffer on device 0 for endpoint
+d-Nov-2026 11:58:00.621268] engine     (D) allocating 128 blocks
+d-Nov-2026 11:58:01.749710] engine     (D) finished allocating blocks
+[06-Nov-2026 11:58:01.751] OCTUi        (I) Connect scan 'raster' to engine.
+d-Nov-2026 11:58:01.768416] engine     (I) starting engine
+d-Nov-2026 11:58:01.769183] engine     (D) session starting
+d-Nov-2026 11:58:01.769505] acquire    (D) configuring acquisition on channels A with 1024 samples/record and 4000 records/block
+d-Nov-2026 11:58:01.793164] engine     (D) recycle loop entered
+d-Nov-2026 11:58:01.793263] engine     (D) format loop 1 entered
+d-Nov-2026 11:58:01.793346] engine     (D) format loop 0 entered
+d-Nov-2026 11:58:01.793436] engine     (D) format loop 3 entered
+d-Nov-2026 11:58:01.793494] engine     (D) process loop entered
+d-Nov-2026 11:58:01.793572] engine     (D) acquire loop entered
+d-Nov-2026 11:58:01.793671] engine     (D) format loop 2 entered
+d-Nov-2026 11:58:01.814010] output     (I) starting I/O
+d-Nov-2026 11:58:01.814420] strobe     (I) starting I/O
+d-Nov-2026 11:58:01.814634] acquire    (I) starting acquisition
+d-Nov-2026 11:58:02.176537] output     (E) error during I/O for block 36: analog write failed: (-200290) buffer underflow
+d-Nov-2026 11:58:02.176538] strobe     (E) error during I/O for block 36: digital write failed: (-200290) buffer underflow
+d-Nov-2026 11:58:02.177149] strobe     (I) stopping I/O
+d-Nov-2026 11:58:02.177083] output     (I) stopping I/O
+d-Nov-2026 11:58:02.177307] strobe     (W) exception while stopping: stop task: (-200290) buffer underflow
+d-Nov-2026 11:58:02.177357] output     (W) exception while stopping: stop task: (-200290) buffer underflow
+d-Nov-2026 11:58:03.013643] engine     (E) during acquisition of job 36 (block 36): analog write failed: (-200290) buffer underflow
+[06-Nov-2026 11:58:03.008] OCTUi        (E) Error event from engine.
+d-Nov-2026 11:58:03.015063] engine     (E) during acquisition of job 36 (block 36): digital write failed: (-200290) buffer underflow
+[06-Nov-2026 11:58:03.008] OCTUi        (E) Error event from engine.
+d-Nov-2026 11:58:03.015320] engine     (W) shutdown requested
+d-Nov-2026 11:58:03.021285] strobe     (E) error during I/O for block 69: digital write failed: (-200293)
+The generation is not yet started, and not enough space is available in the buffer.
+
+Configure a larger buffer, or start the generation before writing more data than will fit in the buffer.
+d-Nov-2026 11:58:03.022446] output     (E) error during I/O for block 69: analog write failed: (-200293)
+The generation is not yet started, and not enough space is available in the buffer.
+
+Configure a larger buffer, or start the generation before writing more data than will fit in the buffer.
+d-Nov-2026 11:58:03.046767] engine     (I) dispatching of blocks completed
+d-Nov-2026 11:58:03.047220] engine     (D) acquire loop waiting for inflight tasks to finish
+d-Nov-2026 11:58:03.047224] engine     (D) waiting for pending jobs to finish
+d-Nov-2026 11:58:03.051379] strobe     (E) error during I/O for block 70: digital write failed: (-200293)
+The generation is not yet started, and not enough space is available in the buffer.
+
+Configure a larger buffer, or start the generation before writing more data than will fit in the buffer.
+d-Nov-2026 11:58:03.052540] output     (E) error during I/O for block 70: analog write failed: (-200293)
+The generation is not yet started, and not enough space is available in the buffer.
+
+Configure a larger buffer, or start the generation before writing more data than will fit in the buffer.
+d-Nov-2026 11:58:03.876659] engine     (E) during acquisition of job 69 (block 69): analog write failed: (-200293)
+The generation is not yet started, and not enough space is available in the buffer.
+
+Configure a larger buffer, or start the generation before writing more data than will fit in the buffer.
+[06-Nov-2026 11:58:03.874] OCTUi        (E) Error event from engine.
+d-Nov-2026 11:58:03.877221] engine     (E) during acquisition of job 69 (block 69): digital write failed: (-200293)
+The generation is not yet started, and not enough space is available in the buffer.
+
+Configure a larger buffer, or start the generation before writing more data than will fit in the buffer.
+[06-Nov-2026 11:58:03.874] OCTUi        (E) Error event from engine.
+d-Nov-2026 11:58:03.877647] engine     (E) during acquisition of job 70 (block 70): analog write failed: (-200293)
+The generation is not yet started, and not enough space is available in the buffer.
+
+Configure a larger buffer, or start the generation before writing more data than will fit in the buffer.
+[06-Nov-2026 11:58:03.874] OCTUi        (E) Error event from engine.
+d-Nov-2026 11:58:03.878091] engine     (E) during acquisition of job 70 (block 70): digital write failed: (-200293)
+The generation is not yet started, and not enough space is available in the buffer.
+
+Configure a larger buffer, or start the generation before writing more data than will fit in the buffer.
+[06-Nov-2026 11:58:03.874] OCTUi        (E) Error event from engine.
+d-Nov-2026 11:58:03.926812] engine     (D) acquire loop exited
+d-Nov-2026 11:58:03.926821] acquire    (I) stopping acquisition
+d-Nov-2026 11:58:03.977955] engine     (D) shutting down session
+d-Nov-2026 11:58:03.978076] engine     (D) process loop exited
+d-Nov-2026 11:58:03.978086] engine     (D) format loop 0 exited
+d-Nov-2026 11:58:03.978087] engine     (D) format loop 1 exited
+d-Nov-2026 11:58:03.978096] engine     (D) format loop 2 exited
+d-Nov-2026 11:58:03.978105] engine     (D) recycle loop exited
+d-Nov-2026 11:58:03.978169] engine     (D) format loop 3 exited
+d-Nov-2026 11:58:03.978919] engine     (D) session exited
+d-Nov-2026 11:58:11.282251] engine     (I) stopping engine
+d-Nov-2026 11:58:11.282410] engine     (W) exception suppressed in engine destructor: analog write failed: (-200290) buffer underflow
+d-Nov-2026 11:58:11.282556] strobe     (D) NI DAQmx Worker thread exited
+d-Nov-2026 11:58:11.283680] output     (D) NI DAQmx Worker thread exited
+d-Nov-2026 11:58:11.284417] process    (D) worker thread exited
+d-Nov-2026 11:58:11.287943] acquire    (D) worker thread exited
+[06-Nov-2026 11:58:12.044] OCTUi        (I) Laser OEM: SVM10G-9402, state: ON, Sweep mode: 1, MZI delay: 1300
+[06-Nov-2026 11:58:12.048] OCTUi        (I) Setting up OCT engine...
+[06-Nov-2026 11:58:12.049] VtxBaseEngine        (I) Using input channel Channel.A for input "A"
+d-Nov-2026 11:58:12.049971] acquire    (D) initializing Alazar board
+d-Nov-2026 11:58:12.050277] acquire    (D) worker thread entered
+d-Nov-2026 11:58:12.050293] acquire    (I) using ATS9373 (981141) PCIe x8 @ 7.5 Gbps
+d-Nov-2026 11:58:12.050506] acquire    (D) calibrating ADC using internal clock at 50000000 samples/second
+d-Nov-2026 11:58:12.210119] acquire    (D) configuring dual edge sampling off for input A
+d-Nov-2026 11:58:12.211319] acquire    (D) configuring external clock on rising edge with level 50% and AC coupling
+d-Nov-2026 11:58:12.392433] acquire    (D) configuring single external trigger on positive edge with range 0 mV (0V is TTL), DC coupling, level 10%, and delay of 127 samples
+d-Nov-2026 11:58:12.400239] acquire    (D) configuring input A with range 400 mV, impedance 50 Ohms, and DC coupling
+d-Nov-2026 11:58:12.408169] acquire    (D) configuring auxiliary I/O to pass trigger
+d-Nov-2026 11:58:12.409383] process    (D) initializing CUDA OCT processor
+d-Nov-2026 11:58:12.409521] process    (I) using NVIDIA GeForce RTX 4080 SUPER (device 0) with compute capability 8.9 and 17170956288 bytes of memory
+d-Nov-2026 11:58:12.409625] process    (D) beginning heavyweight recalculation
+d-Nov-2026 11:58:12.409694] process    (D) worker thread entered
+d-Nov-2026 11:58:12.409732] process    (D) allocating average record history buffer with [8000 x 1024] elements
+d-Nov-2026 11:58:12.410052] process    (D) allocating complex filter with [1024] elements
+d-Nov-2026 11:58:12.410198] process    (D) slot 0 allocating spectral buffer with [4000 x 1024] elements
+d-Nov-2026 11:58:12.410545] process    (D) slot 0 allocating spectral average buffer with [1024] elements
+d-Nov-2026 11:58:12.410602] process    (D) slot 0 allocating complex buffer with [4000 x 1024] elements
+d-Nov-2026 11:58:12.410748] process    (D) slot 0 planning FFT of length 1024
+d-Nov-2026 11:58:12.417226] process    (D) slot 1 allocating spectral buffer with [4000 x 1024] elements
+d-Nov-2026 11:58:12.417454] process    (D) slot 1 allocating spectral average buffer with [1024] elements
+d-Nov-2026 11:58:12.417581] process    (D) slot 1 allocating complex buffer with [4000 x 1024] elements
+d-Nov-2026 11:58:12.417847] process    (D) slot 1 planning FFT of length 1024
+d-Nov-2026 11:58:12.444490] process    (D) recalculation complete for block size 4000 x 1024 (A-scans x samples)
+[06-Nov-2026 11:58:12.444] VtxBaseEngine        (I) Galvo slow axis output on "Dev1/ao0", 2.500000 units/volt
+[06-Nov-2026 11:58:12.444] VtxBaseEngine        (I) Galvo fast axis output on "Dev1/ao1", 2.500000 units/volt
+d-Nov-2026 11:58:12.445196] output     (D) creating analog output Dev1/ao0 with range [-3 V, 3 V] and scale 2.5 lu/v
+d-Nov-2026 11:58:12.446143] output     (D) creating analog output Dev1/ao1 with range [-3 V, 3 V] and scale 2.5 lu/v
+d-Nov-2026 11:58:12.446313] output     (D) configuring sample clock from pfi12 expecting 400000 samples/second with 1x upsampling and 4000 samples/block
+d-Nov-2026 11:58:12.446458] output     (D) disabling regeneration
+d-Nov-2026 11:58:12.446522] output     (D) setting output buffer of 128000 samples/channel
+d-Nov-2026 11:58:12.446846] output     (D) NI DAQmx Worker thread entered
+[06-Nov-2026 11:58:12.446] GUIHelper(raster)    (I) Create StackDeviceTensorEndpointInt8 with shape (400, 400, 512)
+[06-Nov-2026 11:58:12.446] GUIHelper(raster)    (I) Create SpectraStackHostTensorEndpointUInt16 with shape (400, 400, 1024)
+[06-Nov-2026 11:58:12.479] GUIHelper(raster)    (I) tab 0 has index 0
+[06-Nov-2026 11:58:12.479] GUIHelper(raster)    (I) tab 1 has index 1
+[06-Nov-2026 11:58:12.508] GUIHelper(raster)    (I) tab 0 has index 0
+[06-Nov-2026 11:58:12.509] GUIHelper(raster)    (I) tab 1 has index 1
+[06-Nov-2026 11:58:12.509] GUIHelper(aiming)    (I) Create StackDeviceTensorEndpointInt8 with shape (1500, 500, 512)
+[06-Nov-2026 11:58:12.509] GUIHelper(aiming)    (I) Create SpectraStackHostTensorEndpointUInt16 with shape (1500, 500, 1024)
+[06-Nov-2026 11:58:12.565] GUIHelper(galvo)     (I) Create StackDeviceTensorEndpointInt8 with shape (500, 500, 512)
+[06-Nov-2026 11:58:12.565] GUIHelper(galvo)     (I) Create SpectraStackHostTensorEndpointUInt16 with shape (500, 500, 1024)
+[06-Nov-2026 11:58:12.699] GUIHelper(line)      (I) Create StackDeviceTensorEndpointInt8 with shape (1600, 250, 512)
+[06-Nov-2026 11:58:12.699] GUIHelper(line)      (I) Create StackDeviceTensorEndpointInt8 with shape (1600, 250, 512)
+[06-Nov-2026 11:58:12.699] GUIHelper(line)      (I) Create SpectraStackHostTensorEndpointUInt16 with shape (1600, 250, 1024)
+[06-Nov-2026 11:58:12.895] VtxEngine    (I) Scan line has strobe output on device line 0 with flags 8
+[06-Nov-2026 11:58:12.895] VtxEngine    (I) Adding DigitalOutput channel for strobes on device Dev1/port0
+d-Nov-2026 11:58:12.896501] strobe     (D) creating digital output Dev1/port0
+d-Nov-2026 11:58:12.897542] strobe     (D) configuring sample clock from pfi12 expecting 400000 samples/second with 1x upsampling and 4000 samples/block
+d-Nov-2026 11:58:12.897653] strobe     (D) disabling regeneration
+d-Nov-2026 11:58:12.897726] strobe     (D) setting output buffer of 128000 samples/channel
+[06-Nov-2026 11:58:12.897] VtxEngine    (I) Strobe type VolumeStrobe, line 7, flags ffffffffffffffff
+[06-Nov-2026 11:58:12.897] VtxEngine    (I) Strobe type EventStrobe, line 0, flags 8
+d-Nov-2026 11:58:12.898082] strobe     (D) NI DAQmx Worker thread entered
+d-Nov-2026 11:58:12.898111] engine     (D) requesting [4000 x 1024 x 1] buffer on host in block for spectra
+d-Nov-2026 11:58:12.898244] engine     (D) requesting [4000 x 1024 x 1] buffer on device 0 in block for spectra
+d-Nov-2026 11:58:12.898319] engine     (D) requesting [4000 x 1024 x 1] buffer on device 0 in block for A-scans
+d-Nov-2026 11:58:12.898395] aim-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on device 0 for formatting
+d-Nov-2026 11:58:12.898483] aim-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on host for formatting
+d-Nov-2026 11:58:12.898563] line-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on device 0 for formatting
+d-Nov-2026 11:58:12.898674] line-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on host for formatting
+d-Nov-2026 11:58:12.898750] galvo-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on device 0 for formatting
+d-Nov-2026 11:58:12.898819] galvo-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on host for formatting
+d-Nov-2026 11:58:12.898891] raster-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on device 0 for formatting
+d-Nov-2026 11:58:12.898970] raster-spectra-endpoint (D) allocating [0 x 0 x 0 x 1] buffer on host for formatting
+d-Nov-2026 11:58:12.899043] stack      (D) allocating [1600 x 250 x 1024] buffer on device 0 for formatting
+d-Nov-2026 11:58:12.899941] stack      (D) allocating [1600 x 250 x 1024] buffer on host for endpoint
+d-Nov-2026 11:58:13.016281] aim-spectra-endpoint-plot (D) allocating [1500 x 500 x 1024] buffer on device 0 for formatting
+d-Nov-2026 11:58:13.048388] aim-spectra-endpoint-plot (D) allocating [1500 x 500 x 1024] buffer on host for endpoint
+d-Nov-2026 11:58:13.290013] raster-spectra-endpoint-plot (D) allocating [400 x 400 x 1024] buffer on device 0 for formatting
+d-Nov-2026 11:58:13.290508] raster-spectra-endpoint-plot (D) allocating [400 x 400 x 1024] buffer on host for endpoint
+d-Nov-2026 11:58:13.380756] galvo-spectra-endpoint-plot (D) allocating [500 x 500 x 1024] buffer on device 0 for formatting
+d-Nov-2026 11:58:13.418846] galvo-spectra-endpoint-plot (D) allocating [500 x 500 x 1024] buffer on host for endpoint
+d-Nov-2026 11:58:13.681126] galvo-ascan-endpoint-plot (D) allocating [500 x 500 x 512] buffer on device 0 for endpoint
+d-Nov-2026 11:58:13.705672] aim-ascan-endpoint-plot (D) allocating [1500 x 500 x 512] buffer on device 0 for endpoint
+d-Nov-2026 11:58:13.758070] line-ascan-endpoint-plot (D) allocating [1600 x 250 x 512] buffer on device 0 for endpoint
+[06-Nov-2026 11:58:14.174] OCTUi        (E) Failed to start the OCT engine
+Traceback (most recent call last):
+  File "C:\work\vortup\OCTUi.py", line 206, in startClicked
+    self._vtxengine = VtxEngine(self._params, self._guihelpers)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\work\vortup\VtxEngine.py", line 97, in __init__
+    engine.prepare()
+RuntimeError: unable to allocate device memory of 204800000 bytes on device 0: (2) cudaErrorMemoryAllocation
+d-Nov-2026 11:58:14.175661] strobe     (D) NI DAQmx Worker thread exited
+d-Nov-2026 11:58:14.176201] output     (D) NI DAQmx Worker thread exited
+d-Nov-2026 11:58:14.176481] process    (D) worker thread exited
+d-Nov-2026 11:58:14.187187] acquire    (D) worker thread exited
