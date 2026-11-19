@@ -323,103 +323,103 @@ class OCTUi(QObject):
     def aggregateSegmentCallback(self, v):
         self._logger.info("aggregateSegmentCallback({0:s})".format(str(v)))
 
-    def volumeCallback(self, arg0, arg1, arg2):
-        """volume callback that is (should be) called prior to other volume callbacks.
-        Because of that arrangement, this callback will open storage. Same storage is closed
-        in volumeCallback2
+    def volumeCallback(self, sample_idx, scan_idx, volume_idx):
+        """Volume callback of the null endpoint: lets the current helper handle the end of a volume.
+
+        Saving is handled in volumeCallback2 (the storage endpoint's callback), not here. This
+        callback runs before the storage endpoint has written the block that ended the volume, so
+        storage opened here would receive the end of the volume just finished.
 
         Args:
             sample_idx (int): sample index
             scan_idx (int): scan index
             volume_idx (int): volume index
         """
-
-        # self._logger.info("volumeCallback:({0:d}, {1:d}, {2:d}),helper={3:s})".format(arg0, arg1, arg2, "octui"))
-
-        # shape for raster is (BperV, AperB, depth)
-        # For an aiming scan, each "cross" consists of 2 b-scans
-
         helper = self._guihelpers[self._params.scn.current_index]
-        #self._logger.info("volumeCallback:({0:d}, {1:d}, {2:d}),helper={3:s})".format(arg0, arg1, arg2, helper.name))
+        helper.volume(sample_idx, scan_idx, volume_idx)
 
-        # call helper's volume method
-        helper.volume(arg0, arg1, arg2)
+    def volumeCallback2(self, sample_idx, scan_idx, volume_idx):
+        """Volume callback of the storage endpoint: opens and closes the storage for saving volumes.
 
-        shape = helper.components.spectra_endpoint.tensor.shape
-        # self._logger.info("volumeCallback:({0:d}, {1:d}, {2:d}),helper={3:s},shape={4},tensor={5}".format(arg0, arg1, arg2, helper.name, shape, helper.components.spectra_endpoint.tensor))
-        # self._logger.info("volumeCallback({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
-        if self._savingVolumesRequested:
+        vortex calls this at a volume boundary, after the storage endpoint has written the volume
+        that just ended and before it writes the next one (also when one block holds the end of
+        one volume and the start of the next). So:
 
-            self._logger.info("volumeCallback({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(arg0, arg1, arg2, helper.name,shape[0], shape[1], shape[2]))
+        - If saving was requested, open the storage now: the first volume written to it is the
+          next one, complete from its first A-scan.
+        - If saving is in progress, the volume that just ended has been fully written: count it,
+          and close the storage once enough volumes are saved (or Stop was pressed).
 
-            (bOK, baseFilename) = self.checkFileSaveStuff()
-            if bOK:
-                import numpy as np
-
-                with helper.components.spectra_endpoint.tensor as volume:
-                    tmpFilename = baseFilename + ".dat"
-                    with open(tmpFilename, 'wb') as f:
-                        np.save(f, volume) 
-                        self._logger.info("Saved data to {0:s}".format(tmpFilename))
-
-
-
-
-                # Create SimpleStackConfig to config storage
-                npsc = SimpleStackConfig()
-
-                # shape is a mystery. Let's just copy what the endpoint is.
-                # TODO Must figure out why this volume doesn't match acq params (see esp. non-raster scan)
-                # npsc.shape = (self._params.scn.bscans_per_volume, self._params.scn.ascans_per_bscan, self._params.acq.samples_per_ascan, 1)
-                self._logger.info(
-                    "volumeCallback:({0:d}, {1:d}, {2:d}),helper={3:s},shape=({4:d},{5:d},{6:d})".format(
-                        arg0, arg1, arg2, helper.name, shape[0], shape[1], shape[2]
-                    )
-                )
-                npsc.shape = [shape[0], shape[1], shape[2], 1]
-                npsc.header = SimpleStackHeader.NumPy
-                npsc.path = baseFilename + ".npy"
-                self._logger.info("Open storage at {0:s}.".format(baseFilename))
-                helper.components.storage.open(npsc)
-                self._savingVolumesNow = True
-                self._savingVolumesRequested = False
-                # self._savingVolumesThisMany = SHOULD HAVE BEEN SET IN PB CALLBACK WHEN SAVING VOLUMES REQUESTED
-                self._savingVolumesThisManySaved = 0
-                self._octDialog.gbSaveVolumes.enableSaving(False, self._savingVolumesThisMany == 0)
-
-                # now write metadata file (same as conf file)
-                self._params.save(baseFilename + ".conf")
-            else:
-                self._logger.warning("Cannot open file {0:s} for saving.".format(baseFilename))
-                self._savingVolumesRequested = False
-
-    def volumeCallback2(self, arg0, arg1, arg2):
-        """This callback will close a file if opened.
+        The two cases are exclusive, so the volume end that opens the storage never counts.
 
         Args:
-            arg0 (_type_): _description_
-            arg1 (_type_): _description_
-            arg2 (_type_): _description_
+            sample_idx (int): sample index
+            scan_idx (int): scan index
+            volume_idx (int): volume index
         """
-        # self._logger.info("volumeCallback:({0:d}, {1:d}, {2:d}),helper={3:s})".format(arg0, arg1, arg2, "octui-2"))
-
+        helper = self._guihelpers[self._params.scn.current_index]
         if self._savingVolumesNow:
-            # this is called after the current volume has been written
-            self._savingVolumesThisManySaved = self._savingVolumesThisManySaved + 1
-
+            self._savingVolumesThisManySaved += 1
             if self._savingVolumesStopNow or (
                 self._savingVolumesThisMany > 0 and self._savingVolumesThisManySaved == self._savingVolumesThisMany
             ):
-                self._logger.info("Saved {0:d} volumes.".format(self._savingVolumesThisManySaved))
-                # close file
-                self._savingVolumesNow = False
-                self._savingVolumesStopNow = False
-                self._savingVolumesThisManySaved = 0
-                self._savingVolumesThisMany = 0
-                self._savingVolumesRequested = False
-                helper = self._guihelpers[self._params.scn.current_index]
-                helper.components.storage.close()
-                self._octDialog.gbSaveVolumes.enableSaving(True)
+                self._closeStorage(helper)
+        elif self._savingVolumesRequested:
+            self._openStorage(helper, sample_idx, scan_idx, volume_idx)
+
+    def _openStorage(self, helper: ScanGUIHelper, sample_idx: int, scan_idx: int, volume_idx: int) -> None:
+        """Open the helper's storage, and write the current params next to it. Called from volumeCallback2."""
+        shape = helper.components.spectra_endpoint.tensor.shape
+        self._logger.info(
+            "volumeCallback2(%d, %d, %d), helper=%s, shape=%s: open storage",
+            sample_idx, scan_idx, volume_idx, helper.name, str(tuple(shape)),
+        )
+
+        (bOK, baseFilename) = self.checkFileSaveStuff()
+        if not bOK:
+            self._logger.warning("Cannot open file {0:s} for saving.".format(baseFilename))
+            self._savingVolumesRequested = False
+            return
+
+        # HACK: dump the spectra endpoint's buffer. This is the volume that just ended, not the
+        # first saved volume, which starts now.
+        import numpy as np
+
+        with helper.components.spectra_endpoint.tensor as volume:
+            tmpFilename = baseFilename + ".dat"
+            with open(tmpFilename, "wb") as f:
+                np.save(f, volume)
+                self._logger.info("Saved data to {0:s}".format(tmpFilename))
+
+        # Create SimpleStackConfig to config storage
+        npsc = SimpleStackConfig()
+
+        # shape is a mystery. Let's just copy what the endpoint is.
+        # TODO Must figure out why this volume doesn't match acq params (see esp. non-raster scan)
+        npsc.shape = [shape[0], shape[1], shape[2], 1]
+        npsc.header = SimpleStackHeader.NumPy
+        npsc.path = baseFilename + ".npy"
+        self._logger.info("Open storage at {0:s}.".format(baseFilename))
+        helper.components.storage.open(npsc)
+        self._savingVolumesNow = True
+        self._savingVolumesRequested = False
+        # self._savingVolumesThisMany was set when saving was requested (saveNVolumes / saveContVolumes)
+        self._savingVolumesThisManySaved = 0
+        self._octDialog.gbSaveVolumes.enableSaving(False, self._savingVolumesThisMany == 0)
+
+        # now write metadata file (same as conf file)
+        self._params.save(baseFilename + ".conf")
+
+    def _closeStorage(self, helper: ScanGUIHelper) -> None:
+        """Close the helper's storage and reset the saving state. Called from volumeCallback2."""
+        self._logger.info("Saved {0:d} volumes.".format(self._savingVolumesThisManySaved))
+        self._savingVolumesNow = False
+        self._savingVolumesStopNow = False
+        self._savingVolumesThisManySaved = 0
+        self._savingVolumesThisMany = 0
+        self._savingVolumesRequested = False
+        helper.components.storage.close()
+        self._octDialog.gbSaveVolumes.enableSaving(True)
 
     def checkFileSaveStuff(self) -> tuple[bool, str]:
         """This function will verify that the file save root folder is accessible. If so,

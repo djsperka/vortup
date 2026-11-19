@@ -73,7 +73,13 @@ pip install -e C:\work\pkgs\vortex-tools
 - `VtxEngine` assembles the `EngineConfig`. Every helper's format planner and endpoints are added up front, and switching scan type while running only calls `scan_queue.interrupt(helper.getScan())` (`OCTUi.connectCurrentScan`). Strobes always include `VolumeStrobe(7)`.
 - Changing dispersion while running goes through `VtxEngine.update_dispersion`.
 
-**Volume saving** (`OCTUi.volumeCallback` / `volumeCallback2`): the null endpoint's volume callback runs first. It calls `helper.volume()` and, if saving was requested, opens `SimpleStackUInt16` storage under `<data root>/<YYYY-MM-DD>/<timestamp>.npy` and writes the current params next to it as `.conf`. The storage endpoint's volume callback counts saved volumes and closes the storage. The order of endpoints in `ScanGUIHelperComponents.endpoints` matters for this. The current branch also contains a hack that dumps the spectra tensor to `data.dat`.
+**Volume saving** (`OCTUi.volumeCallback` / `volumeCallback2`):
+- The null endpoint's volume callback (`volumeCallback`) only calls `helper.volume()`.
+- The storage endpoint's volume callback (`volumeCallback2`) does all the saving work:
+  - If saving was requested, it opens `SimpleStackUInt16` storage under `<data root>/<YYYY-MM-DD>/<timestamp>.npy` and writes the current params next to it as `.conf`.
+  - On later volume ends, it counts saved volumes and closes the storage when done.
+- vortex calls an endpoint's volume callback at the volume boundary, after that endpoint has written the volume that just ended and before it writes the next one, even when one block holds both. Opening the storage in the null endpoint's callback instead would put the end of the finished volume into the file, and the same volume end would then count it as saved.
+- The current branch also contains a hack that dumps the spectra tensor to `<timestamp>.dat` when the storage is opened. This is the volume that just ended, not the first saved one.
 
 **Logging**: there are two systems.
 - App code (`OCTUi`, `OCTUiParams`, `VtxEngine`, `VtxBaseEngine`, `ScanGUIHelper` and subclasses) uses Python `logging.getLogger(...)`, configured by `OCTUi.setup_logging()`.
