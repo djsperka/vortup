@@ -125,8 +125,14 @@ class MPSW(QWidget):
 
     __save_signal = Signal(int, int, name="save")
 
+    # Carries data from post_data() (any thread) to add_data() (GUI thread).
+    _post_data_signal = Signal(object, object)
+
     def __init__(self, parent=None, columns=2, rows=2):
         super().__init__(parent)
+        # QueuedConnection: add_data always runs later on this widget's (GUI) thread,
+        # even when post_data is called from a vortex callback thread.
+        self._post_data_signal.connect(self.add_data, Qt.ConnectionType.QueuedConnection)
         self._rows = rows
         self._columns = columns
         self._last_position = (0, 0)  # this will keep track of the last position that was updated
@@ -187,7 +193,16 @@ class MPSW(QWidget):
             if self._data[r][c] is None or not self._widgets[r][c]._selected:
                 return (r, c)
 
+    def post_data(self, ascan_data, spectra_data):
+        """Thread-safe version of add_data. Safe to call from vortex callbacks, which run
+        on a vortex worker thread. The arrays must be copies the caller no longer uses.
+        """
+        self._post_data_signal.emit(ascan_data, spectra_data)
+
     def add_data(self, ascan_data, spectra_data):
+        """Add an image and its data to the grid. Must be called on the GUI thread; use
+        post_data from any other thread.
+        """
         (r, c) = self._next_position()
         self._data[r][c] = MPSWData(ascan_data, spectra_data)
         self._widgets[r][c].set_image(ascan_data)

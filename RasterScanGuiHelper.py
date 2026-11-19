@@ -118,7 +118,9 @@ class RasterScanGUIHelper(ScanGUIHelper):
                     ascan_data = volume.max(axis=2).transpose().copy().get()
                     self.components.ascan_endpoint.stream.synchronize()
             # print("volume cb_volume() spectra shape ", spectra_data.shape, " ascan shape ", ascan_data.shape)
-            self._mpsw.add_data(ascan_data, spectra_data)
+            # This callback runs on a vortex worker thread. post_data hands the (copied) arrays
+            # to the GUI thread; calling add_data here would touch Qt widgets off-thread.
+            self._mpsw.post_data(ascan_data, spectra_data)
 
     def volume(self, sample_idx: int, scan_idx: int, volume_idx: int) -> None:
         """volume callback for managing plots
