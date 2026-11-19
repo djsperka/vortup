@@ -41,7 +41,13 @@ The hand-written widget class (`Foo.py`) inherits from both the Qt base class an
 
 ## vortex-tools dependency
 
-`vortex_tools` (the display widgets `RasterEnFaceWidget`, `CrossSectionImageWidget`, and the scan plotting helpers) comes from a fork at `../vortex-tools` (gitlab.com/djsperka/vortex-tools), not only from the pip package `vortex_oct_tools`. `vortex_tools.pth` (which contains `C:/work/src`) looks like a path file for site-packages that puts the fork's source on the import path. Imports such as `vortex_tools.ui.backend.ucdqt` (used in `myqt_app.py`) may exist only in some versions of the fork. Changes to plotting widgets often belong in that repo.
+`vortex_tools` (the display widgets `RasterEnFaceWidget`, `CrossSectionImageWidget`, and the scan plotting helpers) comes from a local fork at `C:\work\pkgs\vortex-tools` (origin gitlab.com/djsperka/vortex-tools, upstream gitlab.com/vortex-oct/vortex-tools). The fork is installed in the `vor2x-3.12` conda env as an editable install of the `vortex_oct_tools` package, so `import vortex_tools` resolves to `C:\work\pkgs\vortex-tools\src\vortex_tools` and edits there take effect without reinstalling. To restore the editable install:
+
+```bash
+pip install -e C:\work\pkgs\vortex-tools
+```
+
+`pip install -r requirements.txt` pins `vortex_oct_tools==0.4.0` from the package index and will replace the editable install, so reinstall the fork afterwards. The repo's `vortex_tools.pth` (`C:/work/src`) is stale and is not used. The fork has diverged from upstream (for example, `UCDNumpyImageWidget` and the qt-only backend), so imports such as `vortex_tools.ui.backend.ucdqt` (used in `myqt_app.py`) may exist only in the fork. Changes to plotting widgets often belong in that repo.
 
 ## Architecture
 
@@ -78,3 +84,8 @@ The hand-written widget class (`Foo.py`) inherits from both the Qt base class an
 ## Config and data files in the repo
 
 `octui.conf` is the seed config. `*-tupper-*.conf/.txt` and `profiler*.log*` are reference logs and configs from the instrument. Set `save_profiler_data` to write `profiler.log` (through `VORTEX_PROFILER_LOG`). It can be analyzed with the vortex profiler tool (`--statistics`).
+
+# Package Documentation
+- We use `vortex` (installed in `C:\Users\User\.conda\envs\vor2x-3.12\Lib\site-packages\vortex`).
+- Before writing code using `vortex`, inspect its source code, type stubs (`.pyi`), or docstrings in `.venv` rather than guessing APIs.
+
