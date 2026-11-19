@@ -25,12 +25,14 @@ class TraceWidget(FigureCanvas):
 
     Then ``samples`` selects which samples to show, and the result is multiplied by ``factor``.
 
-    ``yscale`` chooses the y axis: ``"linear"`` is matplotlib's ``plot``, ``"log"`` is ``semilogy``.
-    (``semilogy`` is ``plot`` after ``set_yscale("log")``, so the axes scale is set once and the
-    line is always drawn with ``plot``.)
+    ``yscale`` chooses the starting y axis: ``"linear"`` is matplotlib's ``plot``, ``"log"`` is
+    ``semilogy``. (``semilogy`` is ``plot`` after ``set_yscale("log")``, so the axes scale is set
+    separately and the line is always drawn with ``plot``.)
 
-    Works with device (cupy) and host (numpy) endpoints. Press Y on the plot to fit the y limits to
-    the data seen over one full volume.
+    Works with device (cupy) and host (numpy) endpoints. Keys (click the plot first):
+
+    - Y: fit the y limits to the data seen over one full volume.
+    - L: toggle the y axis between linear and log. Each scale keeps its own limits.
     """
 
     def __init__(
@@ -58,7 +60,9 @@ class TraceWidget(FigureCanvas):
 
         self._endpoint = endpoint
         self._title = title
-        self._yscale = yscale
+        self._yscale = yscale  # current scale; toggled with the L key
+        self._initial_yscale = yscale  # constructor's scale; saved settings are for this one
+        self._saved_ylim: dict[str, tuple[float, float]] = {}  # last limits used in each scale
         self._mode = mode
         self._ascans = ascans
         self._samples = samples
@@ -112,6 +116,59 @@ class TraceWidget(FigureCanvas):
                 self._axes.set_ylim(10**low_power, 10**hi_power)
         else:
             self._axes.set_ylim(lim[0], lim[1])
+
+    def get_ylim(self) -> tuple[float, float]:
+        """Y limits for the constructor's scale (the one saved settings are applied to).
+
+        If the plot is toggled to the other scale, returns the limits it last had in the
+        constructor's scale, or the current limits if it was never drawn in that scale.
+        """
+        if self._yscale != self._initial_yscale and self._initial_yscale in self._saved_ylim:
+            return self._saved_ylim[self._initial_yscale]
+        return tuple(self._axes.get_ylim())
+
+    def toggle_yscale(self) -> None:
+        """Switch the y axis between linear and log, keeping each scale's limits."""
+        self._saved_ylim[self._yscale] = tuple(self._axes.get_ylim())
+        new_scale = "log" if self._yscale == "linear" else "linear"
+
+        # Limits for the new scale: the ones it had last time, otherwise fit to the current trace.
+        # Log axes can't show non-positive values, so a log fit starts at the smallest positive value.
+        lim = self._saved_ylim.get(new_scale)
+        if lim is None and self._ydata is not None and len(self._ydata) > 0:
+            y = numpy.asarray(self._ydata, dtype=float)
+            if new_scale == "log":
+                y = y[y > 0]
+            if y.size > 0 and y.min() < y.max():
+                lim = (float(y.min()), float(y.max()))
+
+        if lim is None and new_scale == "log":
+            # No data to fit yet: derive positive limits from the current linear ones. A log axis
+            # must never be left with non-positive limits, or matplotlib fails when drawing ticks.
+            lo, hi = self._axes.get_ylim()
+            if hi <= 0:
+                lim = (0.1, 1.0)
+            else:
+                lim = (lo if lo > 0 else hi / 1000, hi)
+
+        self._yscale = new_scale
+        if lim is None:
+            # to linear with no data: the current (positive) log limits are valid as they are
+            self._axes.set_yscale(new_scale)
+        elif new_scale == "log":
+            # set the positive limits while still linear, so the log axis never sees bad limits;
+            # then set_ylim rounds them out to decades
+            self._axes.set_ylim(lim[0], lim[1])
+            self._axes.set_yscale(new_scale)
+            self.set_ylim(lim)
+        else:
+            # switch first: lim may be negative, which a log axis would reject
+            self._axes.set_yscale(new_scale)
+            self.set_ylim(lim)
+
+        # paintEvent only redraws when invalidated
+        self._invalidated = True
+        self.update()
 
     def flush(self):
         if self._axes is not None:
@@ -235,3 +292,5 @@ class TraceWidget(FigureCanvas):
         if e.key() == Qt.Key.Key_Y:
             if not self._update_ylim:
                 self._update_ylim = True
+        elif e.key() == Qt.Key.Key_L:
+            self.toggle_yscale()

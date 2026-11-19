@@ -47,8 +47,8 @@ class RasterScanGUIHelper(ScanGUIHelper):
         settings = {}
         settings["enface.range"] = self._raster_widget._range
         settings["cross.range"] = self._cross_widget._range
-        settings["ascan.ylim"] = list(self._ascan_trace_widget._axes.get_ylim())
-        settings["spectra.ylim"] = list(self._spectra_trace_widget._axes.get_ylim())
+        settings["ascan.ylim"] = list(self._ascan_trace_widget.get_ylim())
+        settings["spectra.ylim"] = list(self._spectra_trace_widget.get_ylim())
         return settings
 
     def getParams(self) -> RasterScanParams:

@@ -69,8 +69,8 @@ class AimingScanGUIHelper(ScanGUIHelper):
         settings = {}
         settings["cross1.range"] = self._cross_widget_1._range
         settings["cross2.range"] = self._cross_widget_2._range
-        settings["ascan.ylim"] = list(self._ascan_trace_widget._axes.get_ylim())
-        settings["spectra.ylim"] = list(self._spectra_trace_widget._axes.get_ylim())
+        settings["ascan.ylim"] = list(self._ascan_trace_widget.get_ylim())
+        settings["spectra.ylim"] = list(self._spectra_trace_widget.get_ylim())
         return settings
 
     def getScan(self) -> RadialScan:
