@@ -102,24 +102,20 @@ class RasterScanGUIHelper(ScanGUIHelper):
         # we only care if we are at index 1
         if self._tabwidget.currentIndex() == 1:
             # print("raster cb_volume({0:d},{1:d},{2:d})".format(sample_idx, scan_idx, volume_idx))
+            # Spectra endpoint is a host endpoint: volume is a numpy array. Copy it, because the
+            # data is used on the GUI thread after the endpoint lock is released.
             with self.components.spectra_endpoint.tensor as volume:
-                if isinstance(volume, np.ndarray):
-                    spectra_data = volume.copy()
-                else:
-                    spectra_data = volume.get()
+                spectra_data = volume.copy()
                 # self._logger.info("spectra nbytes: {0:d}".format(spectra_data.nbytes))
 
-            # ascan_data is a current en face image
+            # ascan_data is a current en face image.
+            # Ascan endpoint is a device endpoint: volume is a cupy array. Run the reduction on
+            # the endpoint's stream so it is ordered after vortex's writes. get() copies to host
+            # and waits for the stream, so no extra copy() or synchronize() is needed.
             with self.components.ascan_endpoint.tensor as volume:
                 # self._logger.info("ascan shape {0:d} x {1:d} x {2:d}, type {3:s}".format(shape[0], shape[1], shape[2], str(type(volume))))
-                if isinstance(volume, np.ndarray):
-                    ascan_data = volume.max(axis=2).transpose().copy()
-                else:
-                    # Run the reduction on the endpoint's stream so it is ordered after vortex's
-                    # writes. get() copies to host and waits for the stream, so no extra copy()
-                    # or synchronize() is needed.
-                    with self.components.ascan_endpoint.stream:
-                        ascan_data = volume.max(axis=2).transpose().get()
+                with self.components.ascan_endpoint.stream:
+                    ascan_data = volume.max(axis=2).transpose().get()
             # print("volume cb_volume() spectra shape ", spectra_data.shape, " ascan shape ", ascan_data.shape)
             # This callback runs on a vortex worker thread. post_data hands the (copied) arrays
             # to the GUI thread; calling add_data here would touch Qt widgets off-thread.
@@ -165,9 +161,8 @@ class RasterScanGUIHelper(ScanGUIHelper):
         sfe = StackFormatExecutor()
         sfe.initialize(sfec)
 
-        # endpoint for display of ascans
-        # When using Alazar/CUDA, this must be on the Device = StackDeviceTensorEndpointInt8.
-        # When using FileAcquisition, this must be on the Host = StackHostTensorEndpointInt8
+        # endpoint for display of ascans. Always a device endpoint (StackDeviceTensorEndpointInt8),
+        # because OCT processing is done with CUDA for every acquisition type.
         vshape = (self.params.bscans_per_volume, self.params.ascans_per_bscan, samples_to_save)
         ascan_endpoint = self._createAscanEndpoint(sfe, vshape, octuiparams.vtx, get_logger('raster-ascan-endpoint-plot', self.log_level))
 

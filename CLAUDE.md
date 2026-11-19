@@ -68,7 +68,8 @@ pip install -e C:\work\pkgs\vortex-tools
 - Adding a new scan type means adding a params dataclass, a decoder branch, a factory branch, a helper subclass and a config widget/.ui.
 
 **Engine** (`VtxBaseEngine.py` → `VtxEngine.py`):
-- `VtxBaseEngine` builds acquisition and processing according to `AcquisitionType`. `ALAZAR_ACQUISITION` uses an Alazar card with an external K-clock, AuxIO trigger out and `CUDAProcessor` with dispersion. `FILE_ACQUISITION` uses `FileAcquisition` looping over `cfg.input_file`, has no galvo, and the ascan endpoint becomes a host tensor endpoint (see `ScanGUIHelper._createAscanEndpoint`). `VtxBaseEngine` also builds the galvo `DAQmxIO`.
+- `VtxBaseEngine` builds acquisition according to `AcquisitionType`. `ALAZAR_ACQUISITION` uses an Alazar card with an external K-clock and AuxIO trigger out. `FILE_ACQUISITION` uses `FileAcquisition` looping over `cfg.input_file` and has no galvo. Both modes use the same `CUDAProcessor` with dispersion, so an NVIDIA GPU is always required. `VtxBaseEngine` also builds the galvo `DAQmxIO`.
+- Because processing is always CUDA, the ascan endpoint is always a device endpoint (`StackDeviceTensorEndpointInt8`, see `ScanGUIHelper._createAscanEndpoint`) and its tensor is a cupy array. Spectra endpoints are host endpoints, and their tensors are numpy arrays. Code that reads an ascan endpoint should reduce on the GPU under `with endpoint.stream:` and transfer with `.get()`. Only `SpectraTraceWidget`, which is given both kinds of endpoint, needs to check the array type.
 - `VtxEngine` assembles the `EngineConfig`. Every helper's format planner and endpoints are added up front, and switching scan type while running only calls `scan_queue.interrupt(helper.getScan())` (`OCTUi.connectCurrentScan`). Strobes always include `VolumeStrobe(7)`.
 - Changing dispersion while running goes through `VtxEngine.update_dispersion`.
 

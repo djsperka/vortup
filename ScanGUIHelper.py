@@ -11,7 +11,6 @@ from vortex.engine import (
     SpectraStackEndpoint,
     SpectraStackHostTensorEndpointUInt16,
     StackDeviceTensorEndpointInt8,
-    StackHostTensorEndpointInt8,
     VolumeStrobe,
 )
 from vortex.format import FormatPlanner, StackFormatExecutor
@@ -22,7 +21,7 @@ from OCTUiParams import OCTUiParams
 from ScanParams import AnyScanParams
 
 # from OCTUi import OCTUi
-from VtxEngineParams import AcquisitionType, VtxEngineParams
+from VtxEngineParams import VtxEngineParams
 
 # Scan patterns that ScanGUIHelper.getScan() can return. vortex's scan classes share no
 # common base class, so this lists the ones the helpers use; extend it for new scan types.
@@ -208,27 +207,22 @@ class ScanGUIHelper(ABC):
 
     def _createAscanEndpoint(
         self, sfe: StackFormatExecutor, shape: tuple[int, int, int], vtx: VtxEngineParams, logger
-    ) -> StackDeviceTensorEndpointInt8 | StackHostTensorEndpointInt8:
+    ) -> StackDeviceTensorEndpointInt8:
         """
-        Subclasses should call this to get the endpoint for ascans. Checks the acquisition type and returns the
-        correct endpoint type.
+        Subclasses should call this to get the endpoint for ascans. OCT processing is done with CUDA
+        for every acquisition type (see VtxBaseEngine), so the processed ascans are on the GPU and
+        this is always a device endpoint: its tensor is a cupy array.
 
         :param self: Description
         :param sfe: Stack format executor for this endpoint
         :type sfe: StackFormatExecutor
         :param shape: Endpoint shape
         :type shape: Tuple[int, int, int]
-        :param vtx: Engine parameters
+        :param vtx: Engine parameters (not currently used; kept so callers need not change)
         :type vtx: VtxEngineParams
         :param logger: Logger for the endpoint
         :return: The endpoint for ascans (post-processing)
-        :rtype: StackDeviceTensorEndpointInt8 | StackHostTensorEndpointInt8
+        :rtype: StackDeviceTensorEndpointInt8
         """
-        if vtx.acquisition_type == AcquisitionType.ALAZAR_ACQUISITION:
-            self._logger.info("Create StackDeviceTensorEndpointInt8 with shape {0:s}".format(str(shape)))
-            return StackDeviceTensorEndpointInt8(sfe, shape, logger)
-        elif vtx.acquisition_type == AcquisitionType.FILE_ACQUISITION:
-            self._logger.info("Create StackHostTensorEndpointInt8 with shape {0:s}".format(str(shape)))
-            return StackHostTensorEndpointInt8(sfe, shape, logger)
-        # NotImplementedError is a RuntimeError, so OCTUi.startClicked logs it instead of crashing.
-        raise NotImplementedError(f"No ascan endpoint for acquisition type {vtx.acquisition_type}")
+        self._logger.info("Create StackDeviceTensorEndpointInt8 with shape {0:s}".format(str(shape)))
+        return StackDeviceTensorEndpointInt8(sfe, shape, logger)

@@ -54,10 +54,9 @@ class LineScanTraceWidget(FigureCanvas):
             with self._endpoint.tensor as volume:
                 if self._mip is None:
                     self._mip = np.full((volume.shape[0], volume.shape[1]), np.nan)
-                if isinstance(volume, cp.ndarray):
+                # Ascan endpoints are device endpoints: volume is a cupy array.
+                with self._endpoint.stream:
                     self._mip[temp_list] = cp.max(volume[temp_list], axis=2).get()
-                else:
-                    self._mip[temp_list] = cp.max(volume[temp_list], axis=2)
 
                 # compute averages
                 self._ydata_a = np.nanmean(self._mip[::2], axis=0)

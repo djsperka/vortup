@@ -43,10 +43,6 @@ class SpectraTraceWidget(FigureCanvas):
         # call flush() to force a re-draw of the line (including re-doing range)
         self._is_flushed = False
 
-        # Will check if tensor is a cupy or numpy array on first time
-        # accessing ydata. After that, assume the endpoint does not change.
-        self._is_cuda_known = False
-        self._is_cuda = False
         super().__init__(fig)
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
 
@@ -64,31 +60,19 @@ class SpectraTraceWidget(FigureCanvas):
         must_plot = False
         if self._bidx >= 0:
             with self._endpoint.tensor as volume:
-                if not self._is_cuda_known:
-                    # Do this just one time - check data type
-                    if isinstance(volume, cupy.ndarray):
-                        self._is_cuda = True
-                    else:
-                        self._is_cuda = False
-                    self._is_cuda_known = True
-
-                if self._is_cuda:
+                # Get ascans 100-110 of the current bscan. This widget is given both ascan
+                # endpoints (device: cupy) and spectra endpoints (host: numpy), so bring the
+                # slice to the host if needed; everything after that is numpy.
+                ztmp = volume[self._bidx, 100:111, :]
+                if isinstance(ztmp, cupy.ndarray):
                     with self._endpoint.stream:
-                        s = slice(100, 111)
-                        ztmp = volume[self._bidx, s, :].get()
-                        zavg = ztmp.mean(axis=0)
-                        if self._zsubplot:
-                            self._ydata = (ztmp - zavg) * self._factor
-                        else:
-                            self._ydata = zavg[0:100] * self._factor
-
-                else:
-                    # look at ascan #105
-                    # get ascans 100-110
-                    s = slice(100, 111)
-                    ztmp = volume[self._bidx, s, :]
-                    zavg = ztmp.mean(axis=0)
+                        ztmp = ztmp.get()
+                zavg = ztmp.mean(axis=0)
+                if self._zsubplot:
+                    # ascan #105 minus the mean of its neighbors
                     self._ydata = (ztmp[5] - zavg) * self._factor
+                else:
+                    self._ydata = zavg[0:100] * self._factor
 
                 if self._update_ylim and not self._update_ylim_ready:
                     # This is true on the first time only.
@@ -202,10 +186,6 @@ class AscanTraceWidget(FigureCanvas):
         # call flush() to force a re-draw of the line (including re-doing range)
         self._is_flushed = False
 
-        # Will check if tensor is a cupy or numpy array on first time
-        # accessing ydata. After that, assume the endpoint does not change.
-        self._is_cuda_known = False
-        self._is_cuda = False
         super().__init__(fig)
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
 
@@ -232,20 +212,10 @@ class AscanTraceWidget(FigureCanvas):
         must_plot = False
         if self._bidx >= 0:
             with self._endpoint.tensor as volume:
-                if not self._is_cuda_known:
-                    # Do this just one time - check data type
-                    if isinstance(volume, cupy.ndarray):
-                        self._is_cuda = True
-                    else:
-                        self._is_cuda = False
-                    self._is_cuda_known = True
-
                 # get y values.  These are not normalized or anything, straight from CUDA OCT calc.
-                if self._is_cuda:
-                    with self._endpoint.stream:
-                        ytmp = volume[self._bidx].mean(axis=0).get()
-                else:
-                    ytmp = volume[self._bidx].mean(axis=0)
+                # Ascan endpoints are device endpoints: volume is a cupy array.
+                with self._endpoint.stream:
+                    ytmp = volume[self._bidx].mean(axis=0).get()
 
                 # TODO: Should this factor be here? Convert from log10 to 20*log10?
                 self._ydata = 20 * ytmp

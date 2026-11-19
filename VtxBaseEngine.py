@@ -5,7 +5,7 @@ from vortex import get_console_logger
 from vortex.acquire import AlazarAcquisition, AlazarConfig, FileAcquisition, FileAcquisitionConfig, alazar
 from vortex.engine import Block, dispersion_phasor
 from vortex.io import DAQmxConfig, DAQmxIO, daqmx
-from vortex.process import CPUProcessor, CPUProcessorConfig, CUDAProcessor, CUDAProcessorConfig
+from vortex.process import CUDAProcessor, CUDAProcessorConfig
 
 from DAQConst import getAlazarChannel
 from VtxEngineParams import AcquisitionType, VtxEngineParams
@@ -79,28 +79,6 @@ class VtxBaseEngine:
             acquire.initialize(ac)
             self._acquire = acquire
 
-            # Now set up CUDA processing
-            self._processor_config = CUDAProcessorConfig()
-
-            # match acquisition settings. The value for sample_per_record should be the recomputed value
-            # from above. This value is taken from the VtxEngineParams, but is rounded down to the closest
-            # multiple allowed by the alazar card.
-            self._processor_config.samples_per_record = ac.samples_per_record
-            self._processor_config.ascans_per_block = cfg.ascans_per_block
-            self._processor_config.slots = cfg.process_slots
-
-            # reasmpling
-            self._processor_config.resampling_samples = resampling
-
-            # spectral filter with dispersion correction
-            self._processor_config.spectral_filter = self.get_spectral_filter(cfg.dispersion, ac.samples_per_record)
-
-            # DC subtraction per block
-            self._processor_config.average_window = 2 * self._processor_config.ascans_per_block
-
-            self._processor = CUDAProcessor(get_console_logger("process", cfg.log_level))
-            self._processor.initialize(self._processor_config)
-
         elif cfg.acquisition_type == AcquisitionType.FILE_ACQUISITION:
             # Create a single block (as defined in acq settings) of ascans.
             #
@@ -136,39 +114,35 @@ class VtxBaseEngine:
             acquire.initialize(ac)
             self._acquire = acquire
 
-            # configure no processing.
-            # pc = NullProcessorConfig()
-            # pc.samples_per_record = ac.samples_per_record   #has to be same as that in AcquisitionConfig
-            # pc.ascans_per_block = cfg.ascans_per_block
-
-            # self._octprocess = NullProcessor()
-            # self._octprocess.initialize(pc)
-
-            # Now set up CPU processing
-            self._processor_config = CPUProcessorConfig()
-
-            # match acquisition settings. The value for sample_per_record should be the recomputed value
-            # from above. This value is taken from the VtxEngineParams, but is rounded down to the closest
-            # multiple allowed by the alazar card.
-            self._processor_config.samples_per_record = ac.samples_per_record
-            self._processor_config.ascans_per_block = cfg.ascans_per_block
-            self._processor_config.slots = cfg.process_slots
-
-            # reasmpling
-            self._processor_config.resampling_samples = resampling
-
-            # spectral filter with dispersion correction
-            self._processor_config.spectral_filter = self.get_spectral_filter(cfg.dispersion, ac.samples_per_record)
-
-            # DC subtraction per block
-            self._processor_config.average_window = 2 * self._processor_config.ascans_per_block
-
-            self._processor = CPUProcessor(get_console_logger("process", cfg.log_level))
-            self._processor.initialize(self._processor_config)
-
         else:
             # NotImplementedError is a RuntimeError, so OCTUi.startClicked logs it instead of crashing.
             raise NotImplementedError(f"No acquisition/processing set up for acquisition type {cfg.acquisition_type}")
+
+        #
+        # OCT processing
+        #
+        # CUDA processing for every acquisition type. Acquisition blocks are pinned host memory whether
+        # they come from the Alazar card or a file, so CUDAProcessor takes either. Processed A-scans are
+        # on the GPU, so A-scan endpoints are always device (cupy) endpoints.
+        self._processor_config = CUDAProcessorConfig()
+
+        # match acquisition settings. For Alazar, samples_per_record is the value recomputed above
+        # (rounded to a multiple the card allows), not necessarily the one in VtxEngineParams.
+        self._processor_config.samples_per_record = ac.samples_per_record
+        self._processor_config.ascans_per_block = cfg.ascans_per_block
+        self._processor_config.slots = cfg.process_slots
+
+        # resampling
+        self._processor_config.resampling_samples = resampling
+
+        # spectral filter with dispersion correction
+        self._processor_config.spectral_filter = self.get_spectral_filter(cfg.dispersion, ac.samples_per_record)
+
+        # DC subtraction per block
+        self._processor_config.average_window = 2 * self._processor_config.ascans_per_block
+
+        self._processor = CUDAProcessor(get_console_logger("process", cfg.log_level))
+        self._processor.initialize(self._processor_config)
 
         # Save the number of samples per record that we settled on.
         self._samples_per_record = self._processor.config.samples_per_record
