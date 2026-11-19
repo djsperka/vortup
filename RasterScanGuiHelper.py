@@ -106,7 +106,7 @@ class RasterScanGUIHelper(ScanGUIHelper):
                 if isinstance(volume, np.ndarray):
                     spectra_data = volume.copy()
                 else:
-                    spectra_data = volume.copy().get()
+                    spectra_data = volume.get()
                 # self._logger.info("spectra nbytes: {0:d}".format(spectra_data.nbytes))
 
             # ascan_data is a current en face image
@@ -115,8 +115,11 @@ class RasterScanGUIHelper(ScanGUIHelper):
                 if isinstance(volume, np.ndarray):
                     ascan_data = volume.max(axis=2).transpose().copy()
                 else:
-                    ascan_data = volume.max(axis=2).transpose().copy().get()
-                    self.components.ascan_endpoint.stream.synchronize()
+                    # Run the reduction on the endpoint's stream so it is ordered after vortex's
+                    # writes. get() copies to host and waits for the stream, so no extra copy()
+                    # or synchronize() is needed.
+                    with self.components.ascan_endpoint.stream:
+                        ascan_data = volume.max(axis=2).transpose().get()
             # print("volume cb_volume() spectra shape ", spectra_data.shape, " ascan shape ", ascan_data.shape)
             # This callback runs on a vortex worker thread. post_data hands the (copied) arrays
             # to the GUI thread; calling add_data here would touch Qt widgets off-thread.
