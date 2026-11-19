@@ -27,7 +27,7 @@ from OCTUiParams import OCTUiParams
 from ScanConfigWidget import RasterScanConfigWidget
 from ScanGUIHelper import ScanGUIHelper, ScanGUIHelperComponents
 from ScanParams import RasterScanParams
-from TraceWidget import SpectraTraceWidget
+from TraceWidget import TraceWidget
 
 
 class RasterScanGUIHelper(ScanGUIHelper):
@@ -205,9 +205,23 @@ class RasterScanGUIHelper(ScanGUIHelper):
         self._tabwidget = QTabWidget()
         self._raster_widget = RasterEnFaceWidget(ascan_endpoint, cmap=mpl.colormaps["gray"])
         self._cross_widget = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps["gray"])
-        # self._ascan_trace_widget = AscanTraceWidget(ascan_endpoint, title="ascan")
-        self._ascan_trace_widget = SpectraTraceWidget(ascan_endpoint, title="ascan", factor=10, zsubplot=False)
-        self._spectra_trace_widget = SpectraTraceWidget(spectra_endpoint, title="raw spectra")
+        self._ascan_trace_widget = TraceWidget(
+            ascan_endpoint,
+            title="ascan",
+            mode="mean",
+            samples=slice(0, 100),
+            factor=10,
+            xlabel="K-clock sample",
+            ylabel="mV",
+        )
+        self._spectra_trace_widget = TraceWidget(
+            spectra_endpoint,
+            title="raw spectra",
+            mode="deviation",
+            factor=800 / 2**16,
+            xlabel="K-clock sample",
+            ylabel="mV",
+        )
         self._mpsw = MPSW(parent=None, columns=3, rows=3)
         self._mpsw.save.connect(self._savedata)
 

@@ -35,16 +35,17 @@ then transfer.** For example:
 
 - `RasterEnFaceWidget` takes the max projection on the GPU and transfers only the B×A image, not the
   B×A×Z volume (`vortex_tools/ui/display.py`).
-- `SpectraTraceWidget` pulls only 11 A-scans (`TraceWidget.py`).
+- `TraceWidget` pulls only the A-scans it averages (11 by default; a whole B-scan for the log
+  A-scan plots).
 
 **Where the array type is still checked:**
 
-- `SpectraTraceWidget` is the only vortup widget that checks the type. It is given both kinds of
-  endpoint (raster uses it for the A-scan endpoint and for the spectra endpoint). It slices the data,
-  calls `.get()` only if the slice is a cupy array, and then runs one shared numpy path.
+- `TraceWidget` is the only vortup widget that checks the type. It is given both kinds of endpoint
+  (the A-scan endpoint and the spectra endpoint). It slices the data, calls `.get()` only if the
+  slice is a cupy array, and then runs one shared numpy path.
 - The vortex-tools display widgets keep their `isinstance(volume, cupy.ndarray)` branches. That is
   fork code, and in vortup only the cupy branch runs.
-- `AscanTraceWidget`, `LineScanTraceWidget` and `RasterScanGUIHelper.cb_volume` assume cupy for
+- `LineScanTraceWidget` and `RasterScanGUIHelper.cb_volume` assume cupy for
   A-scans and numpy for spectra, with no branches.
 
 ## 2. Callbacks: what matters

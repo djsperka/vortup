@@ -27,7 +27,7 @@ from OCTUiParams import OCTUiParams
 from ScanConfigWidget import LineScanConfigWidget
 from ScanGUIHelper import ScanGUIHelper, ScanGUIHelperComponents
 from ScanParams import LineScanParams
-from TraceWidget import AscanTraceWidget
+from TraceWidget import TraceWidget
 
 
 class LineScanGUIHelper(ScanGUIHelper):
@@ -210,7 +210,17 @@ class LineScanGUIHelper(ScanGUIHelper):
     def getPlotWidget(self, ascan_endpoint) -> QWidget:
         # self._mpsw = MPSW()
         self._cross_widget = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps["gray"], title="Cross section")
-        self._ascan_trace_widget = AscanTraceWidget(ascan_endpoint, title="Ascan")
+        self._ascan_trace_widget = TraceWidget(
+            ascan_endpoint,
+            title="Ascan",
+            yscale="log",
+            mode="mean",
+            ascans=slice(None),
+            factor=20,
+            ylabel="log",
+            color="r",
+            grid=True,
+        )
 
         # apply settings
         if "cross.range" in self.settings:

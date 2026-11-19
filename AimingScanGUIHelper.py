@@ -25,7 +25,7 @@ from OCTUiParams import OCTUiParams
 from ScanConfigWidget import AimingScanConfigWidget
 from ScanGUIHelper import ScanGUIHelper, ScanGUIHelperComponents
 from ScanParams import AimingScanParams
-from TraceWidget import AscanTraceWidget, SpectraTraceWidget
+from TraceWidget import TraceWidget
 
 
 class AimingScanGUIHelper(ScanGUIHelper):
@@ -161,8 +161,25 @@ class AimingScanGUIHelper(ScanGUIHelper):
     def getPlotWidget(self, ascan_endpoint, spectra_endpoint) -> QWidget:
         self._cross_widget_1 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps["gray"], title="horiz")
         self._cross_widget_2 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps["gray"], title="vert")
-        self._ascan_trace_widget = AscanTraceWidget(ascan_endpoint, title="ascan")
-        self._spectra_trace_widget = SpectraTraceWidget(spectra_endpoint, title="raw spectra")
+        self._ascan_trace_widget = TraceWidget(
+            ascan_endpoint,
+            title="ascan",
+            yscale="log",
+            mode="mean",
+            ascans=slice(None),
+            factor=20,
+            ylabel="log",
+            color="r",
+            grid=True,
+        )
+        self._spectra_trace_widget = TraceWidget(
+            spectra_endpoint,
+            title="raw spectra",
+            mode="deviation",
+            factor=800 / 2**16,
+            xlabel="K-clock sample",
+            ylabel="mV",
+        )
 
         # apply settings
         if "cross1.range" in self.settings:
