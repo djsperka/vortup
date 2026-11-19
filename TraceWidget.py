@@ -1,6 +1,7 @@
 import logging
-from collections.abc import Iterable
-from typing import Literal
+import warnings
+from collections.abc import Iterable, Sequence
+from typing import Literal, Protocol
 
 import cupy
 import numpy
@@ -11,23 +12,112 @@ from qtpy.QtGui import QKeyEvent, QPaintEvent
 
 _logger = logging.getLogger(__name__)
 
-# Inheriting from FigureCanvasQTAgg.
-# FigureCanvasQTAgg is a widget. Call update() to invalidate and trigger a paintEvent.
+
+# ---------------------------------------------------------------------------------------------
+# Trace sources: turn endpoint data into the line(s) a TraceWidget draws.
+# ---------------------------------------------------------------------------------------------
 
 
-class TraceWidget(FigureCanvas):
-    """Line plot of one trace taken from the current bscan of an endpoint.
+class TraceSource(Protocol):
+    """Computes the lines for a TraceWidget.
 
-    The trace is computed from a range of ascans of the most recent bscan:
+    Called on the GUI thread inside ``with endpoint.tensor as volume``. ``volume`` is a cupy array
+    for device endpoints and a numpy array for host endpoints. Do any GPU work under
+    ``with endpoint.stream:`` and return host (numpy) arrays, one per line, all the same length.
+
+    - ``bidx``: first bscan index of the most recent segment callback.
+    - ``new_bidxs``: every bscan index received since the last call (may contain repeats).
+    """
+
+    def __call__(self, endpoint, volume, bidx: int, new_bidxs: list[int]) -> list[numpy.ndarray]: ...
+
+
+class AscanRangeTrace:
+    """One line along depth, from a range of ascans of the current bscan.
 
     - ``mode="mean"``: the mean of those ascans.
     - ``mode="deviation"``: the middle ascan of the range minus the mean of the range.
 
     Then ``samples`` selects which samples to show, and the result is multiplied by ``factor``.
+    """
+
+    def __init__(
+        self,
+        mode: Literal["deviation", "mean"] = "deviation",
+        ascans: slice = slice(100, 111),
+        samples: slice = slice(None),
+        factor: float = 1.0,
+    ):
+        if mode not in ("deviation", "mean"):
+            raise ValueError(f"mode must be 'deviation' or 'mean', not {mode!r}")
+        self.mode = mode
+        self.ascans = ascans
+        self.samples = samples
+        self.factor = factor
+
+    def __call__(self, endpoint, volume, bidx: int, new_bidxs: list[int]) -> list[numpy.ndarray]:
+        # Ascan endpoints are device endpoints (cupy); spectra endpoints are host endpoints (numpy).
+        # Bring the slice to the host if needed; everything after that is numpy.
+        ztmp = volume[bidx, self.ascans, :]
+        if isinstance(ztmp, cupy.ndarray):
+            with endpoint.stream:
+                ztmp = ztmp.get()
+        zavg = ztmp.mean(axis=0)
+        if self.mode == "deviation":
+            trace = ztmp[len(ztmp) // 2] - zavg
+        else:
+            trace = zavg
+        return [trace[self.samples] * self.factor]
+
+
+class BidirectionalProfileTrace:
+    """Two lines along the scan line, for tuning galvo delay on a bidirectional line scan.
+
+    Each bscan is reduced to its max over depth (one value per ascan). The reduced bscans are
+    kept for the whole volume, and the lines are the means of the even bscans and of the odd
+    bscans, i.e. the two sweep directions. Every bscan index received is used, not only the latest.
+    """
+
+    def __init__(self):
+        self._mip: numpy.ndarray | None = None  # bscans x ascans, NaN until a bscan arrives
+
+    def __call__(self, endpoint, volume, bidx: int, new_bidxs: list[int]) -> list[numpy.ndarray]:
+        if self._mip is None or self._mip.shape != tuple(volume.shape[:2]):
+            self._mip = numpy.full(volume.shape[:2], numpy.nan)
+        if new_bidxs:
+            if isinstance(volume, cupy.ndarray):
+                # reduce on the GPU, transfer only bscans x ascans
+                with endpoint.stream:
+                    self._mip[new_bidxs] = volume[new_bidxs].max(axis=2).get()
+            else:
+                self._mip[new_bidxs] = volume[new_bidxs].max(axis=2)
+        with warnings.catch_warnings():
+            # before any odd (or even) bscan has arrived its line is all NaN; that's expected
+            warnings.simplefilter("ignore", RuntimeWarning)
+            return [numpy.nanmean(self._mip[0::2], axis=0), numpy.nanmean(self._mip[1::2], axis=0)]
+
+
+# ---------------------------------------------------------------------------------------------
+# The widget
+# ---------------------------------------------------------------------------------------------
+
+# Inheriting from FigureCanvasQTAgg.
+# FigureCanvasQTAgg is a widget. Call update() to invalidate and trigger a paintEvent.
+
+
+class TraceWidget(FigureCanvas):
+    """Line plot of one or more traces computed from an endpoint.
+
+    What is plotted comes from ``trace``, a TraceSource (see ``AscanRangeTrace`` and
+    ``BidirectionalProfileTrace``). If ``trace`` isn't given, an ``AscanRangeTrace`` is built from
+    ``mode``, ``ascans``, ``samples`` and ``factor``.
 
     ``yscale`` chooses the starting y axis: ``"linear"`` is matplotlib's ``plot``, ``"log"`` is
     ``semilogy``. (``semilogy`` is ``plot`` after ``set_yscale("log")``, so the axes scale is set
-    separately and the line is always drawn with ``plot``.)
+    separately and the lines are always drawn with ``plot``.)
+
+    ``color`` sets the colour of a single line; ``colors`` sets one per line. ``labels`` adds a
+    legend. ``ylim`` sets the starting y limits.
 
     Works with device (cupy) and host (numpy) endpoints. Keys (click the plot first):
 
@@ -52,36 +142,39 @@ class TraceWidget(FigureCanvas):
         ylabel: str | None = None,
         color=None,
         grid: bool = False,
+        trace: TraceSource | None = None,
+        colors: Sequence | None = None,
+        labels: Sequence[str] | None = None,
+        ylim: Sequence[float] | None = None,
     ):
         if yscale not in ("linear", "log"):
             raise ValueError(f"yscale must be 'linear' or 'log', not {yscale!r}")
-        if mode not in ("deviation", "mean"):
-            raise ValueError(f"mode must be 'deviation' or 'mean', not {mode!r}")
 
         self._endpoint = endpoint
+        self._trace = trace if trace is not None else AscanRangeTrace(mode, ascans, samples, factor)
         self._title = title
         self._yscale = yscale  # current scale; toggled with the L key
         self._initial_yscale = yscale  # constructor's scale; saved settings are for this one
         self._saved_ylim: dict[str, tuple[float, float]] = {}  # last limits used in each scale
-        self._mode = mode
-        self._ascans = ascans
-        self._samples = samples
-        self._factor = factor
         self._xlabel = xlabel
         self._ylabel = ylabel
-        self._color = color
+        self._colors = list(colors) if colors is not None else [color]
+        self._labels = list(labels) if labels is not None else None
         self._grid = grid
 
         fig = Figure(figsize=(width, height), dpi=dpi)
         self._axes = fig.add_subplot(111)
         self._setup_axes()
+        if ylim is not None:
+            self.set_ylim(ylim)
         fig.tight_layout()
 
-        self._line2d = None
+        self._line2ds: list = []
         self._xdata = None
-        self._ydata = None
+        self._ydata: list[numpy.ndarray] | None = None
         self._invalidated = False
         self._bidx = 0
+        self._pending_bidxs: list[int] = []  # every bscan index since the last paint
         self._update_ylim_start_idx = -1
         self._update_ylim_last_idx = -1
         self._update_ylim_lap = False
@@ -89,7 +182,7 @@ class TraceWidget(FigureCanvas):
         self._update_ylim_ready = False
         self._ylim_temp = [999999, -999999]
 
-        # call flush() to force a re-draw of the line (including re-doing range)
+        # call flush() to force a re-draw of the lines (including re-doing range)
         self._is_flushed = False
 
         super().__init__(fig)
@@ -106,6 +199,13 @@ class TraceWidget(FigureCanvas):
         self._axes.set_yscale(self._yscale)
         if self._grid:
             self._axes.grid(True, which="both", color="0.5")
+
+    def _finite_ydata(self) -> numpy.ndarray:
+        """All finite y values of all lines, as one flat array (empty if there are none)."""
+        if not self._ydata:
+            return numpy.empty(0)
+        y = numpy.concatenate([numpy.asarray(d, dtype=float).ravel() for d in self._ydata])
+        return y[numpy.isfinite(y)]
 
     def set_ylim(self, lim):
         if self._yscale == "log":
@@ -132,11 +232,11 @@ class TraceWidget(FigureCanvas):
         self._saved_ylim[self._yscale] = tuple(self._axes.get_ylim())
         new_scale = "log" if self._yscale == "linear" else "linear"
 
-        # Limits for the new scale: the ones it had last time, otherwise fit to the current trace.
+        # Limits for the new scale: the ones it had last time, otherwise fit to the current data.
         # Log axes can't show non-positive values, so a log fit starts at the smallest positive value.
         lim = self._saved_ylim.get(new_scale)
-        if lim is None and self._ydata is not None and len(self._ydata) > 0:
-            y = numpy.asarray(self._ydata, dtype=float)
+        if lim is None:
+            y = self._finite_ydata()
             if new_scale == "log":
                 y = y[y > 0]
             if y.size > 0 and y.min() < y.max():
@@ -174,29 +274,16 @@ class TraceWidget(FigureCanvas):
         if self._axes is not None:
             self._is_flushed = True
             self._axes.clear()
-            self._line2d = None
-
-    def _compute_trace(self, volume) -> numpy.ndarray:
-        # Ascan endpoints are device endpoints (cupy); spectra endpoints are host endpoints (numpy).
-        # Bring the slice to the host if needed; everything after that is numpy.
-        ztmp = volume[self._bidx, self._ascans, :]
-        if isinstance(ztmp, cupy.ndarray):
-            with self._endpoint.stream:
-                ztmp = ztmp.get()
-        zavg = ztmp.mean(axis=0)
-        if self._mode == "deviation":
-            # middle ascan of the range minus the mean of the range
-            trace = ztmp[len(ztmp) // 2] - zavg
-        else:
-            trace = zavg
-        return trace[self._samples] * self._factor
+            self._line2ds = []
 
     def get_xy_data(self) -> tuple[bool, bool]:
         have_data = False
         must_plot = False
         if self._bidx >= 0:
+            # take the pending indices; update_trace (vortex thread) starts a new list
+            new_bidxs, self._pending_bidxs = self._pending_bidxs, []
             with self._endpoint.tensor as volume:
-                self._ydata = self._compute_trace(volume)
+                self._ydata = self._trace(self._endpoint, volume, self._bidx, new_bidxs)
 
                 if self._update_ylim and not self._update_ylim_ready:
                     # This is true on the first time only.
@@ -222,12 +309,10 @@ class TraceWidget(FigureCanvas):
                             self._update_ylim_ready = True
 
                     self._update_ylim_last_idx = self._bidx
-                    ylow = numpy.min(self._ydata)
-                    yhi = numpy.max(self._ydata)
-                    if ylow < self._ylim_temp[0]:
-                        self._ylim_temp[0] = ylow
-                    if yhi > self._ylim_temp[1]:
-                        self._ylim_temp[1] = yhi
+                    y = self._finite_ydata()
+                    if y.size > 0:
+                        self._ylim_temp[0] = min(self._ylim_temp[0], float(y.min()))
+                        self._ylim_temp[1] = max(self._ylim_temp[1], float(y.max()))
                     _logger.debug(
                         "ylim update first %d last %d, lim (%f,%f)",
                         self._update_ylim_start_idx,
@@ -237,9 +322,14 @@ class TraceWidget(FigureCanvas):
                     )
             have_data = True
 
-            # check for x data
-            if self._xdata is None or len(self._ydata) != len(self._xdata):
-                self._xdata = list(range(1, len(self._ydata) + 1))
+            # check for x data (all lines have the same length)
+            n = len(self._ydata[0])
+            if self._xdata is None or n != len(self._xdata):
+                self._xdata = list(range(1, n + 1))
+                must_plot = True
+
+            # number of lines changed?
+            if len(self._ydata) != len(self._line2ds):
                 must_plot = True
 
             # flushed?
@@ -257,13 +347,21 @@ class TraceWidget(FigureCanvas):
         if not have_data:
             return
 
-        if must_plot or self._line2d is None:
+        if must_plot or not self._line2ds:
             # first draw, or the axes were cleared by flush(): restore labels/scale/grid too
+            for line in self._line2ds:
+                line.remove()
             self._setup_axes()
-            line2ds = self._axes.plot(self._xdata, self._ydata, color=self._color)
-            self._line2d = line2ds[0]
+            self._line2ds = []
+            for i, y in enumerate(self._ydata):
+                color = self._colors[i] if i < len(self._colors) else None
+                label = self._labels[i] if self._labels and i < len(self._labels) else None
+                self._line2ds.extend(self._axes.plot(self._xdata, y, color=color, label=label))
+            if self._labels:
+                self._axes.legend()
         else:
-            self._line2d.set_ydata(self._ydata)
+            for line, y in zip(self._line2ds, self._ydata, strict=True):
+                line.set_ydata(y)
 
         if self._update_ylim_ready:
             self._update_ylim = False
@@ -277,11 +375,12 @@ class TraceWidget(FigureCanvas):
         super().paintEvent(e)
 
     def update_trace(self, bscan_idxs: Iterable[int] = []):
-        # Set _invalidated to true and call update(). The update() call will move the actual update
-        # to the gui thread, not the daq thread.
+        # Record the indices, set _invalidated and call update(). The update() call moves the actual
+        # update to the gui thread, not the daq thread.
 
         if len(bscan_idxs) > 0:
             self._bidx = bscan_idxs[0]
+            self._pending_bidxs.extend(bscan_idxs)
             self._invalidated = True
             self.update()
 

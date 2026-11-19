@@ -41,12 +41,14 @@ then transfer.** For example:
 **Where the array type is still checked:**
 
 - `TraceWidget` is the only vortup widget that checks the type. It is given both kinds of endpoint
-  (the A-scan endpoint and the spectra endpoint). It slices the data, calls `.get()` only if the
-  slice is a cupy array, and then runs one shared numpy path.
+  (the A-scan endpoint and the spectra endpoint). Its trace sources check the type:
+  - `AscanRangeTrace` slices the data, calls `.get()` only if the slice is a cupy array, and then
+    runs one shared numpy path.
+  - `BidirectionalProfileTrace` (galvo tuning) takes the max over depth on the GPU, then calls
+    `.get()`.
 - The vortex-tools display widgets keep their `isinstance(volume, cupy.ndarray)` branches. That is
   fork code, and in vortup only the cupy branch runs.
-- `LineScanTraceWidget` and `RasterScanGUIHelper.cb_volume` assume cupy for
-  A-scans and numpy for spectra, with no branches.
+- `RasterScanGUIHelper.cb_volume` assumes cupy for A-scans and numpy for spectra, with no branches.
 
 ## 2. Callbacks: what matters
 

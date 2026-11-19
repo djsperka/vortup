@@ -21,11 +21,11 @@ from vortex.scan import RasterScan, RasterScanConfig
 from vortex.storage import SimpleStackUInt16
 from vortex_tools.ui.display import CrossSectionImageWidget
 
-from LineScanTraceWidget import LineScanTraceWidget
 from OCTUiParams import OCTUiParams
 from ScanConfigWidget import GalvoTuningScanConfigWidget
 from ScanGUIHelper import ScanGUIHelper, ScanGUIHelperComponents
 from ScanParams import GalvoTuningScanParams
+from TraceWidget import BidirectionalProfileTrace, TraceWidget
 
 
 class GalvoTuningScanGUIHelper(ScanGUIHelper):
@@ -82,7 +82,7 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
         settings = {}
         settings["cross1.range"] = self._cross_widget_1._range
         settings["cross2.range"] = self._cross_widget_2._range
-        settings["linescan.ylim"] = list(self._linescan_trace_widget._axes.get_ylim())
+        settings["linescan.ylim"] = list(self._linescan_trace_widget.get_ylim())
         return settings
 
     def getScan(self) -> RasterScan:
@@ -172,7 +172,14 @@ class GalvoTuningScanGUIHelper(ScanGUIHelper):
     def getPlotWidget(self, ascan_endpoint) -> QWidget:
         self._cross_widget_1 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps["gray"], title="one way")
         self._cross_widget_2 = CrossSectionImageWidget(ascan_endpoint, cmap=mpl.colormaps["gray"], title="other way")
-        self._linescan_trace_widget = LineScanTraceWidget(ascan_endpoint, title="Galvo tuning")
+        self._linescan_trace_widget = TraceWidget(
+            ascan_endpoint,
+            title="Galvo tuning",
+            trace=BidirectionalProfileTrace(),
+            colors=["r", "b"],
+            ylim=(0, 100),
+            xlabel="A-scan",
+        )
 
         # apply settings
         if "cross1.range" in self.settings:
